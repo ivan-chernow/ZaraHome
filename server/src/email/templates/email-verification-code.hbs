@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Код подтверждения для ZaraHome</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #faf6f2; 
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container { 
+      max-width: 500px; 
+      margin: 40px auto; 
+      background: #fff; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1); 
+      padding: 40px;
+      text-align: center;
+    }
+    .logo { 
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f5f5f5;
+    }
+    .logo h1 { 
+      color: #b48a78; 
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 1px;
+    }
+    h2 { 
+      color: #b48a78; 
+      font-size: 24px;
+      margin: 0 0 20px 0;
+    }
+    .code { 
+      font-size: 36px; 
+      letter-spacing: 8px; 
+      color: #b48a78; 
+      background: #faf6f2;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 30px 0;
+      font-weight: bold;
+      display: inline-block;
+    }
+    p {
+      margin: 20px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .footer { 
+      margin-top: 40px; 
+      font-size: 12px; 
+      color: #999; 
+      padding-top: 20px;
+      border-top: 2px solid #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>ZaraHome</h1>
+    </div>
+    <h2>Ваш код подтверждения</h2>
+    <p>
+      Для завершения регистрации в <b>ZaraHome</b><br>
+      введите этот код в форму на сайте:
+    </p>
+    <div class="code">{{code}}</div>
+    <p>
+      Код действителен в течение 24 часов.<br>
+      Если вы не запрашивали этот код,<br>
+      просто проигнорируйте это письмо.
+    </p>
+    <div class="footer">
+      &copy; {{year}} ZaraHome. Все права защищены.
+    </div>
+  </div>
+</body>
+</html>
