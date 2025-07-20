@@ -18,7 +18,7 @@ const Help = ({ title, style }) => {
           </div>
         </div>
 
-        <ul className="flex items-center justify-center  ">
+        <ul className="flex  justify-center items-center ">
           <HelpElement
             svgPath="/assets/img/Help/tg.svg"
             width="39"

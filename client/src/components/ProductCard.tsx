@@ -49,7 +49,7 @@ const ProductCard = ({
   return (
     <li
       className="
-      max-w-[300px] h-[497px]
+      w-[300px] h-[497px]
       mr-[-1px]
       bg-white
       relative

@@ -40,7 +40,7 @@ const OftenBought = () => {
         <h2 className="mb-[47px] font-light text-[42px] text-right">
           Часто с этим товаром покупают
         </h2>
-        <ul className="flex items-center justify-end mb-[60px]">
+        <ul className="flex  items-center justify-center mb-[60px]">
           {randomProducts.map((product) => (
             <ProductCard
               key={product.id}
