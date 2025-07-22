@@ -25,7 +25,7 @@ import { CartModule } from './cart/cart.module';
             password: process.env.DB_PASSWORD || 'postgres',
             database: process.env.DB_DATABASE || 'zarahome',
             entities: Object.values(entities),
-            synchronize: false,
+            synchronize: true,
             dropSchema: false,
         }),
         ThrottlerModule.forRoot([{

@@ -23,7 +23,14 @@ export class LoginController {
 
     @Post('refresh')
     async refresh(@Req() req: Request, @Res() res: Response) {
-        const refreshToken = req.cookies['refreshToken'] || req.body.refreshToken;
+        // Безопасно получаем refreshToken из cookies или body
+        const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+        // Проверяем наличие токена
+        if (!refreshToken) {
+            return res.status(400).json({ message: 'Refresh token is required' });
+        }
+
         const result = await this.loginService.refreshTokens(refreshToken, res);
         return res.json(result);
     }
