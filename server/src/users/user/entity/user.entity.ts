@@ -1,10 +1,11 @@
 import { RefreshToken } from "src/auth/login/entity/refresh-token.entity";
 import { Product } from "src/products/entity/products.entity";
 import { Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from "typeorm";
-import { Favorite } from "src/favorites/entities/favorite.entity";
+import { Favorite } from "src/favorites/entity/favorite.entity";
 
 import { Column } from "typeorm";
 import { DeliveryAddress } from "./delivery-address.entity";
+import { Cart } from "src/cart/entity/cart.entity";
 
 export enum UserRole {
     USER = 'user',
@@ -45,4 +46,7 @@ export class User {
 
     @OneToMany(() => Favorite, favorite => favorite.user)
     favorites: Favorite[];
+
+    @OneToMany(() => Cart, cart => cart.user)
+    cart: Cart[];
 }

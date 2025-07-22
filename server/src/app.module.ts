@@ -10,6 +10,7 @@ import { PromocodesModule } from './promocodes/promocodes.module';
 import { DatabaseModule } from './database/database.module';
 import * as entities from './database/entities';
 import { FavoritesModule } from './favorites/favorites.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { FavoritesModule } from './favorites/favorites.module';
         PromocodesModule,
         DatabaseModule,
         FavoritesModule,
+        CartModule,
     ],
     providers: [
         {
