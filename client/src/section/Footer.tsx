@@ -37,7 +37,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <VerticalLine className="h-auto" />
+          <VerticalLine height="h-auto" />
 
           <div className="flex-1 max-w-[200px]">
             <h2 className="text-[18px] font-semibold mb-[25px]">
@@ -60,7 +60,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <VerticalLine className="h-auto" />
+          <VerticalLine height="h-auto" />
 
           <div className="flex-1 max-w-[280px] px-[20px]">
             <h2 className="text-[18px] font-semibold mb-[25px]">Помощь</h2>
@@ -80,7 +80,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <VerticalLine className="h-auto" />
+          <VerticalLine height="h-auto" />
 
           <div className="flex-1 max-w-[250px]">
             <h2 className="text-[18px] font-semibold mb-[25px]">Контакты</h2>
