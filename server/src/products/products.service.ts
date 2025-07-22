@@ -74,4 +74,9 @@ async deleteProduct(id: number) {
     
     return categories;
   }
+
+  async findByIds(ids: number[]): Promise<Product[]> {
+    if (!ids.length) return [];
+    return this.productRepo.findByIds(ids);
+  }
 }

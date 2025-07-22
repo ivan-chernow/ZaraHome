@@ -3,12 +3,49 @@
 import React from "react";
 import MainLayout from "@/layout/MainLayout";
 import ProductCard from "@/components/ProductCard";
-import { useGetFavoritesQuery } from "@/api/favorites.api";
 import { CircularProgress } from "@mui/material";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import {
+  useGetFavoritesQuery,
+  useGetProductsByIdsQuery,
+} from "@/api/favorites.api";
 
 const Page = () => {
-  const { data: favoriteProducts, isLoading, error } = useGetFavoritesQuery();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
+  const favoriteIds = useSelector((state: RootState) => state.favorites.ids);
+
+  // Вызовы хуков только когда нужно
+  const {
+    data: serverFavorites = [],
+    isLoading: loadingServer,
+    error: errorServer,
+  } = useGetFavoritesQuery(undefined, { skip: !isAuthenticated });
+  const {
+    data: guestFavorites = [],
+    isLoading: loadingGuest,
+    error: errorGuest,
+  } = useGetProductsByIdsQuery(favoriteIds, {
+    skip: isAuthenticated,
+    refetchOnMountOrArgChange: true,
+  });
+
+  let favoriteProducts = [];
+  let isLoading = false;
+  let error = null;
+
+  if (isAuthenticated) {
+    favoriteProducts = serverFavorites;
+    isLoading = loadingServer;
+    error = errorServer;
+  } else {
+    favoriteProducts = guestFavorites;
+    isLoading = loadingGuest;
+    error = errorGuest;
+  }
 
   const renderContent = () => {
     if (isLoading) {

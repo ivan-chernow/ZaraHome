@@ -28,6 +28,9 @@ export const favoritesApi = createApi({
         getFavoriteStatus: builder.query<Record<number, boolean>, number[]>({
             query: (productIds) => `/favorites/status?productIds=${productIds.join(',')}`,
         }),
+        getProductsByIds: builder.query<Product[], number[]>({
+            query: (ids) => `/products?ids=${ids.join(',')}`,
+        }),
     }),
 });
 
@@ -36,4 +39,5 @@ export const {
     useAddToFavoritesMutation,
     useRemoveFromFavoritesMutation,
     useLazyGetFavoriteStatusQuery,
+    useGetProductsByIdsQuery,
 } = favoritesApi;

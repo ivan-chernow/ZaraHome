@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Product } from '@/api/products.api';
 
 interface FavoritesState {
     ids: number[];
@@ -13,8 +12,8 @@ const favoritesSlice = createSlice({
     name: 'favorites',
     initialState,
     reducers: {
-        setFavorites: (state, action: PayloadAction<Product[]>) => {
-            state.ids = action.payload.map(p => p.id);
+        setFavorites: (state, action: PayloadAction<number[]>) => {
+            state.ids = action.payload;
         },
         addFavorite: (state, action: PayloadAction<number>) => {
             if (!state.ids.includes(action.payload)) {
