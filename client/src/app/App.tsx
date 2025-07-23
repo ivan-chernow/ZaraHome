@@ -9,13 +9,8 @@ import WhyUs from "@/section/WhyUs";
 import Question from "@/section/Question";
 import Help from "@/section/Help";
 import Footer from "@/section/Footer";
-import LoginModal from "@/components/Login/LoginModal";
-import { RootState } from "@/store/store";
-import { useSelector } from "react-redux";
 
 export function App() {
-  const { isOpenAuth } = useSelector((state: RootState) => state.auth);
-
   return (
     <>
       <Header />
@@ -28,7 +23,6 @@ export function App() {
         <Help title="Не нашли ответ на свой вопрос?" style="justify-end" />
       </div>
       <Footer />
-      {isOpenAuth && <LoginModal />}
     </>
   );
 }
