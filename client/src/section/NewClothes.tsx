@@ -5,9 +5,10 @@ import Container from "@mui/material/Container";
 import { useGetCatalogQuery } from "@/api/products.api";
 import { getAllProducts } from "@/store/features/catalog/catalog.utils";
 import slugify from "slugify";
+import { ProductCardSkeleton } from "@/components/ProductCardSceleton";
 
 const NewClothes = () => {
-  const { data: categories } = useGetCatalogQuery();
+  const { data: categories, isLoading } = useGetCatalogQuery();
 
   const allProducts = useMemo(() => {
     if (!categories) return [];
@@ -49,9 +50,13 @@ const NewClothes = () => {
       />
       <Container maxWidth="lg">
         <ul className="flex items-center justify-center flex-wrap mt-[50px] ">
-          {newArrivals.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            : newArrivals.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
         </ul>
       </Container>
       <NewsBlockSection
@@ -64,9 +69,13 @@ const NewClothes = () => {
       />
       <Container maxWidth="lg">
         <ul className="flex items-center justify-center flex-wrap mt-[50px] ">
-          {discountedItems.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            : discountedItems.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
         </ul>
       </Container>
     </section>
