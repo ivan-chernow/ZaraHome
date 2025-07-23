@@ -5,9 +5,16 @@ import VerticalLine from "@/components/ui/VerticalLine";
 import HorizontalLine from "@/components/ui/HorizontalLine";
 import Container from "@mui/material/Container";
 import { useRouter } from "next/navigation";
+import { catalog } from "public/assets/data/catalog";
+import Link from "next/link";
+import slugify from "slugify";
 
 const Footer = () => {
   const router = useRouter();
+
+  const customSlugify = (text: string) =>
+    slugify(text.replace("й", "y"), { lower: true, strict: true });
+
   return (
     <footer className="pb-[55px] mt-auto ">
       <div className="flex justify-center w-full">
@@ -15,49 +22,36 @@ const Footer = () => {
       </div>
       <Container maxWidth="lg">
         <div className="flex justify-between pt-[24px]">
-          <div className="flex-1 max-w-[200px]">
-            <h2 className="text-[18px] font-semibold mb-[25px]">Магазин</h2>
-            <ul className="space-y-[10px]">
-              {[
-                "Спальня",
-                "Одежда и обувь",
-                "Гостиная",
-                "Кухня",
-                "Ванная комната",
-              ].map((item) => (
-                <li key={item}>
-                  <a
-                    href="#"
-                    className="text-[#00000080] hover:text-black  transition-colors cursor-pointer"
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <VerticalLine height="h-auto" />
-
-          <div className="flex-1 max-w-[200px]">
-            <h2 className="text-[18px] font-semibold mb-[25px]">
-              Дополнительно
-            </h2>
-            <ul className="space-y-[10px]">
-              {["Экстра", "Для детей"].map((item) => (
-                <li
-                  key={item}
-                  className="text-[#00000080] hover:text-black  transition-colors"
-                >
-                  <a
-                    href="#"
-                    className="text-[#00000080] hover:text-black  transition-colors cursor-pointer"
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className=" ">
+            <h2 className="text-[18px] font-semibold mb-[25px] ">Магазин</h2>
+            <div className="flex items-center justify-between">
+              <ul className="space-y-[10px] mr-[50px]">
+                {catalog.slice(0, 4).map((item) => (
+                  <li key={item.category}>
+                    <Link
+                      href={`/products/category/${customSlugify(item.link)}`}
+                    >
+                      <p className="text-[#00000080] hover:text-black transition-colors cursor-pointer">
+                        {item.category}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="space-y-[10px]">
+                {catalog.slice(4, 8).map((item) => (
+                  <li key={item.category}>
+                    <Link
+                      href={`/products/category/${customSlugify(item.link)}`}
+                    >
+                      <p className="text-[#00000080] hover:text-black transition-colors cursor-pointer">
+                        {item.category}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <VerticalLine height="h-auto" />
