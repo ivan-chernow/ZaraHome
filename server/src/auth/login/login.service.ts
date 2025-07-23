@@ -62,7 +62,18 @@ export class LoginService {
                 httpOnly: true,
                 sameSite: 'lax',
                 expires: expiresAt,
+                path: '/',
+                secure: false, // В DEV! Только в проде true
             });
+            res.json({
+                accessToken,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    role: user.role,
+                },
+            });
+            return;
         }
 
         return {
@@ -98,12 +109,21 @@ export class LoginService {
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: 'lax',
                     expires: expiresAt,
+                    path: '/',
                 });
+                res.json({
+                    accessToken: this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }, { expiresIn: '15m' }),
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role,
+                    },
+                });
+                return;
             }
 
-            const accessToken = this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }, { expiresIn: '15m' });
             return {
-                accessToken,
+                accessToken: this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }, { expiresIn: '15m' }),
                 user: {
                     id: user.id,
                     email: user.email,
@@ -118,7 +138,14 @@ export class LoginService {
     async logout(userId: number, res?: any) {
         await this.refreshTokenRepository.delete({ user: { id: userId } });
         if (res) {
-            res.clearCookie('refreshToken');
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: false, // В DEV! Только в проде true
+            });
+            res.json({ success: true, message: 'Вы успешно вышли из системы' });
+            return;
         }
         return { success: true, message: 'Вы успешно вышли из системы' };
     }
