@@ -3,6 +3,7 @@ import Image from "next/image";
 import Container from "@mui/material/Container";
 import VerticalLine from "@/components/ui/VerticalLine";
 import HorizontalLine from "@/components/ui/HorizontalLine";
+import Link from "next/link";
 
 const WhyUs = () => {
   return (
@@ -124,9 +125,11 @@ const WhyUs = () => {
               width="25"
               height="25"
             />
-            <p className="font-semibold underline pb-[3px]">
-              Смотреть все отзывы
-            </p>
+            <Link href="/reviews">
+              <p className="font-semibold underline pb-[3px]">
+                Смотреть все отзывы
+              </p>
+            </Link>
           </a>
         </div>
       </Container>
