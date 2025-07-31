@@ -41,7 +41,7 @@ const FavoriteButton = ({ productId }: FavoriteButtonProps) => {
         dispatch(removeFavorite(productId));
       } else {
         await addToFavorites(productId);
-        dispatch(setFavorites(favorites));
+        dispatch(setFavorites(favoriteIds));
       }
     } else {
       let favorites: number[];
