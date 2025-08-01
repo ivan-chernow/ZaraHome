@@ -85,14 +85,16 @@ const NavMenuPagination: React.FC<NavMenuPaginationProps> = ({
                 ))}
               </div>
 
-              {/* Пагинация */}
-              <PaginationBlock
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-                size="small"
-                className="mt-4"
-              />
+              {/* Пагинация - показываем только если есть больше одной страницы */}
+              {totalPages > 1 && (
+                <PaginationBlock
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={handlePageChange}
+                  size="small"
+                  className="mt-4"
+                />
+              )}
 
               {/* Сообщение если товаров нет */}
               {filteredProducts.length === 0 && (

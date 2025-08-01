@@ -18,7 +18,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   searchValue,
   pageSize = 12,
 }) => {
-  // Используем хук пагинации
+  // Используем хук пагинации только если есть результаты поиска
   const {
     currentPage,
     totalPages,
@@ -73,12 +73,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         ))}
       </div>
 
-      {/* Пагинация */}
-      <PaginationBlock
-        count={totalPages}
-        page={currentPage}
-        onChange={handlePageChange}
-      />
+      {/* Пагинация - показываем только если есть больше одной страницы */}
+      {totalPages > 1 && (
+        <PaginationBlock
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

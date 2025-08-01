@@ -5,7 +5,6 @@ import {
   toggleDiscounts,
   toggleNewProducts,
   toggleInformation,
-  toggleSearch,
 } from "@/store/features/catalog/navMenu.slice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -13,7 +12,6 @@ import NavMenuOpenAllProducts from "@/components/NavMenuOpenAllProducts";
 import NavMenuOpenDiscounts from "@/components/NavMenuOpenDiscounts";
 import NavMenuOpenNewProducts from "@/components/NavMenuOpenNewProducts";
 import NavMenuOpenInformation from "@/components/NavMenuOpenInformation";
-import NavMenuSearch from "@/components/NavMenuSearch";
 
 const NavMenu = () => {
   const dispatch = useDispatch();
@@ -22,7 +20,6 @@ const NavMenu = () => {
     isOpenDiscounts,
     isOpenAllProducts,
     isOpenInformation,
-    isOpenSearch,
   } = useSelector((state: RootState) => state.navMenu);
 
   const handleMouseLeave = () => {
@@ -30,7 +27,6 @@ const NavMenu = () => {
     dispatch(toggleDiscounts(false));
     dispatch(toggleNewProducts(false));
     dispatch(toggleInformation(false));
-    dispatch(toggleSearch(false));
   };
 
   const handleCloseMenu = () => {
@@ -61,12 +57,6 @@ const NavMenu = () => {
                 onMouseEnter={() => dispatch(toggleNewProducts(true))}
               >
                 <p className="text-[18px] cursor-pointer">Новинки</p>
-              </li>
-              <li
-                className="mr-[15px] cursor-pointer hover:text-[#00000080] hover:duration-200 hover:ease-in"
-                onMouseEnter={() => dispatch(toggleSearch(true))}
-              >
-                <p className="text-[18px] cursor-pointer">Поиск</p>
               </li>
               <li
                 className="mr-[15px] cursor-pointer hover:text-[#00000080] hover:duration-200 hover:ease-in"
@@ -103,14 +93,6 @@ const NavMenu = () => {
             onMouseEnter={() => dispatch(toggleNewProducts(true))}
           >
             <NavMenuOpenNewProducts />
-          </div>
-        )}
-        {isOpenSearch && (
-          <div
-            className="w-full"
-            onMouseEnter={() => dispatch(toggleSearch(true))}
-          >
-            <NavMenuSearch />
           </div>
         )}
         {isOpenInformation && (

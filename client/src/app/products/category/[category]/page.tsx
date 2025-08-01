@@ -193,11 +193,14 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
         )}
       </div>
 
-      <PaginationBlock
-        count={totalPages}
-        page={currentPage}
-        onChange={handlePageChange}
-      />
+      {/* Пагинация - показываем только если есть больше одной страницы */}
+      {totalPages > 1 && (
+        <PaginationBlock
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };
