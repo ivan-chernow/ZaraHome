@@ -1,6 +1,5 @@
 "use client";
 import React, { use, useEffect, useMemo, useRef } from "react";
-import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import HomeIcon from "@/components/ui/HomeIcon";
 import { useGetCatalogQuery } from "@/api/products.api";
@@ -11,6 +10,7 @@ import { getAllProducts } from "@/store/features/catalog/catalog.utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import PaginationBlock from "@/components/PaginationBlock";
 import { usePagination } from "@/hooks/usePagination";
+import { useSorting } from "@/hooks/useSorting";
 
 const PAGE_SIZE = 12;
 
@@ -85,7 +85,8 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
   const customSlugify = (text: string) =>
     slugify(text.replace("й", "y"), { lower: true, strict: true });
 
-  const products = useMemo(() => {
+  // Получаем базовые продукты
+  const baseProducts = useMemo(() => {
     if (!categories) return [];
     if (categorySlug === "novinki") {
       return getAllProducts(categories).filter((p) => p.isNew);
@@ -98,6 +99,16 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
       return getProductsByCategory(currentCategory);
     }
   }, [categories, categorySlug]);
+
+  // Используем хук сортировки
+  const {
+    sortType,
+    sortedProducts: products,
+    handleSortByPrice,
+    handleSortByDate,
+  } = useSorting({
+    products: baseProducts,
+  });
 
   // Используем хук пагинации
   const {
@@ -151,11 +162,18 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
       {/* Заголовок категории и сортировка + иконки справа */}
       <div className="flex flex-col mb-[60px] w-full">
         <h3 className="font-light text-[42px]">{categoryName}</h3>
+
+        {/* Кнопки сортировки напрямую */}
         <div className="flex items-center justify-end mt-[53px]">
-          <div
-            className={`flex items-center mr-[12px] cursor-pointer transition-all ease-in-out duration-300 hover:underline `}
+          <button
+            className={`flex items-center mr-[12px] cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
+              sortType === "price"
+                ? "text-blue-600 font-semibold underline"
+                : ""
+            }`}
+            onClick={handleSortByPrice}
           >
-            <Image
+            <img
               src="/assets/img/Catalog/cheap.png"
               alt="cheap"
               width={24}
@@ -164,11 +182,14 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
             <p className="text-[14px] font-semibold mr-[3px]">
               Сначала дешевые
             </p>
-          </div>
-          <div
-            className={`flex items-center cursor-pointer transition-all ease-in-out duration-300 hover:underline `}
+          </button>
+          <button
+            className={`flex items-center cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
+              sortType === "date" ? "text-blue-600 font-semibold underline" : ""
+            }`}
+            onClick={handleSortByDate}
           >
-            <Image
+            <img
               src="/assets/img/Catalog/Time_later.svg"
               alt="later"
               width={24}
@@ -177,7 +198,7 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
             <p className="text-[14px] font-semibold mr-[5px]">
               Добавлены позже
             </p>
-          </div>
+          </button>
         </div>
       </div>
 

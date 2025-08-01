@@ -52,22 +52,41 @@ const AuthCheck = () => {
             dispatch(setCredentials({ user, accessToken }));
 
             // 4. Загружаем избранное с сервера (пример через fetch, можно через RTK Query)
-            const response = await fetch("/api/favorites", {
-              headers: { Authorization: `Bearer ${accessToken}` },
-            });
-            if (response.ok) {
-              const favorites = await response.json();
-              dispatch(setFavorites(favorites));
+            try {
+              const response = await fetch("/api/favorites", {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+              if (response.ok) {
+                const favorites = await response.json();
+                dispatch(setFavorites(favorites));
+              }
+            } catch (favoritesError) {
+              console.warn(
+                "Failed to load favorites from server:",
+                favoritesError
+              );
+              // Если не удалось загрузить избранное с сервера, используем localStorage
+              try {
+                const localFavorites = getLocalStorage("favorites", []);
+                dispatch(setFavorites(localFavorites));
+              } catch {
+                dispatch(setFavorites([]));
+              }
             }
           }
         }
-      } catch {
+      } catch (error) {
         // Если silent login не удался (гость):
+        console.log("Silent login failed, loading as guest:", error);
         // 1. Пробуем загрузить избранное из localStorage
         try {
           const localFavorites = getLocalStorage("favorites", []);
           dispatch(setFavorites(localFavorites));
-        } catch {
+        } catch (localStorageError) {
+          console.warn(
+            "Failed to load favorites from localStorage:",
+            localStorageError
+          );
           // Если localStorage пустой или повреждён — кладём пустой массив
           dispatch(setFavorites([]));
         }

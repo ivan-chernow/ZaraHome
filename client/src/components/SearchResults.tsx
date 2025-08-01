@@ -4,6 +4,8 @@ import SearchResultProductCard from "./SearchResultProductCard";
 import PaginationBlock from "./PaginationBlock";
 import PaginationStats from "./PaginationStats";
 import { usePagination } from "@/hooks/usePagination";
+import { useSorting } from "@/hooks/useSorting";
+import SortButtons from "./SortButtons";
 
 interface SearchResultsProps {
   products: Product[];
@@ -18,14 +20,20 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   searchValue,
   pageSize = 12,
 }) => {
+  // Используем хук сортировки
+  const { sortType, sortedProducts, handleSortByPrice, handleSortByDate } =
+    useSorting({
+      products,
+    });
+
   // Используем хук пагинации только если есть результаты поиска
   const {
     currentPage,
     totalPages,
     paginatedItems: paginatedProducts,
     handlePageChange,
-  } = usePagination(products, {
-    totalItems: products.length,
+  } = usePagination(sortedProducts, {
+    totalItems: sortedProducts.length,
     pageSize,
   });
 
@@ -56,9 +64,18 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <PaginationStats
           currentPage={currentPage}
           totalPages={totalPages}
-          totalItems={products.length}
+          totalItems={sortedProducts.length}
           pageSize={pageSize}
           className="mb-4"
+        />
+      </div>
+
+      {/* Кнопки сортировки */}
+      <div className="mb-6">
+        <SortButtons
+          sortType={sortType}
+          onSortByPrice={handleSortByPrice}
+          onSortByDate={handleSortByDate}
         />
       </div>
 
