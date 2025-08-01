@@ -29,7 +29,14 @@ export const favoritesApi = createApi({
             query: (productIds) => `/favorites/status?productIds=${productIds.join(',')}`,
         }),
         getProductsByIds: builder.query<Product[], number[]>({
-            query: (ids) => `/products?ids=${ids.join(',')}`,
+            query: (ids) => {
+                if (!ids || ids.length === 0) {
+                    return '/products?ids=empty'; // Специальный endpoint для пустого массива
+                }
+                return `/products?ids=${ids.join(',')}`;
+            },
+            // Не кэшируем пустые запросы
+            keepUnusedDataFor: 300,
         }),
     }),
 });

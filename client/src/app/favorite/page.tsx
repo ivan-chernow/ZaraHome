@@ -7,10 +7,9 @@ import { CircularProgress } from "@mui/material";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import {
-  useGetFavoritesQuery,
-  useGetProductsByIdsQuery,
-} from "@/api/favorites.api";
+import { useGetFavoritesQuery } from "@/api/favorites.api";
+import { useGetCatalogQuery } from "@/api/products.api";
+import { getAllProducts } from "@/store/features/catalog/catalog.utils";
 
 const Page = () => {
   const isAuthenticated = useSelector(
@@ -18,20 +17,28 @@ const Page = () => {
   );
   const favoriteIds = useSelector((state: RootState) => state.favorites.ids);
 
-  // Вызовы хуков только когда нужно
+  // Загружаем каталог для получения товаров по ID
+  const { data: categories } = useGetCatalogQuery();
+
+  // Для авторизованных пользователей - загружаем с сервера
   const {
     data: serverFavorites = [],
     isLoading: loadingServer,
     error: errorServer,
   } = useGetFavoritesQuery(undefined, { skip: !isAuthenticated });
-  const {
-    data: guestFavorites = [],
-    isLoading: loadingGuest,
-    error: errorGuest,
-  } = useGetProductsByIdsQuery(favoriteIds, {
-    skip: isAuthenticated,
-    refetchOnMountOrArgChange: true,
-  });
+
+  // Для гостей - получаем товары из каталога по ID
+  const guestFavorites = React.useMemo(() => {
+    if (isAuthenticated || !categories || favoriteIds.length === 0) {
+      return [];
+    }
+
+    const allProducts = getAllProducts(categories);
+    return allProducts.filter((product) => favoriteIds.includes(product.id));
+  }, [isAuthenticated, categories, favoriteIds]);
+
+  const loadingGuest = !categories && !isAuthenticated;
+  const errorGuest = null;
 
   // Показываем одинаковый контент на сервере и клиенте
   const favoriteProducts = isAuthenticated ? serverFavorites : guestFavorites;
@@ -47,10 +54,24 @@ const Page = () => {
       );
     }
 
-    if (error) {
+    // Показываем ошибку только для авторизованных пользователей
+    if (error && isAuthenticated) {
+      console.error("Favorites error:", error);
       return (
         <div className="text-center py-12">
-          <p className="text-red-500">Ошибка при загрузке избранных товаров.</p>
+          <p className="text-red-500 text-lg font-semibold mb-2">
+            ОШИБКА ПРИ ЗАГРУЗКЕ ИЗБРАННЫХ ТОВАРОВ
+          </p>
+          <p className="text-gray-600 mb-4">
+            Не удалось загрузить ваши избранные товары. Попробуйте обновить
+            страницу.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Обновить страницу
+          </button>
         </div>
       );
     }
