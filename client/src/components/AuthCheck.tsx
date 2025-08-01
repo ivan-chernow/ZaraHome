@@ -10,6 +10,7 @@ import {
 } from "@/store/features/auth/auth.slice";
 import { useRefreshMutation, useLazyGetUserQuery } from "@/api/auth.api";
 import { setFavorites } from "@/store/features/favorites/favorites.slice";
+import { getLocalStorage } from "@/utils/storage";
 
 /**
  * Компонент AuthCheck:
@@ -64,9 +65,7 @@ const AuthCheck = () => {
         // Если silent login не удался (гость):
         // 1. Пробуем загрузить избранное из localStorage
         try {
-          const localFavorites = JSON.parse(
-            localStorage.getItem("favorites") || "[]"
-          );
+          const localFavorites = getLocalStorage("favorites", []);
           dispatch(setFavorites(localFavorites));
         } catch {
           // Если localStorage пустой или повреждён — кладём пустой массив

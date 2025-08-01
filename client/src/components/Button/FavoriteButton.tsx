@@ -12,6 +12,7 @@ import {
   removeFavorite,
   setFavorites,
 } from "@/store/features/favorites/favorites.slice";
+import { getLocalStorage, setLocalStorage } from "@/utils/storage";
 
 interface FavoriteButtonProps {
   productId: number;
@@ -44,18 +45,13 @@ const FavoriteButton = ({ productId }: FavoriteButtonProps) => {
         dispatch(setFavorites(favoriteIds));
       }
     } else {
-      let favorites: number[];
-      try {
-        favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-      } catch {
-        favorites = [];
-      }
+      let favorites = getLocalStorage("favorites", []);
       if (favorites.includes(productId)) {
-        favorites = favorites.filter((id) => id !== productId);
+        favorites = favorites.filter((id: number) => id !== productId);
       } else {
         favorites.push(productId);
       }
-      localStorage.setItem("favorites", JSON.stringify(favorites));
+      setLocalStorage("favorites", favorites);
       dispatch(setFavorites(favorites));
     }
   };

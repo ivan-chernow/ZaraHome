@@ -33,19 +33,10 @@ const Page = () => {
     refetchOnMountOrArgChange: true,
   });
 
-  let favoriteProducts = [];
-  let isLoading = false;
-  let error = null;
-
-  if (isAuthenticated) {
-    favoriteProducts = serverFavorites;
-    isLoading = loadingServer;
-    error = errorServer;
-  } else {
-    favoriteProducts = guestFavorites;
-    isLoading = loadingGuest;
-    error = errorGuest;
-  }
+  // Показываем одинаковый контент на сервере и клиенте
+  const favoriteProducts = isAuthenticated ? serverFavorites : guestFavorites;
+  const isLoading = isAuthenticated ? loadingServer : loadingGuest;
+  const error = isAuthenticated ? errorServer : errorGuest;
 
   const renderContent = () => {
     if (isLoading) {

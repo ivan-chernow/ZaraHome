@@ -118,19 +118,17 @@ const WhyUs = () => {
               width={19}
             />
           </div>
-          <a className="flex justify-center items-center" href="#">
+          <Link href="/reviews" className="flex justify-center items-center">
             <Image
               src="/assets/img/WhyUs/reviews.svg"
               alt="img"
               width="25"
               height="25"
             />
-            <Link href="/reviews">
-              <p className="font-semibold underline pb-[3px]">
-                Смотреть все отзывы
-              </p>
-            </Link>
-          </a>
+            <p className="font-semibold underline pb-[3px]">
+              Смотреть все отзывы
+            </p>
+          </Link>
         </div>
       </Container>
     </section>
