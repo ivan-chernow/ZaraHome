@@ -1,18 +1,34 @@
 import React from "react";
 import type { Product } from "@/api/products.api";
 import SearchResultProductCard from "./SearchResultProductCard";
+import PaginationBlock from "./PaginationBlock";
+import PaginationStats from "./PaginationStats";
+import { usePagination } from "@/hooks/usePagination";
 
 interface SearchResultsProps {
   products: Product[];
   isLoading?: boolean;
   searchValue: string;
+  pageSize?: number;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   products,
   isLoading,
   searchValue,
+  pageSize = 12,
 }) => {
+  // Используем хук пагинации
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedProducts,
+    handlePageChange,
+  } = usePagination(products, {
+    totalItems: products.length,
+    pageSize,
+  });
+
   if (isLoading) {
     return (
       <div className="py-[50px] text-center text-gray-500">
@@ -32,8 +48,23 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   return (
     <div className="py-[50px]">
-      <div className="grid grid-cols-4 gap-6 w-full">
-        {products.map((product) => (
+      {/* Статистика поиска */}
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-2">
+          Результаты поиска: &ldquo;{searchValue}&rdquo;
+        </h3>
+        <PaginationStats
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={products.length}
+          pageSize={pageSize}
+          className="mb-4"
+        />
+      </div>
+
+      {/* Сетка товаров */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full mb-8">
+        {paginatedProducts.map((product) => (
           <SearchResultProductCard
             key={product.id}
             product={product}
@@ -41,6 +72,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           />
         ))}
       </div>
+
+      {/* Пагинация */}
+      <PaginationBlock
+        count={totalPages}
+        page={currentPage}
+        onChange={handlePageChange}
+      />
     </div>
   );
 };

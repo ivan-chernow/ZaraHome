@@ -1,17 +1,67 @@
 "use client";
-import React, { use, useState, useEffect, useMemo, useRef } from "react";
+import React, { use, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import HomeIcon from "@/components/ui/HomeIcon";
 import { useGetCatalogQuery } from "@/api/products.api";
 import { getProductsByCategory } from "@/store/features/catalog/catalog.utils";
-import CircularProgress from "@mui/material/CircularProgress";
-import Pagination from "@mui/material/Pagination";
+import Skeleton from "@mui/material/Skeleton";
 import slugify from "slugify";
 import { getAllProducts } from "@/store/features/catalog/catalog.utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import PaginationBlock from "@/components/PaginationBlock";
+import { usePagination } from "@/hooks/usePagination";
 
 const PAGE_SIZE = 12;
+
+const ProductCardSkeleton = () => (
+  <li className="w-[300px] h-[497px] mr-[-1px] bg-white relative group overflow-hidden rounded-xl shadow animate-pulse flex flex-col">
+    <div
+      className="mb-[18px] relative overflow-hidden"
+      style={{ width: "auto", height: 326 }}
+    >
+      <Skeleton
+        variant="rectangular"
+        width={300}
+        height={326}
+        className="rounded-xl"
+      />
+      <div className="absolute right-0 bottom-[-2.2px] z-10">
+        <Skeleton variant="circular" width={56} height={56} />
+      </div>
+    </div>
+    <div className="absolute top-2 left-2 z-10 flex flex-col gap-y-1">
+      <Skeleton
+        variant="rectangular"
+        width={40}
+        height={24}
+        className="rounded"
+      />
+      <Skeleton
+        variant="rectangular"
+        width={40}
+        height={24}
+        className="rounded"
+      />
+    </div>
+    <div className="flex px-[10px] gap-x-2 mb-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Skeleton key={i} variant="circular" width={24} height={24} />
+      ))}
+    </div>
+    <Skeleton variant="text" width={180} height={28} className="ml-2" />
+    <Skeleton variant="text" width={120} height={20} className="ml-2 mb-auto" />
+    <div className="flex justify-between mt-4 px-[10px] items-end">
+      <Skeleton variant="text" width={80} height={32} />
+      <Skeleton
+        variant="rectangular"
+        width={56}
+        height={40}
+        className="rounded"
+      />
+    </div>
+  </li>
+);
 
 const Page = ({ params }: { params: Promise<{ category: string }> }) => {
   const { category: categorySlug } = use(params);
@@ -19,23 +69,18 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Получаем текущую страницу из query-параметра
-  const initialPage = Number(searchParams.get("page")) || 1;
-  const [page, setPage] = useState(initialPage);
   const prevCategory = useRef<string | undefined>(undefined);
-
-  useEffect(() => {
-    setPage(Number(searchParams.get("page")) || 1);
-  }, [searchParams]);
 
   // Сброс страницы только если категория реально меняется
   useEffect(() => {
     if (prevCategory.current && prevCategory.current !== categorySlug) {
-      setPage(1);
-      router.push("?page=1", { scroll: false });
+      // Сбрасываем страницу в URL
+      const params = new URLSearchParams(searchParams);
+      params.delete("page");
+      router.push(`?${params.toString()}`, { scroll: false });
     }
     prevCategory.current = categorySlug;
-  }, [categorySlug, router]);
+  }, [categorySlug, router, searchParams]);
 
   const customSlugify = (text: string) =>
     slugify(text.replace("й", "y"), { lower: true, strict: true });
@@ -54,14 +99,16 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
     }
   }, [categories, categorySlug]);
 
-  const totalPages = useMemo(
-    () => Math.ceil(products.length / PAGE_SIZE),
-    [products]
-  );
-  const paginatedProducts = useMemo(
-    () => products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [products, page]
-  );
+  // Используем хук пагинации
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedProducts,
+    handlePageChange,
+  } = usePagination(products, {
+    totalItems: products.length,
+    pageSize: PAGE_SIZE,
+  });
 
   const categoryName = useMemo(() => {
     if (!categories) return decodeURIComponent(categorySlug);
@@ -71,19 +118,14 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
     return found ? found.name : decodeURIComponent(categorySlug);
   }, [categories, categorySlug]);
 
-  const handlePageChange = (_: any, value: number) => {
-    setPage(value);
-    router.push(`?page=${value}`, { scroll: false });
-    // Скроллим к началу списка
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-[500px]">
-        <CircularProgress />
+      <div className="w-full min-h-[300px] flex items-center justify-center">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </ul>
       </div>
     );
   }
@@ -150,45 +192,12 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
           <p className="text-center text-lg">Товаров нет</p>
         )}
       </div>
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-8">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            siblingCount={1}
-            boundaryCount={1}
-            sx={{
-              "& .MuiPagination-ul": {
-                justifyContent: "center",
-                gap: "12px",
-              },
-              "& .MuiButtonBase-root": {
-                borderRadius: "12px",
-                minWidth: "44px",
-                minHeight: "44px",
-                fontWeight: 600,
-                fontSize: "18px",
-                border: "1.5px solid #000",
-                color: "#000",
-                backgroundColor: "#fff",
-                transition: "all 0.2s",
-                "&:hover": {
-                  backgroundColor: "#000",
-                  color: "#fff",
-                  borderColor: "#000",
-                },
-              },
-              "& .Mui-selected": {
-                backgroundColor: "#000 !important",
-                color: "#fff !important",
-                borderColor: "#000 !important",
-              },
-            }}
-          />
-        </div>
-      )}
+
+      <PaginationBlock
+        count={totalPages}
+        page={currentPage}
+        onChange={handlePageChange}
+      />
     </div>
   );
 };
