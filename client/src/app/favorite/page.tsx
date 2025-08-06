@@ -15,6 +15,7 @@ const Page = () => {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
+
   const favoriteIds = useSelector((state: RootState) => state.favorites.ids);
 
   // Загружаем каталог для получения товаров по ID

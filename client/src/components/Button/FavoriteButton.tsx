@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
@@ -16,66 +16,142 @@ import { getLocalStorage, setLocalStorage } from "@/utils/storage";
 
 interface FavoriteButtonProps {
   productId: number;
+  className?: string;
+  size?: "small" | "medium" | "large";
 }
 
-const FavoriteButton = ({ productId }: FavoriteButtonProps) => {
+// Константы для размеров
+const SIZE_CONFIG = {
+  small: { button: "w-8 h-8", icon: 16 },
+  medium: { button: "w-10 h-10", icon: 18 },
+  large: { button: "w-14 h-14", icon: 22 },
+} as const;
+
+// Хук для работы с избранным
+const useFavorites = (productId: number) => {
   const dispatch = useDispatch();
   const { ids: favoriteIds } = useSelector(
     (state: RootState) => state.favorites
   );
-  const isFavorite = favoriteIds.includes(productId);
-
-  const [addToFavorites] = useAddToFavoritesMutation();
-  const [removeFromFavorites] = useRemoveFromFavoritesMutation();
-
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
 
-  const handleToggleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const [addToFavorites] = useAddToFavoritesMutation();
+  const [removeFromFavorites] = useRemoveFromFavoritesMutation();
 
-    if (isAuthenticated) {
+  const isFavorite = useMemo(
+    () => favoriteIds.includes(productId),
+    [favoriteIds, productId]
+  );
+
+  const handleAuthenticatedToggle = useCallback(async () => {
+    try {
       if (isFavorite) {
-        await removeFromFavorites(productId);
+        await removeFromFavorites(productId).unwrap();
         dispatch(removeFavorite(productId));
       } else {
-        await addToFavorites(productId);
-        dispatch(setFavorites(favoriteIds));
+        await addToFavorites(productId).unwrap();
+        dispatch(setFavorites([...favoriteIds, productId]));
       }
-    } else {
-      let favorites = getLocalStorage("favorites", []);
-      if (favorites.includes(productId)) {
-        favorites = favorites.filter((id: number) => id !== productId);
-      } else {
-        favorites.push(productId);
-      }
-      setLocalStorage("favorites", favorites);
-      dispatch(setFavorites(favorites));
+    } catch (error) {
+      console.error("Ошибка при работе с избранным:", error);
     }
-  };
+  }, [
+    isFavorite,
+    productId,
+    favoriteIds,
+    addToFavorites,
+    removeFromFavorites,
+    dispatch,
+  ]);
 
-  return (
-    <div
-      onClick={handleToggleFavorite}
-      className={`        bg-black
-        cursor-pointer
-        transition-colors
-        duration-300
-        w-[56px] h-[56px]
-        flex items-center justify-center
-        ${isFavorite ? "bg-red-500" : "hover:bg-red-400"}
-      `}
-    >
-      <Image
-        src="/assets/img/New%20Clothes/favorite.svg"
-        alt="favorites"
-        width={22}
-        height={20}
-      />
-    </div>
-  );
+  const handleGuestToggle = useCallback(() => {
+    const favorites = getLocalStorage("favorites", []);
+    const updatedFavorites = isFavorite
+      ? favorites.filter((id: number) => id !== productId)
+      : [...favorites, productId];
+
+    setLocalStorage("favorites", updatedFavorites);
+    dispatch(setFavorites(updatedFavorites));
+  }, [isFavorite, productId, dispatch]);
+
+  return {
+    isFavorite,
+    isAuthenticated,
+    handleToggle: isAuthenticated
+      ? handleAuthenticatedToggle
+      : handleGuestToggle,
+  };
 };
+
+// Компонент иконки избранного
+const FavoriteIcon: React.FC<{ size: number }> = React.memo(({ size }) => (
+  <Image
+    src="/assets/img/New%20Clothes/favorite.svg"
+    alt="Добавить в избранное"
+    width={size}
+    height={size}
+    className="transition-transform duration-200 hover:scale-110"
+  />
+));
+
+FavoriteIcon.displayName = "FavoriteIcon";
+
+const FavoriteButton: React.FC<FavoriteButtonProps> = React.memo(
+  ({ productId, className = "", size = "large" }) => {
+    const { isFavorite, handleToggle } = useFavorites(productId);
+
+    const sizeConfig = useMemo(() => SIZE_CONFIG[size], [size]);
+
+    const buttonClasses = useMemo(() => {
+      const baseClasses = [
+        "cursor-pointer",
+        "transition-all",
+        "duration-300",
+        "flex",
+        "items-center",
+        "justify-center",
+        "rounded-lg",
+        "border-2",
+        "border-transparent",
+        "hover:border-red-300",
+        "active:scale-95",
+        sizeConfig.button,
+        className,
+      ];
+
+      const stateClasses = isFavorite
+        ? ["bg-red-500", "hover:bg-red-600", "text-white"]
+        : ["bg-gray-100", "hover:bg-red-50", "text-gray-600"];
+
+      return [...baseClasses, ...stateClasses].join(" ");
+    }, [isFavorite, sizeConfig.button, className]);
+
+    const handleClick = useCallback(
+      (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleToggle();
+      },
+      [handleToggle]
+    );
+
+    return (
+      <button
+        onClick={handleClick}
+        className={buttonClasses}
+        aria-label={
+          isFavorite ? "Удалить из избранного" : "Добавить в избранное"
+        }
+        title={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+      >
+        <FavoriteIcon size={sizeConfig.icon} />
+      </button>
+    );
+  }
+);
+
+FavoriteButton.displayName = "FavoriteButton";
 
 export default FavoriteButton;
