@@ -11,29 +11,34 @@ import { productsApi } from "@/api/products.api";
 import { promocodesApi } from '@/api/promocodes.api';
 import { favoritesApi } from "@/api/favorites.api";
 import favoritesReducer from "./features/favorites/favorites.slice";
+import cartItemsReducer from './features/cart/cartItems.slice';
+import { cartApi } from '@/api/cart.api';
 
 export const store = configureStore({
-	reducer: {
-		cart: cartReducer,
-		catalog: catalogReducer,
-		auth: authReducer,
-		navMenu: navMenuReducer,
-		productCard: productCardReducer,
-		favorites: favoritesReducer,
-		[authApi.reducerPath]: authApi.reducer,
-		[profileApi.reducerPath]: profileApi.reducer,
-		[productsApi.reducerPath]: productsApi.reducer,
-		[promocodesApi.reducerPath]: promocodesApi.reducer,
-		[favoritesApi.reducerPath]: favoritesApi.reducer,
-	},
-	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware().concat(
-			authApi.middleware,
-			profileApi.middleware,
-			promocodesApi.middleware,
-			productsApi.middleware,
-			favoritesApi.middleware
-		),
+  reducer: {
+    cart: cartReducer,
+    cartItems: cartItemsReducer,
+    catalog: catalogReducer,
+    auth: authReducer,
+    navMenu: navMenuReducer,
+    productCard: productCardReducer,
+    favorites: favoritesReducer,
+    [authApi.reducerPath]: authApi.reducer,
+    [profileApi.reducerPath]: profileApi.reducer,
+    [productsApi.reducerPath]: productsApi.reducer,
+    [promocodesApi.reducerPath]: promocodesApi.reducer,
+    [favoritesApi.reducerPath]: favoritesApi.reducer,
+    [cartApi.reducerPath]: cartApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(
+      authApi.middleware,
+      profileApi.middleware,
+      promocodesApi.middleware,
+      productsApi.middleware,
+      favoritesApi.middleware,
+      cartApi.middleware,
+    ),
 })
 
 setupListeners(store.dispatch);

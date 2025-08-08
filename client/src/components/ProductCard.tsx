@@ -149,7 +149,7 @@ const ProductCard = ({
           <span className="font-bold text-[18px] ml-0.5">₽</span>
         </p>
 
-        <CartButton size={cartButtonSize} />
+        <CartButton size={cartButtonSize} productId={product.id} />
       </div>
 
       <div

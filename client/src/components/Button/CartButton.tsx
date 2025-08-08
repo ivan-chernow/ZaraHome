@@ -1,21 +1,94 @@
-import React from "react";
+"use client";
+
+import React, { useCallback, useMemo } from "react";
 import { Button } from "@mui/material";
 import Image from "next/image";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
+import { getLocalStorage, setLocalStorage } from "@/utils/storage";
+import {
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+} from "@/api/cart.api";
+import {
+  addCartItem,
+  removeCartItem,
+  setCartItems,
+} from "@/store/features/cart/cartItems.slice";
 
 interface CartButtonProps {
+  productId: number;
   size?: "default" | "small";
 }
 
-const CartButton = ({ size = "default" }: CartButtonProps) => {
+const CartButton = ({ productId, size = "default" }: CartButtonProps) => {
+  const dispatch = useDispatch();
   const isSmall = size === "small";
+
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
+  const cartIds = useSelector((state: RootState) => state.cartItems.ids);
+
+  const isInCart = useMemo(
+    () => cartIds.includes(productId),
+    [cartIds, productId]
+  );
+
+  const [addToCart] = useAddToCartMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
+  const handleAuthenticatedToggle = useCallback(async () => {
+    try {
+      if (isInCart) {
+        dispatch(removeCartItem(productId));
+        await removeFromCart(productId).unwrap();
+      } else {
+        dispatch(addCartItem(productId));
+        await addToCart(productId).unwrap();
+      }
+    } catch (error) {
+      // Rollback optimistic update
+      if (isInCart) {
+        dispatch(addCartItem(productId));
+      } else {
+        dispatch(removeCartItem(productId));
+      }
+      console.error("Ошибка при работе с корзиной:", error);
+    }
+  }, [isInCart, productId, addToCart, removeFromCart, dispatch]);
+
+  const handleGuestToggle = useCallback(() => {
+    const cart = getLocalStorage("cart", []);
+    const updatedCart = isInCart
+      ? cart.filter((id: number) => id !== productId)
+      : [...cart, productId];
+
+    setLocalStorage("cart", updatedCart);
+    dispatch(setCartItems(updatedCart));
+  }, [isInCart, productId, dispatch]);
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isAuthenticated) {
+        handleAuthenticatedToggle();
+      } else {
+        handleGuestToggle();
+      }
+    },
+    [isAuthenticated, handleAuthenticatedToggle, handleGuestToggle]
+  );
 
   return (
     <Button
+      onClick={handleClick}
       variant="outlined"
       sx={{
-        backgroundColor: "black",
+        backgroundColor: isInCart ? "white" : "black",
         borderColor: "black",
-        color: "white",
+        color: isInCart ? "black" : "white",
         width: isSmall ? "120px" : "180px",
         height: isSmall ? "40px" : "50px",
         position: "absolute",
@@ -28,19 +101,17 @@ const CartButton = ({ size = "default" }: CartButtonProps) => {
         gap: "2px",
         transition:
           "background-color 0.3s ease-in, color 0.3s ease-in, border-color 0.3s ease-in",
-        // Базовый стиль иконки: задаём явный filter и transition, чтобы анимация была синхронной с текстом
         "& .MuiButton-endIcon img": {
-          filter: "invert(0)",
+          filter: isInCart ? "invert(1)" : "invert(0)",
           transition: "filter 0.3s ease-in",
         },
         "&:hover": {
-          backgroundColor: "white",
-          color: "black",
+          backgroundColor: isInCart ? "black" : "white",
+          color: isInCart ? "white" : "black",
           border: "1px solid black",
         },
-        // Ховер-стиль для изображения иконки: меняем filter одновременно с цветом текста
         "&:hover .MuiButton-endIcon img": {
-          filter: "invert(1)",
+          filter: isInCart ? "invert(0)" : "invert(1)",
         },
       }}
       endIcon={
@@ -54,7 +125,13 @@ const CartButton = ({ size = "default" }: CartButtonProps) => {
         ) : undefined
       }
     >
-      {isSmall ? "В корзину" : "в корзину"}
+      {isSmall
+        ? isInCart
+          ? "В корзине"
+          : "В корзину"
+        : isInCart
+        ? "в корзине"
+        : "в корзину"}
     </Button>
   );
 };
