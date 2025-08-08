@@ -26,14 +26,21 @@ const CartButton = ({ size = "default" }: CartButtonProps) => {
         fontWeight: 600,
         fontFamily: "inherit",
         gap: "2px",
-        transition: "all 0.3s ease-in",
+        transition:
+          "background-color 0.3s ease-in, color 0.3s ease-in, border-color 0.3s ease-in",
+        // Базовый стиль иконки: задаём явный filter и transition, чтобы анимация была синхронной с текстом
+        "& .MuiButton-endIcon img": {
+          filter: "invert(0)",
+          transition: "filter 0.3s ease-in",
+        },
         "&:hover": {
           backgroundColor: "white",
           color: "black",
           border: "1px solid black",
-          "& .MuiButton-endIcon": {
-            filter: "invert(3)",
-          },
+        },
+        // Ховер-стиль для изображения иконки: меняем filter одновременно с цветом текста
+        "&:hover .MuiButton-endIcon img": {
+          filter: "invert(1)",
         },
       }}
       endIcon={
@@ -43,9 +50,6 @@ const CartButton = ({ size = "default" }: CartButtonProps) => {
             src="/assets/img/New%20Clothes/cart.svg"
             width={23}
             height={21}
-            style={{
-              transition: "filter 0.3s ease-in",
-            }}
           />
         ) : undefined
       }
