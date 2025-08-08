@@ -3,13 +3,13 @@
 import React from "react";
 import MainLayout from "@/layout/MainLayout";
 import ProductCard from "@/components/ProductCard";
-import { CircularProgress } from "@mui/material";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useGetFavoritesQuery } from "@/api/favorites.api";
 import { useGetCatalogQuery } from "@/api/products.api";
 import { getAllProducts } from "@/store/features/catalog/catalog.utils";
+import { ProductCardSkeleton } from "@/components/ProductCardSceleton";
 
 const Page = () => {
   const isAuthenticated = useSelector(
@@ -49,9 +49,11 @@ const Page = () => {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex justify-center items-center h-64">
-          <CircularProgress />
-        </div>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10 items-stretch">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </ul>
       );
     }
 
@@ -79,7 +81,7 @@ const Page = () => {
 
     if (favoriteProducts && favoriteProducts.length > 0) {
       return (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10 items-stretch">
           {favoriteProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
