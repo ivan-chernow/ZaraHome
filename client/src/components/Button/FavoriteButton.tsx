@@ -115,7 +115,6 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = React.memo(
         "rounded-lg",
         "border-2",
         "border-transparent",
-        "hover:border-red-300",
         "active:scale-95",
         sizeConfig.button,
         className,
@@ -123,7 +122,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = React.memo(
 
       const stateClasses = isFavorite
         ? ["bg-red-500", "hover:bg-red-600", "text-white"]
-        : ["bg-gray-100", "hover:bg-red-50", "text-gray-600"];
+        : ["bg-black", "hover:bg-black/80", "text-white"]; // тёмный фон вместо светлого
 
       return [...baseClasses, ...stateClasses].join(" ");
     }, [isFavorite, sizeConfig.button, className]);
