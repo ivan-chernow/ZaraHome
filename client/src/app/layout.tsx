@@ -3,7 +3,6 @@ import { Inter, Roboto, Ysabeau_SC } from "next/font/google";
 import "../../public/assets/styles/globals.css";
 import React from "react";
 import NavigationProgress from "@/components/NavigationProgress";
-import AuthSpinnerWrapper from "@/components/AuthSpinnerWrapper";
 import AuthCheck from "@/components/AuthCheck";
 import { Providers } from "@/store/provider";
 import { useSelector } from "react-redux";
@@ -38,7 +37,6 @@ function LayoutWithModal({ children }: { children: React.ReactNode }) {
   return (
     <>
       {isOpenAuth && <LoginModal />}
-      <AuthSpinnerWrapper />
       <NavigationProgress />
       <AuthCheck />
       {children}

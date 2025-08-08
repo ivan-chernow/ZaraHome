@@ -11,6 +11,7 @@ import {
 import {
   removeFavorite,
   setFavorites,
+  addFavorite,
 } from "@/store/features/favorites/favorites.slice";
 import { getLocalStorage, setLocalStorage } from "@/utils/storage";
 
@@ -52,19 +53,12 @@ const useFavorites = (productId: number) => {
         dispatch(removeFavorite(productId));
       } else {
         await addToFavorites(productId).unwrap();
-        dispatch(setFavorites([...favoriteIds, productId]));
+        dispatch(addFavorite(productId));
       }
     } catch (error) {
       console.error("Ошибка при работе с избранным:", error);
     }
-  }, [
-    isFavorite,
-    productId,
-    favoriteIds,
-    addToFavorites,
-    removeFromFavorites,
-    dispatch,
-  ]);
+  }, [isFavorite, productId, addToFavorites, removeFromFavorites, dispatch]);
 
   const handleGuestToggle = useCallback(() => {
     const favorites = getLocalStorage("favorites", []);

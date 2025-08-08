@@ -15,10 +15,9 @@ import {
   setView,
   logout,
 } from "@/store/features/auth/auth.slice";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const dispatch: AppDispatch = useDispatch();
   const { isOpenCart } = useSelector((state: RootState) => state.cart);
@@ -33,11 +32,11 @@ const Header = () => {
     if (isProfilePage) {
       // Если мы в профиле, выполняем выход
       dispatch(logout());
-      router.push("/");
+      window.location.href = "/";
     } else if (isAuthenticated && user) {
       // Если пользователь авторизован, перенаправляем в личный кабинет
       const path = user.role === "admin" ? "/profile/admin" : "/profile";
-      router.push(path);
+      window.location.href = path;
     } else {
       // Если не авторизован, открываем модальное окно входа
       dispatch(openModalAuth());

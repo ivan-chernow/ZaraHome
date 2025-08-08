@@ -10,17 +10,17 @@ export class FavoritesController {
 
   @Post(':productId')
   add(@Param('productId') productId: string, @Req() req: AuthenticatedRequest) {
-    return this.favoritesService.add(req.user.id, +productId);
+    return this.favoritesService.add(req.user.userId, +productId);
   }
 
   @Delete(':productId')
   remove(@Param('productId') productId: string, @Req() req: AuthenticatedRequest) {
-    return this.favoritesService.remove(req.user.id, +productId);
+    return this.favoritesService.remove(req.user.userId, +productId);
   }
 
   @Get()
   findAll(@Req() req: AuthenticatedRequest) {
-    return this.favoritesService.findAll(req.user.id);
+    return this.favoritesService.findAll(req.user.userId);
   }
 
   @Get('status')
@@ -28,6 +28,6 @@ export class FavoritesController {
     @Req() req: AuthenticatedRequest,
     @Query('productIds', new ParseArrayPipe({ items: Number, separator: ',' })) productIds: number[],
   ) {
-    return this.favoritesService.getFavoriteStatus(req.user.id, productIds);
+    return this.favoritesService.getFavoriteStatus(req.user.userId, productIds);
   }
 }

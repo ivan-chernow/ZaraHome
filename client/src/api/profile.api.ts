@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { ProfileDto, ChangePasswordDto, ChangeDeliveryAddressDto, DeliveryAddressDto, UpdateProfileDto } from './types/profile.types';
-import { baseQueryWithReauth } from './auth.api';
+import { ProfileDto, ChangePasswordDto, ChangeDeliveryAddressDto, DeliveryAddressDto } from './types/profile.types';
+import { baseQueryWithReauth } from './baseQueryWithReauth';
 
 export const profileApi = createApi({
     reducerPath: 'profileApi',
@@ -14,7 +14,7 @@ export const profileApi = createApi({
             }),
             providesTags: ['Profile'],
         }),
-        updateProfile: builder.mutation<void, UpdateProfileDto>({
+        updateProfile: builder.mutation<void, ProfileDto>({
             query: (dto) => ({
                 url: '/user/profile',
                 method: 'PATCH',

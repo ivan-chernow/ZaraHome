@@ -7,7 +7,8 @@ export const favoritesApi = createApi({
     baseQuery: baseQueryWithReauth,
     tagTypes: ['Favorites'],
     endpoints: (builder) => ({
-        getFavorites: builder.query<Product[], void>({
+        // Accept userId to scope the cache key per user. The API still calls the same endpoint.
+        getFavorites: builder.query<Product[], number | undefined>({
             query: () => '/favorites',
             providesTags: ['Favorites'],
         }),
@@ -31,11 +32,10 @@ export const favoritesApi = createApi({
         getProductsByIds: builder.query<Product[], number[]>({
             query: (ids) => {
                 if (!ids || ids.length === 0) {
-                    return '/products?ids=empty'; // Специальный endpoint для пустого массива
+                    return '/products?ids=empty';
                 }
                 return `/products?ids=${ids.join(',')}`;
             },
-            // Не кэшируем пустые запросы
             keepUnusedDataFor: 300,
         }),
     }),

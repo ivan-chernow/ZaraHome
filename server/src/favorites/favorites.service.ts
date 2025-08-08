@@ -51,9 +51,9 @@ export class FavoritesService {
   async findAll(userId: number): Promise<Product[]> {
     const favorites = await this.favoriteRepository.find({
       where: { user: { id: userId } },
-      relations: ['product', 'product.size', 'product.colors'], // Загружаем связанные продукты
+      relations: ['product'],
     });
-    return favorites.map(fav => fav.product);
+    return favorites.map((fav) => fav.product);
   }
 
   async getFavoriteStatus(userId: number, productIds: number[]): Promise<Record<number, boolean>> {
@@ -64,14 +64,15 @@ export class FavoritesService {
       where: {
         user: { id: userId },
         product: { id: In(productIds) },
-      }
+      },
+      relations: ['product'],
     });
     const favoriteMap = favorites.reduce((acc, fav) => {
       acc[fav.product.id] = true;
       return acc;
     }, {} as Record<number, boolean>);
 
-    productIds.forEach(id => {
+    productIds.forEach((id) => {
       if (!favoriteMap[id]) {
         favoriteMap[id] = false;
       }

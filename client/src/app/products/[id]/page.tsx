@@ -12,7 +12,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  CircularProgress,
   Container,
 } from "@mui/material";
 import Color from "@/components/Color";
@@ -28,6 +27,7 @@ import {
 } from "@/store/features/catalog/catalog.utils";
 import SliderSwiper from "@/components/ui/SliderSwiper";
 import Link from "next/link";
+import Skeleton from "@mui/material/Skeleton";
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const resolvedParams = use(params);
@@ -51,8 +51,19 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <CircularProgress />
+      <div className="max-w-[1200px] mx-auto p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Skeleton variant="rectangular" height={400} />
+          <div>
+            <Skeleton variant="text" height={48} width="60%" />
+            <Skeleton variant="text" height={28} width="40%" />
+            <Skeleton variant="text" height={20} width="80%" />
+            <div className="mt-6 space-y-3">
+              <Skeleton variant="rectangular" height={56} width={300} />
+              <Skeleton variant="rectangular" height={56} width={300} />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -22,16 +22,20 @@ const loadInitialState = (): AuthState => {
 
   const savedState = localStorage.getItem('authState');
   if (savedState) {
-    const parsedState = JSON.parse(savedState);
-    return {
-      ...parsedState,
-      isOpenAuth: false,
-      view: 'login',
-      viewPassword: false,
-      isLoading: false,
-      error: null,
-      isAuthenticating: false,
-    };
+    try {
+      const parsedState = JSON.parse(savedState);
+      return {
+        ...parsedState,
+        isOpenAuth: false,
+        view: 'login',
+        viewPassword: false,
+        isLoading: false,
+        error: null,
+        isAuthenticating: false,
+      };
+    } catch (error) {
+      console.warn('Failed to parse saved auth state:', error);
+    }
   }
 
   return {
@@ -72,10 +76,16 @@ export const authSlice = createSlice({
       state.isAuthenticating = action.payload;
     },
     setCredentials: (state, action: PayloadAction<{ user: User | null; accessToken: string }>) => {
-      state.user = action.payload.user;
+      // Если user равен null (при обновлении токена), сохраняем существующего пользователя
+      if (action.payload.user !== null) {
+        state.user = action.payload.user;
+      }
       state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
       state.error = null;
+      
+      // Сохраняем токен в localStorage
+      localStorage.setItem('accessToken', action.payload.accessToken);
       
       // Сохраняем состояние в localStorage
       localStorage.setItem('authState', JSON.stringify({
@@ -93,6 +103,7 @@ export const authSlice = createSlice({
       // Очищаем состояние в localStorage
       localStorage.removeItem('authState');
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
     },
   },
   extraReducers: (builder) => {
@@ -108,6 +119,10 @@ export const authSlice = createSlice({
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
+        
+        // Сохраняем токены в localStorage
+        localStorage.setItem('accessToken', action.payload.accessToken);
+        localStorage.setItem('refreshToken', action.payload.refreshToken);
         
         // Сохраняем состояние в localStorage
         localStorage.setItem('authState', JSON.stringify({
@@ -136,6 +151,7 @@ export const authSlice = createSlice({
         // Очищаем состояние в localStorage
         localStorage.removeItem('authState');
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       })
       .addMatcher(authApi.endpoints.logout.matchRejected, (state, action) => {
         state.isLoading = false;
@@ -145,10 +161,10 @@ export const authSlice = createSlice({
       // Refresh Token
       .addMatcher(authApi.endpoints.refresh.matchFulfilled, (state, action) => {
         state.accessToken = action.payload.accessToken;
-        state.user = action.payload.user;
-        state.isAuthenticated = true;
+        // Сохраняем токен в localStorage
+        localStorage.setItem('accessToken', action.payload.accessToken);
         
-        // Обновляем состояние в localStorage
+        // Обновляем состояние в localStorage (пользователь остается прежним)
         localStorage.setItem('authState', JSON.stringify({
           user: state.user,
           accessToken: state.accessToken,

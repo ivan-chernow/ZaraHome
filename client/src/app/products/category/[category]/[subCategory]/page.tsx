@@ -3,12 +3,12 @@ import React, { use } from "react";
 import ProductCard from "@/components/ProductCard";
 import HomeIcon from "@/components/ui/HomeIcon";
 import { useGetCatalogQuery } from "@/api/products.api";
-import CircularProgress from "@mui/material/CircularProgress";
 import slugify from "slugify";
 import Link from "next/link";
 import { getProductsBySubCategory } from "@/store/features/catalog/catalog.utils";
 import { useSorting } from "@/hooks/useSorting";
 import SortButtons from "@/components/SortButtons";
+import { ProductCardSkeleton } from "@/components/ProductCardSceleton";
 
 const Page = ({
   params,
@@ -54,14 +54,14 @@ const Page = ({
     <div className="flex flex-col flex-1 pl-0">
       <div className="flex items-center mb-[39px]">
         <HomeIcon />
-        <span className="mx-[6px] text-[#0000004D]">{">"}</span>
+        <span className="mx-[6px] text-[#0000004D]">{" > "}</span>
         <Link
           href={`/products/category/${categorySlug}`}
           className="text-[#00000099] text-[14px] font-medium hover:underline"
         >
           {categoryName}
         </Link>
-        <span className="mx-[6px] text-[#0000004D]">{">"}</span>
+        <span className="mx-[6px] text-[#0000004D]">{" > "}</span>
         <span className="text-[#00000099] text-[14px] underline font-medium">
           {subCategoryName}
         </span>
@@ -78,7 +78,11 @@ const Page = ({
       </div>
       <div className="w-full min-h-[300px] flex items-center justify-center">
         {!categories ? (
-          <CircularProgress />
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </ul>
         ) : products && products.length > 0 ? (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
             {products.map((product) => (
