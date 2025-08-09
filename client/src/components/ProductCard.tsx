@@ -149,7 +149,12 @@ const ProductCard = ({
           <span className="font-bold text-[18px] ml-0.5">₽</span>
         </p>
 
-        <CartButton size={cartButtonSize} productId={product.id} />
+        <CartButton
+          size={cartButtonSize}
+          productId={product.id}
+          price={Object.values(product.size)[0]?.price}
+          img={product.img?.[0]}
+        />
       </div>
 
       <div

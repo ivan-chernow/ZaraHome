@@ -13,6 +13,23 @@ import { favoritesApi } from "@/api/favorites.api";
 import favoritesReducer from "./features/favorites/favorites.slice";
 import cartItemsReducer from './features/cart/cartItems.slice';
 import { cartApi } from '@/api/cart.api';
+import { setLocalStorage } from "@/utils/storage";
+
+// Утилита для санитарной очистки структуры корзины
+const sanitizeCartItems = (raw: any): any[] => {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((i) => i && typeof i.id === "number" && typeof i.price === "number")
+    .map((i) => ({
+      id: i.id,
+      price: i.price,
+      img: typeof i.img === "string" ? i.img : undefined,
+      quantity:
+        typeof i.quantity === "number" && Number.isFinite(i.quantity) && i.quantity > 0
+          ? i.quantity
+          : 1,
+    }));
+};
 
 export const store = configureStore({
   reducer: {
@@ -45,3 +62,10 @@ setupListeners(store.dispatch);
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
+
+// Подписка для сохранения корзины в localStorage при изменениях
+store.subscribe(() => {
+  const state = store.getState();
+  const items = state.cartItems?.items ?? [];
+  setLocalStorage("cart", sanitizeCartItems(items));
+});

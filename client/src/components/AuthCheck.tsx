@@ -7,6 +7,7 @@ import { RootState } from "@/store/store";
 import { setFavorites } from "@/store/features/favorites/favorites.slice";
 import { getLocalStorage } from "@/utils/storage";
 import { setCartItems } from "@/store/features/cart/cartItems.slice";
+import { useGetFavoritesQuery } from "@/api/favorites.api";
 
 /**
  * Компонент AuthCheck:
@@ -17,11 +18,13 @@ import { setCartItems } from "@/store/features/cart/cartItems.slice";
 const AuthCheck = () => {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { data: favoritesData } = useGetFavoritesQuery(undefined, {
+    skip: !isAuthenticated,
+  });
 
   useEffect(() => {
-    // Загружаем избранное и корзину из localStorage только для гостей
-    // Авторизованные пользователи получают данные с сервера
     if (!isAuthenticated) {
+      // Гость: читаем локальные снэпшоты
       try {
         const localFavorites = getLocalStorage("favorites", []);
         dispatch(
@@ -40,6 +43,14 @@ const AuthCheck = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // Авторизованный пользователь: синхронизируем избранное с сервером
+    if (isAuthenticated && Array.isArray(favoritesData)) {
+      const ids = favoritesData.map((p) => p.id);
+      dispatch(setFavorites(ids));
+    }
+  }, [isAuthenticated, favoritesData, dispatch]);
 
   return null;
 };

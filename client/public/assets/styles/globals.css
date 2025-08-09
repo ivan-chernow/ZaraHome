@@ -36,3 +36,18 @@ body {
 .font-ysabeau {
     font-family: var(--font-ysabeau);
 }
+
+/* Hide scrollbars but keep scrolling */
+/* Firefox */
+* {
+  scrollbar-width: none;
+}
+/* IE/Edge */
+* {
+  -ms-overflow-style: none;
+}
+/* Chrome/Safari/Opera */
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}

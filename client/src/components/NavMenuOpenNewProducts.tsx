@@ -7,9 +7,10 @@ import { getAllProducts } from "@/store/features/catalog/catalog.utils";
 import type { Product } from "@/api/products.api";
 import NavMenuProductCard from "./NavMenuProductCard";
 import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
+import NavMenuGridSkeleton from "./skeleton/NavMenuGridSkeleton";
 
 const NavMenuOpenNewProducts = () => {
-  const { data: categories } = useGetCatalogQuery();
+  const { data: categories, isLoading } = useGetCatalogQuery();
 
   const latestNewProducts: Product[] = useMemo(() => {
     if (!categories) return [];
@@ -36,11 +37,15 @@ const NavMenuOpenNewProducts = () => {
       <Container maxWidth="lg">
         <div className="flex flex-col items-center">
           <NavMenuSearchWrapper alwaysShowChildren={true}>
-            <div className="grid grid-cols-4 gap-6 w-full py-8">
-              {latestNewProducts.map((product) => (
-                <NavMenuProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {isLoading ? (
+              <NavMenuGridSkeleton items={4} />
+            ) : (
+              <div className="grid grid-cols-4 gap-6 w-full py-8">
+                {latestNewProducts.map((product) => (
+                  <NavMenuProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
           </NavMenuSearchWrapper>
         </div>
       </Container>

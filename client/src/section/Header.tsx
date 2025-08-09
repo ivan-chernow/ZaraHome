@@ -16,6 +16,10 @@ import {
   logout,
 } from "@/store/features/auth/auth.slice";
 import { usePathname } from "next/navigation";
+import {
+  selectCartTotalCount,
+  selectCartTotalPrice,
+} from "@/store/features/cart/cartItems.slice";
 
 const Header = () => {
   const pathname = usePathname();
@@ -25,6 +29,12 @@ const Header = () => {
     (state: RootState) => state.auth
   );
   const cartButtonRef = useRef<HTMLDivElement>(null);
+  const totalCount = useSelector((state: RootState) =>
+    selectCartTotalCount(state)
+  );
+  const totalPrice = useSelector((state: RootState) =>
+    selectCartTotalPrice(state)
+  );
 
   const isProfilePage = pathname?.startsWith("/profile");
 
@@ -100,12 +110,11 @@ const Header = () => {
               <div className="absolute -top-2 -right-2 flex items-center justify-center">
                 <div className="absolute border-2 border-black rounded-full w-5 h-5"></div>
                 <span className="relative text-black text-[14px] font-bold">
-                  0
+                  {totalCount}
                 </span>
               </div>
             </div>
-
-            <p className="ml-[16px] font-roboto font-medium">0</p>
+            <p className="ml-[16px] font-roboto font-medium">{totalPrice}₽</p>
           </div>
           <VerticalLine height="57px" />
         </div>

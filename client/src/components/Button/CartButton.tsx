@@ -18,21 +18,28 @@ import {
 
 interface CartButtonProps {
   productId: number;
+  price: number;
+  img?: string;
   size?: "default" | "small";
 }
 
-const CartButton = ({ productId, size = "default" }: CartButtonProps) => {
+const CartButton = ({
+  productId,
+  price,
+  img,
+  size = "default",
+}: CartButtonProps) => {
   const dispatch = useDispatch();
   const isSmall = size === "small";
 
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
-  const cartIds = useSelector((state: RootState) => state.cartItems.ids);
+  const cartItems = useSelector((state: RootState) => state.cartItems.items);
 
   const isInCart = useMemo(
-    () => cartIds.includes(productId),
-    [cartIds, productId]
+    () => cartItems.some((item) => item.id === productId),
+    [cartItems, productId]
   );
 
   const [addToCart] = useAddToCartMutation();
@@ -44,29 +51,29 @@ const CartButton = ({ productId, size = "default" }: CartButtonProps) => {
         dispatch(removeCartItem(productId));
         await removeFromCart(productId).unwrap();
       } else {
-        dispatch(addCartItem(productId));
+        dispatch(addCartItem({ id: productId, price, img }));
         await addToCart(productId).unwrap();
       }
     } catch (error) {
       // Rollback optimistic update
       if (isInCart) {
-        dispatch(addCartItem(productId));
+        dispatch(addCartItem({ id: productId, price, img }));
       } else {
         dispatch(removeCartItem(productId));
       }
       console.error("Ошибка при работе с корзиной:", error);
     }
-  }, [isInCart, productId, addToCart, removeFromCart, dispatch]);
+  }, [isInCart, productId, price, img, addToCart, removeFromCart, dispatch]);
 
   const handleGuestToggle = useCallback(() => {
     const cart = getLocalStorage("cart", []);
     const updatedCart = isInCart
-      ? cart.filter((id: number) => id !== productId)
-      : [...cart, productId];
+      ? cart.filter((item: any) => item.id !== productId)
+      : [...cart, { id: productId, price, quantity: 1, img }];
 
     setLocalStorage("cart", updatedCart);
     dispatch(setCartItems(updatedCart));
-  }, [isInCart, productId, dispatch]);
+  }, [isInCart, productId, price, img, dispatch]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -85,6 +92,7 @@ const CartButton = ({ productId, size = "default" }: CartButtonProps) => {
     <Button
       onClick={handleClick}
       variant="outlined"
+      disabled={typeof price !== "number"}
       sx={{
         backgroundColor: isInCart ? "white" : "black",
         borderColor: "black",

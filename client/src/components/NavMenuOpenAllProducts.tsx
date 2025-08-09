@@ -2,12 +2,15 @@ import React from "react";
 import NavMenuAccordion from "./NavMenuAccordion";
 import { Container } from "@mui/material";
 import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
+import { useGetCatalogQuery } from "@/api/products.api";
+import NavMenuAccordionSkeleton from "./skeleton/NavMenuAccordionSkeleton";
 
 interface NavMenuOpenProps {
   onClose: () => void;
 }
 
 const NavMenuOpen: React.FC<NavMenuOpenProps> = ({ onClose }) => {
+  const { isLoading } = useGetCatalogQuery();
   return (
     <div className="absolute top-0 left-0 w-screen bg-white z-50 h-auto  shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
       <Container maxWidth="lg">
@@ -15,7 +18,11 @@ const NavMenuOpen: React.FC<NavMenuOpenProps> = ({ onClose }) => {
           <NavMenuSearchWrapper alwaysShowChildren={true}>
             <div className="py-[50px]">
               <div className="flex w-full justify-center">
-                <NavMenuAccordion onClose={onClose} />
+                {isLoading ? (
+                  <NavMenuAccordionSkeleton />
+                ) : (
+                  <NavMenuAccordion onClose={onClose} />
+                )}
               </div>
             </div>
           </NavMenuSearchWrapper>
