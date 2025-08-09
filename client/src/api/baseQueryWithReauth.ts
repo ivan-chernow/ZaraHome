@@ -9,8 +9,10 @@ const mutex = new Mutex();
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:3001',
   credentials: 'include',
-  prepareHeaders: (headers) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  prepareHeaders: (headers, { getState }) => {
+    // Берем токен из Redux, а не из localStorage, чтобы избежать авто-логина на перезагрузке
+    const state: any = getState();
+    const token = state?.auth?.accessToken ?? null;
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
@@ -27,6 +29,12 @@ export const baseQueryWithReauth: BaseQueryFn<
 
   if (result.error && result.error.status === 401) {
     console.log('Unauthorized request, attempting token refresh...');
+    const state: any = api.getState?.();
+    const isAuthenticated: boolean = !!state?.auth?.isAuthenticated;
+    // Не пытаемся рефрешить токен, если пользователь не вошел (исключаем авто-логин)
+    if (!isAuthenticated) {
+      return result;
+    }
     
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
@@ -44,11 +52,6 @@ export const baseQueryWithReauth: BaseQueryFn<
         if (refreshResult.data) {
           const { accessToken } = refreshResult.data as { accessToken: string };
           
-          // Сохраняем токен на клиенте
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('accessToken', accessToken);
-          }
-          
           // Обновляем только токен, пользователь остается прежним
           api.dispatch({ type: 'auth/setCredentials', payload: { accessToken, user: null } });
           
@@ -58,16 +61,10 @@ export const baseQueryWithReauth: BaseQueryFn<
           result = await baseQuery(args, api, extraOptions);
         } else {
           console.log('Token refresh failed, logging out...');
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('accessToken');
-          }
           api.dispatch({ type: 'auth/logout' });
         }
       } catch (error) {
         console.error('Error during token refresh:', error);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('accessToken');
-        }
         api.dispatch({ type: 'auth/logout' });
       } finally {
         release();
