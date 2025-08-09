@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import Discount from "./Discount";
 import New from "./ui/New";
 import type { Product } from "@/api/products.api";
+import { useDispatch } from "react-redux";
+import { closeAllMenus } from "@/store/features/catalog/navMenu.slice";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -14,8 +16,12 @@ interface NavMenuProductCardProps {
 }
 
 const NavMenuProductCard: React.FC<NavMenuProductCardProps> = ({ product }) => {
+  const dispatch = useDispatch();
   return (
-    <Link href={`/products/${product.id}`}>
+    <Link
+      href={`/products/${product.id}`}
+      onClick={() => dispatch(closeAllMenus())}
+    >
       <motion.div
         className="group cursor-pointer"
         whileHover={{ y: -5 }}

@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Product } from "@/api/products.api";
+import { useDispatch } from "react-redux";
+import { closeAllMenus } from "@/store/features/catalog/navMenu.slice";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -16,6 +18,7 @@ const SearchResultProductCard: React.FC<SearchResultProductCardProps> = ({
   product,
   searchText,
 }) => {
+  const dispatch = useDispatch();
   const getHighlightedText = (text: string, highlight: string) => {
     if (!highlight.trim()) {
       return <span>{text}</span>;
@@ -49,7 +52,10 @@ const SearchResultProductCard: React.FC<SearchResultProductCardProps> = ({
   };
 
   return (
-    <Link href={`/products/${product.id}`}>
+    <Link
+      href={`/products/${product.id}`}
+      onClick={() => dispatch(closeAllMenus())}
+    >
       <motion.div
         className="group cursor-pointer"
         whileHover={{ y: -5 }}
