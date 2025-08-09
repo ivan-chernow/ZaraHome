@@ -23,42 +23,27 @@ const Page = () => {
 
   const favoriteIds = useSelector((state: RootState) => state.favorites.ids);
 
-  const [hasMounted, setHasMounted] = React.useState(false);
-  const [favoritesReady, setFavoritesReady] = React.useState(false);
-  const [initialLoadComplete, setInitialLoadComplete] = React.useState(false);
-
+  // Поднимаем локальные избранные на случай, если Redux пуст (например, сразу после F5)
   React.useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  // Guest: sync from localStorage once
-  React.useEffect(() => {
-    if (!isAuthenticated) {
-      const fromStorage: number[] = getLocalStorage("favorites", []);
-      if (Array.isArray(fromStorage)) {
-        const differs =
-          fromStorage.length !== favoriteIds.length ||
-          fromStorage.some((id) => !favoriteIds.includes(id));
-        if (differs) dispatch(setFavorites(fromStorage));
-      }
-      setFavoritesReady(true);
-      return;
+    const key = isAuthenticated && userId ? `favorites:${userId}` : "favorites";
+    const fromStorage: number[] = getLocalStorage(key, []);
+    if (Array.isArray(fromStorage) && fromStorage.length > 0) {
+      const differs =
+        fromStorage.length !== favoriteIds.length ||
+        fromStorage.some((id) => !favoriteIds.includes(id));
+      if (differs) dispatch(setFavorites(fromStorage));
     }
-    setFavoritesReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userId]);
 
-  // Catalog (needed only for guest mapping by IDs)
+  // Каталог — нужен для мгновенного отображения по локальным id
   const { data: categories, isLoading: loadingCatalog } = useGetCatalogQuery();
 
-  // Server favorites for authenticated
+  // Избранные с сервера (для авторизованных)
   const {
     data: serverFavorites = [],
     isLoading: loadingServer,
     isFetching: fetchingServer,
-    isError: isErrorServer,
-    error: errorServer,
-    isSuccess: successServer,
   } = useGetFavoritesQuery(isAuthenticated ? userId : undefined, {
     skip: !isAuthenticated,
     refetchOnMountOrArgChange: true,
@@ -66,105 +51,46 @@ const Page = () => {
     refetchOnReconnect: true,
   });
 
-  // Sync Redux favoriteIds with server for proper button states (only on success and when not fetching)
-  React.useEffect(() => {
-    if (!isAuthenticated) return;
-    if (!successServer) return;
-    if (fetchingServer) return;
-    const serverIds = Array.isArray(serverFavorites)
-      ? (serverFavorites as any[]).map((p) => p.id)
-      : [];
-    const a = [...favoriteIds].sort((x, y) => x - y);
-    const b = [...serverIds].sort((x, y) => x - y);
-    const equal = a.length === b.length && a.every((v, i) => v === b[i]);
-    if (!equal) dispatch(setFavorites(serverIds));
-  }, [
-    isAuthenticated,
-    successServer,
-    fetchingServer,
-    serverFavorites,
-    favoriteIds,
-    dispatch,
-  ]);
-
-  // Guest mapping by IDs
-  const guestFavorites = React.useMemo(() => {
-    if (isAuthenticated || !categories || favoriteIds.length === 0) return [];
+  // Map local ids -> products по каталогу (для мгновенного рендера)
+  const localMapped = React.useMemo(() => {
+    if (!categories || favoriteIds.length === 0) return [] as any[];
     const allProducts = getAllProducts(categories);
-    return allProducts.filter((product) => favoriteIds.includes(product.id));
-  }, [isAuthenticated, categories, favoriteIds]);
+    return allProducts.filter((p) => favoriteIds.includes(p.id));
+  }, [categories, favoriteIds]);
 
-  // Auth mapping by IDs (for instant UI updates) and merging with server
-  const authMappedFavorites = React.useMemo(() => {
-    if (!isAuthenticated || !categories || favoriteIds.length === 0) return [];
-    const allProducts = getAllProducts(categories);
-    return allProducts.filter((product) => favoriteIds.includes(product.id));
-  }, [isAuthenticated, categories, favoriteIds]);
-
-  // Decide products
+  // Формируем итоговый список: приоритет — сервер (если уже пришёл), объединяя с локальным
   const favoriteProducts = React.useMemo(() => {
-    if (isAuthenticated) {
-      // Merge server favorites with mapped by IDs for instant updates
-      const byId = new Map<number, any>();
-      // Always respect current favoriteIds
-      const idsSet = new Set(favoriteIds);
-      if (Array.isArray(serverFavorites)) {
-        for (const p of serverFavorites as any[]) {
-          if (idsSet.has(p.id)) byId.set(p.id, p);
-        }
-      }
-      for (const p of authMappedFavorites) {
-        if (idsSet.has(p.id) && !byId.has(p.id)) byId.set(p.id, p);
-      }
-      return Array.from(byId.values());
-    }
-    return guestFavorites;
-  }, [
-    isAuthenticated,
-    serverFavorites,
-    authMappedFavorites,
-    guestFavorites,
-    favoriteIds,
-  ]);
+    const byId = new Map<number, any>();
 
-  // Mark initial load complete
-  React.useEffect(() => {
-    if (!hasMounted || !favoritesReady) return;
-
-    if (isAuthenticated) {
-      // consider initial done when first load finished (either success or error), but don't block on refetch
-      if (!loadingServer && !fetchingServer) setInitialLoadComplete(true);
-      return;
+    // локальные мгновенно
+    for (const p of localMapped) {
+      byId.set(p.id, p);
     }
 
-    // guest needs catalog
-    if (categories && !loadingCatalog) setInitialLoadComplete(true);
-  }, [
-    hasMounted,
-    favoritesReady,
-    isAuthenticated,
-    loadingServer,
-    fetchingServer,
-    categories,
-    loadingCatalog,
-  ]);
+    // серверные (перекрывают локальные при совпадении id)
+    if (Array.isArray(serverFavorites)) {
+      for (const p of serverFavorites as any[]) {
+        byId.set(p.id, p);
+      }
+    }
 
-  // Loading state
+    return Array.from(byId.values());
+  }, [localMapped, serverFavorites]);
+
+  // Состояние загрузки: показываем скелетоны, если ничего отобразить и ещё ждём данные
   const isLoading = (() => {
-    if (!hasMounted || !favoritesReady || !initialLoadComplete) return true;
-    if (isAuthenticated)
-      return loadingServer && !successServer && serverFavorites.length === 0;
-    return loadingCatalog || !categories;
-  })();
+    // Если уже есть что показать (локальное или серверное) — не считаем загрузкой
+    if (favoriteProducts.length > 0) return false;
 
-  // Show error only when truly failed and not refetching, and have nothing to show
-  const shouldShowError = Boolean(
-    isAuthenticated &&
-      isErrorServer &&
-      !fetchingServer &&
-      serverFavorites.length === 0 &&
-      initialLoadComplete
-  );
+    // Если есть локальные ids, но каталог не подгружен — ждём (скелетоны)
+    if (favoriteIds.length > 0 && loadingCatalog) return true;
+
+    // Для авторизованных ждём сервер, если нет локальных данных
+    if (isAuthenticated) return loadingServer || fetchingServer;
+
+    // Для гостей — ждём только каталог, если нет ids
+    return loadingCatalog;
+  })();
 
   const renderContent = () => {
     if (isLoading) {
@@ -175,11 +101,6 @@ const Page = () => {
           ))}
         </ul>
       );
-    }
-
-    // Do not show blocking error UI; log and continue to graceful empty state
-    if (shouldShowError) {
-      console.error("Favorites error:", errorServer);
     }
 
     if (favoriteProducts && favoriteProducts.length > 0) {

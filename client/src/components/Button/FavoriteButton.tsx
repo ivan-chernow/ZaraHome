@@ -37,6 +37,7 @@ const useFavorites = (productId: number) => {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
+  const userId = useSelector((state: RootState) => state.auth.user?.id);
 
   const [addToFavorites] = useAddToFavoritesMutation();
   const [removeFromFavorites] = useRemoveFromFavoritesMutation();
@@ -51,14 +52,34 @@ const useFavorites = (productId: number) => {
       if (isFavorite) {
         await removeFromFavorites(productId).unwrap();
         dispatch(removeFavorite(productId));
+        // Синхронизируем локально для мгновенного восстановления после перезагрузки
+        const key = userId ? `favorites:${userId}` : "favorites";
+        const favorites = getLocalStorage(key, []);
+        const updated = Array.isArray(favorites)
+          ? favorites.filter((id: number) => id !== productId)
+          : [];
+        setLocalStorage(key, updated);
       } else {
         await addToFavorites(productId).unwrap();
         dispatch(addFavorite(productId));
+        const key = userId ? `favorites:${userId}` : "favorites";
+        const favorites = getLocalStorage(key, []);
+        const updated = Array.isArray(favorites)
+          ? Array.from(new Set([...(favorites as number[]), productId]))
+          : [productId];
+        setLocalStorage(key, updated);
       }
     } catch (error) {
       console.error("Ошибка при работе с избранным:", error);
     }
-  }, [isFavorite, productId, addToFavorites, removeFromFavorites, dispatch]);
+  }, [
+    isFavorite,
+    productId,
+    addToFavorites,
+    removeFromFavorites,
+    dispatch,
+    userId,
+  ]);
 
   const handleGuestToggle = useCallback(() => {
     const favorites = getLocalStorage("favorites", []);
