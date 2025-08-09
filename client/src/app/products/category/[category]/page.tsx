@@ -129,18 +129,6 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
     return found ? found.name : decodeURIComponent(categorySlug);
   }, [categories, categorySlug]);
 
-  if (isLoading) {
-    return (
-      <div className="w-full min-h-[300px] flex items-center justify-center">
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-            <ProductCardSkeleton key={i} />
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[500px]">
@@ -153,57 +141,92 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
     <div className="flex flex-col flex-1 pl-0">
       <div className="flex items-center mb-[39px]">
         <HomeIcon />
-        <span className="mx-[6px] text-[#0000004D]">{">"}</span>
+        <span className="mx-[6px] text-[#0000004D]">{" > "}</span>
         <span className="text-[#00000099] text-[14px] underline font-medium">
-          {categoryName}
+          {isLoading ? (
+            <Skeleton variant="text" width={180} height={24} />
+          ) : (
+            categoryName
+          )}
         </span>
       </div>
 
       {/* Заголовок категории и сортировка + иконки справа */}
       <div className="flex flex-col mb-[60px] w-full">
-        <h3 className="font-light text-[42px]">{categoryName}</h3>
+        {isLoading ? (
+          <Skeleton variant="text" width={320} height={48} />
+        ) : (
+          <h3 className="font-light text-[42px]">{categoryName}</h3>
+        )}
 
-        {/* Кнопки сортировки напрямую */}
+        {/* Кнопки сортировки или их скелетоны */}
         <div className="flex items-center justify-end mt-[53px]">
-          <button
-            className={`flex items-center mr-[12px] cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
-              sortType === "price"
-                ? "text-blue-600 font-semibold underline"
-                : ""
-            }`}
-            onClick={handleSortByPrice}
-          >
-            <img
-              src="/assets/img/Catalog/cheap.png"
-              alt="cheap"
-              width={24}
-              height={24}
-            />
-            <p className="text-[14px] font-semibold mr-[3px]">
-              Сначала дешевые
-            </p>
-          </button>
-          <button
-            className={`flex items-center cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
-              sortType === "date" ? "text-blue-600 font-semibold underline" : ""
-            }`}
-            onClick={handleSortByDate}
-          >
-            <img
-              src="/assets/img/Catalog/Time_later.svg"
-              alt="later"
-              width={24}
-              height={24}
-            />
-            <p className="text-[14px] font-semibold mr-[5px]">
-              Добавлены позже
-            </p>
-          </button>
+          {isLoading ? (
+            <>
+              <Skeleton
+                variant="rectangular"
+                width={170}
+                height={32}
+                className="rounded mr-[12px]"
+              />
+              <Skeleton
+                variant="rectangular"
+                width={170}
+                height={32}
+                className="rounded"
+              />
+            </>
+          ) : (
+            <>
+              <button
+                className={`flex items-center mr-[12px] cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
+                  sortType === "price"
+                    ? "text-blue-600 font-semibold underline"
+                    : ""
+                }`}
+                onClick={handleSortByPrice}
+              >
+                <img
+                  src="/assets/img/Catalog/cheap.png"
+                  alt="cheap"
+                  width={24}
+                  height={24}
+                />
+                <p className="text-[14px] font-semibold mr-[3px]">
+                  Сначала дешевые
+                </p>
+              </button>
+              <button
+                className={`flex items-center cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
+                  sortType === "date"
+                    ? "text-blue-600 font-semibold underline"
+                    : ""
+                }`}
+                onClick={handleSortByDate}
+              >
+                <img
+                  src="/assets/img/Catalog/Time_later.svg"
+                  alt="later"
+                  width={24}
+                  height={24}
+                />
+                <p className="text-[14px] font-semibold mr-[5px]">
+                  Добавлены позже
+                </p>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       <div className="w-full min-h-[300px] flex items-center justify-center">
-        {paginatedProducts && paginatedProducts.length > 0 ? (
+        {isLoading ? (
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </ul>
+        ) : paginatedProducts && paginatedProducts.length > 0 ? (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
             {paginatedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
@@ -215,7 +238,7 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
       </div>
 
       {/* Пагинация - показываем только если есть больше одной страницы */}
-      {totalPages > 1 && (
+      {!isLoading && totalPages > 1 && (
         <PaginationBlock
           count={totalPages}
           page={currentPage}
