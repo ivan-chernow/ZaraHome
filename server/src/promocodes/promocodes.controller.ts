@@ -29,10 +29,8 @@ export class PromocodesController {
     return { message: 'Промокод успешно деактивирован' };
   }
 
-  // Применение промокода
+  // Применение промокода (доступно всем пользователям)
   @Post('apply')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.USER)
   async applyPromocode(
     @Body() applyPromocodeDto: { code: string; orderAmount: number }
   ) {
@@ -42,15 +40,10 @@ export class PromocodesController {
     );
   }
 
-
-
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAllActive() {
     return await this.promocodesService.getAllActive();
   }
-
-  // Деактивация промокода (только для админа)
-
 } 
