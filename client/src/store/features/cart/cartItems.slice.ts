@@ -47,6 +47,14 @@ const cartItemsSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
     },
+    setCartItemQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
+      const { id, quantity } = action.payload;
+      const nextQty = Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1;
+      const existingItem = state.items.find((item) => item.id === id);
+      if (existingItem) {
+        existingItem.quantity = nextQty;
+      }
+    },
   },
 });
 
@@ -63,5 +71,6 @@ export const {
   removeCartItem,
   deleteCartItem,
   clearCart,
+  setCartItemQuantity,
 } = cartItemsSlice.actions;
 export default cartItemsSlice.reducer; 

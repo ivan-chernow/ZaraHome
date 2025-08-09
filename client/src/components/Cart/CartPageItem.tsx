@@ -10,8 +10,12 @@ import {
   addCartItem,
   removeCartItem,
   deleteCartItem,
+  setCartItemQuantity,
   type CartItem as CartItemType,
 } from "@/store/features/cart/cartItems.slice";
+import { useState, useCallback, useEffect } from "react";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 
 interface CartPageItemProps {
   item: CartItemType;
@@ -32,15 +36,31 @@ const getFullImageUrl = (path?: string): string | undefined => {
 
 const CartPageItem: React.FC<CartPageItemProps> = ({ item }) => {
   const dispatch = useDispatch();
+  const [inputValue, setInputValue] = useState<string>(String(item.quantity));
   const categories = useSelector(
     (state: RootState) => state.catalog.categories
   );
   const product = findProductById(categories, item.id);
 
+  // Синхронизируем инпут с количеством из стора (после +/− или внешних изменений)
+  useEffect(() => {
+    setInputValue(String(item.quantity));
+  }, [item.quantity]);
+
   const handleDecrease = () => dispatch(removeCartItem(item.id));
   const handleIncrease = () =>
     dispatch(addCartItem({ id: item.id, price: item.price, img: item.img }));
   const handleDelete = () => dispatch(deleteCartItem(item.id));
+
+  const commitInput = useCallback(() => {
+    const numeric = parseInt(inputValue, 10);
+    if (!Number.isFinite(numeric) || numeric <= 0) {
+      setInputValue(String(item.quantity));
+      return;
+    }
+    dispatch(setCartItemQuantity({ id: item.id, quantity: numeric }));
+    setInputValue(String(numeric));
+  }, [dispatch, inputValue, item.id, item.quantity]);
 
   return (
     <li className="flex items-center justify-between py-4">
@@ -72,19 +92,36 @@ const CartPageItem: React.FC<CartPageItemProps> = ({ item }) => {
         <button
           aria-label="Уменьшить количество"
           onClick={handleDecrease}
-          className="text-[#6B7280] hover:text-black transition transform hover:scale-105 active:scale-95"
+          className="w-7 h-7 flex items-center justify-center rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition transform hover:scale-105 active:scale-95 cursor-pointer leading-none"
         >
-          −
+          <RemoveRoundedIcon fontSize="small" />
         </button>
-        <div className="w-[36px] h-[28px] border border-[#E5E5E5] text-center leading-[28px] text-[14px]">
-          {item.quantity}
-        </div>
+        <input
+          className="w-[56px] h-[36px] border border-[#E5E5E5] text-center text-[16px] rounded outline-none focus:border-gray-400"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={inputValue}
+          onChange={(e) => {
+            const raw = e.target.value.replace(/\D+/g, "");
+            setInputValue(raw);
+            const numeric = parseInt(raw, 10);
+            if (Number.isFinite(numeric) && numeric > 0) {
+              dispatch(setCartItemQuantity({ id: item.id, quantity: numeric }));
+            }
+          }}
+          onBlur={commitInput}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.currentTarget.blur();
+            }
+          }}
+        />
         <button
           aria-label="Увеличить количество"
           onClick={handleIncrease}
-          className="text-[#6B7280] hover:text-black transition transform hover:scale-105 active:scale-95"
+          className="w-7 h-7 flex items-center justify-center rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition transform hover:scale-105 active:scale-95 cursor-pointer leading-none"
         >
-          +
+          <AddRoundedIcon fontSize="small" />
         </button>
       </div>
 
@@ -96,7 +133,7 @@ const CartPageItem: React.FC<CartPageItemProps> = ({ item }) => {
         </span>
         <button
           aria-label="Удалить товар"
-          className="ml-1 p-1 rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition-colors duration-150 transform hover:scale-105 active:scale-95"
+          className="ml-1 p-1 rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition-colors duration-150 transform hover:scale-105 active:scale-95 cursor-pointer"
           onClick={handleDelete}
         >
           <CloseIcon fontSize="small" />

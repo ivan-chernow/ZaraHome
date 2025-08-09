@@ -14,6 +14,7 @@ import {
 } from "@/store/features/cart/cartItems.slice";
 import CartPageItem from "@/components/Cart/CartPageItem";
 import HorizontalLine from "@/components/ui/HorizontalLine";
+import Link from "next/link";
 
 const Page = () => {
   const router = useRouter();
@@ -27,7 +28,12 @@ const Page = () => {
       <section className="pb-[101px] pt-[45px]">
         <Container maxWidth="lg">
           <div className="flex items-center mb-[31px]">
-            <HomeOutlinedIcon fontSize="small" />
+            <Link href="/">
+              <HomeOutlinedIcon
+                fontSize="small"
+                className="cursor-pointer hover:opacity-80 transition"
+              />
+            </Link>
             <span className="text-[#00000099] ml-[4px] mr-[6px]">&gt;</span>
             <span className="text-[14px] font-medium text-[#00000099] underline">
               Корзина
