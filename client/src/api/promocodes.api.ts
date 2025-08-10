@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithReauth } from './baseQueryWithReauth';
 
 // Типы для промокодов
 export interface Promocode {
@@ -40,17 +41,7 @@ export interface ApiError {
 // Создание API
 export const promocodesApi = createApi({
     reducerPath: 'promocodesApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:3001',
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem('accessToken');
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            headers.set('Content-Type', 'application/json');
-            return headers;
-        },
-    }),
+    baseQuery: baseQueryWithReauth,
     tagTypes: ['Promocode'],
     endpoints: (builder) => ({
         // Создание промокода (только для админов)

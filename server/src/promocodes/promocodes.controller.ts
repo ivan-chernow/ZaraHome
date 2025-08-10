@@ -44,6 +44,6 @@ export class PromocodesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAllActive() {
-    return await this.promocodesService.getAllActive();
+    return await this.promocodesService.getAll();
   }
 } 

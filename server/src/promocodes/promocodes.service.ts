@@ -87,7 +87,16 @@ export class PromocodesService {
     });
   }
 
-  // Деактивация промокода (для админа)
+  // Получение всех промокодов (активных и неактивных)
+  async getAll(): Promise<Promocode[]> {
+    return await this.promocodeRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
+  // Деактивация/удаление промокода (для админа)
   async deactivate(code: string): Promise<void> {
     const promocode = await this.promocodeRepository.findOne({
       where: { code: code.toUpperCase() }
@@ -97,13 +106,7 @@ export class PromocodesService {
       throw new Error('Промокод не найден');
     }
 
-    if (!promocode.isActive) {
-      throw new Error('Промокод уже деактивирован');
-    }
-
-    await this.promocodeRepository.update(
-      { code: code.toUpperCase() },
-      { isActive: false }
-    );
+    // Жёсткое удаление записи из БД по запросу "деактивировать"
+    await this.promocodeRepository.delete({ code: code.toUpperCase() });
   }
 } 
