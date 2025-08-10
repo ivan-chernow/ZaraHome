@@ -19,6 +19,8 @@ import {
   CartItem,
 } from "@/store/features/cart/cartItems.slice";
 import { useApplyPromocodeMutation } from "@/api/promocodes.api";
+import { useGetDeliveryAddressesQuery } from "@/api/profile.api";
+import type { DeliveryAddressDto } from "@/api/types/profile.types";
 import { Alert } from "@mui/material";
 
 const Page = () => {
@@ -93,6 +95,31 @@ const Page = () => {
     }
   }, [promo, cartTotal, applyPromocode]);
 
+  // Адреса доставки
+  const { data: addresses = [], isLoading: isAddrLoading } =
+    useGetDeliveryAddressesQuery(undefined, {
+      skip: !isAuthenticated,
+    });
+  const primary: DeliveryAddressDto | undefined = addresses[0];
+  const secondary: DeliveryAddressDto | undefined = addresses[1];
+  const formatFullName = (a: DeliveryAddressDto | undefined) => {
+    if (!a) return "";
+    return `${a.lastName} ${a.firstName} ${a.patronymic}`.trim();
+  };
+  const formatAddress = (a: DeliveryAddressDto | undefined) => {
+    if (!a) return "";
+    const parts: string[] = ["Россия", a.region, a.city];
+    const street = a.street ? `ул.${a.street}` : "";
+    const house = a.house ? `д.${a.house}` : "";
+    const building = a.building ? `корп.${a.building}` : "";
+    const apartment = a.apartment ? `кв.${a.apartment}` : "";
+    const tail = [street, house, building, apartment]
+      .filter(Boolean)
+      .join(", ");
+    if (tail) parts.push(tail);
+    return parts.filter(Boolean).join(", ");
+  };
+
   return (
     <MainLayout>
       <Container maxWidth="lg" sx={{ pt: "45px" }}>
@@ -151,10 +178,12 @@ const Page = () => {
                   </div>
                   <div className="flex flex-col">
                     <p className="font-semibold mb-[4px]">
-                      Сидоров Иван Петрович
+                      {isAddrLoading
+                        ? "Загрузка..."
+                        : formatFullName(primary) || "Адрес не указан"}
                     </p>
                     <p className="text-[14px] text-[#00000080]">
-                      Россия, Московская обл., Москва, ул.Ленина, д.24, кв.15
+                      {isAddrLoading ? "" : formatAddress(primary)}
                     </p>
                   </div>
                 </div>
@@ -170,7 +199,9 @@ const Page = () => {
                       <span className="bg-black rounded-full w-[6px] h-[6px]"></span>
                     </span>
                   </div>
-                  <p className="font-semibold">Другой адрес</p>
+                  <p className="font-semibold">
+                    {formatFullName(secondary) || "Другой адрес"}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center justify-start">
