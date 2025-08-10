@@ -174,4 +174,21 @@ export class UserService {
     Object.assign(address, addressData);
     return this.addressRepository.save(address);
   }
+
+  async deleteDeliveryAddress(userId: number, addressId: number): Promise<void> {
+    const address = await this.addressRepository.findOne({
+      where: { id: addressId },
+      relations: ['user']
+    });
+
+    if (!address) {
+      throw new NotFoundException('Адрес не найден');
+    }
+
+    if (address.user.id !== userId) {
+      throw new BadRequestException('У вас нет прав на удаление этого адреса');
+    }
+
+    await this.addressRepository.remove(address);
+  }
 }

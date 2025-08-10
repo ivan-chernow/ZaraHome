@@ -83,6 +83,13 @@ export const profileApi = createApi({
                 { type: 'DeliveryAddress', id: 'LIST' }
             ],
         }),
+        deleteDeliveryAddress: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/user/delivery-addresses/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: [{ type: 'DeliveryAddress', id: 'LIST' }],
+        }),
     }),
 });
 
@@ -95,6 +102,7 @@ export const {
     useGetDeliveryAddressesQuery,
     useAddDeliveryAddressMutation,
     useUpdateDeliveryAddressMutation,
+    useDeleteDeliveryAddressMutation,
 } = profileApi;
 
 

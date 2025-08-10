@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, UseGuards, Request, Post, Put, Param } from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, Request, Post, Put, Param, Delete } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { UserService } from './user.service';
 import { ChangeDeliveryAddressDto, ChangeEmailDto, ChangePasswordDto } from './dto/user.dto';
@@ -45,5 +45,13 @@ export class UserController {
         @Body() dto: ChangeDeliveryAddressDto
     ) {
         return this.userService.updateDeliveryAddress(req.user.userId, id, dto);
+    }
+
+    @Delete('delivery-addresses/:id')
+    async deleteDeliveryAddress(
+        @Request() req,
+        @Param('id') id: number
+    ) {
+        return this.userService.deleteDeliveryAddress(req.user.userId, id);
     }
 }
