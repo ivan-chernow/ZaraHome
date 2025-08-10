@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  Fade,
-  TextField,
-  Alert,
-  Snackbar,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Fade, TextField, Alert, Snackbar, IconButton } from "@mui/material";
 import MainButton from "@/components/Button/MainButton";
 import { useForm } from "react-hook-form";
 import {
@@ -260,43 +253,34 @@ const DeliveryAddress = () => {
                     transition={{ duration: 0.2 }}
                     className="group-hover:scale-110 group-hover:rotate-15 transition-transform duration-200"
                   >
-                    <Tooltip
-                      title={
-                        editingIndex === index
-                          ? "Закрыть редактирование"
-                          : "Редактировать адрес"
-                      }
-                      placement="top"
-                    >
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditClick(index);
-                        }}
-                        sx={{
-                          width: "32px",
-                          height: "32px",
-                          borderRadius: "50%",
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClick(index);
+                      }}
+                      sx={{
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "50%",
+                        backgroundColor:
+                          editingIndex === index ? "black" : "transparent",
+                        "&:hover": {
                           backgroundColor:
-                            editingIndex === index ? "black" : "transparent",
-                          "&:hover": {
-                            backgroundColor:
-                              editingIndex === index ? "#333" : "#f0f0f0",
-                            transform: "scale(1.1)",
-                          },
-                          transition: "background-color 0.3s, transform 0.2s",
-                        }}
-                      >
-                        {editingIndex === index ? (
-                          <CloseIcon fontSize="small" sx={{ color: "white" }} />
-                        ) : (
-                          <ModeEditOutlinedIcon
-                            fontSize="small"
-                            sx={{ color: "gray" }}
-                          />
-                        )}
-                      </IconButton>
-                    </Tooltip>
+                            editingIndex === index ? "#333" : "#f0f0f0",
+                          transform: "scale(1.1)",
+                        },
+                        transition: "background-color 0.3s, transform 0.2s",
+                      }}
+                    >
+                      {editingIndex === index ? (
+                        <CloseIcon fontSize="small" sx={{ color: "white" }} />
+                      ) : (
+                        <ModeEditOutlinedIcon
+                          fontSize="small"
+                          sx={{ color: "gray" }}
+                        />
+                      )}
+                    </IconButton>
                   </motion.div>
                 </div>
               </motion.div>
