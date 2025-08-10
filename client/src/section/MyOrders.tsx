@@ -1,38 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import { Fade } from "@mui/material";
-import VerticalLine from '@/components/ui/VerticalLine';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { motion, AnimatePresence } from 'framer-motion';
+import VerticalLine from "@/components/ui/VerticalLine";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const orderProducts = [
   {
-    img: '/img1.jpg',
-    name: 'LEATHER SANDALS',
-    desc: 'Кожаные сандалии',
-    price: '11 540 ₽',
+    img: "/img1.jpg",
+    name: "LEATHER SANDALS",
+    desc: "Кожаные сандалии",
+    price: "11 540 ₽",
   },
   {
-    img: '/img2.jpg',
-    name: 'LEATHER SANDALS',
-    desc: 'Кожаные сандалии',
-    price: '11 540 ₽',
+    img: "/img2.jpg",
+    name: "LEATHER SANDALS",
+    desc: "Кожаные сандалии",
+    price: "11 540 ₽",
   },
   {
-    img: '/img3.jpg',
-    name: 'LEATHER SANDALS',
-    desc: 'Кожаные сандалии',
-    price: '11 540 ₽',
+    img: "/img3.jpg",
+    name: "LEATHER SANDALS",
+    desc: "Кожаные сандалии",
+    price: "11 540 ₽",
   },
   {
-    img: '/img4.jpg',
-    name: 'LEATHER SANDALS',
-    desc: 'Кожаные сандалии',
-    price: '11 540 ₽',
+    img: "/img4.jpg",
+    name: "LEATHER SANDALS",
+    desc: "Кожаные сандалии",
+    price: "11 540 ₽",
   },
 ];
 
 const MyOrders = () => {
   const [open, setOpen] = React.useState(false);
+  // DEMO: skeleton при монтировании (заменить на isLoading при интеграции с API)
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-10 bg-gray-200 rounded w-1/3 mb-6" />
+        {[...Array(2)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-gray-100 rounded-lg shadow-md mb-4 h-[74px] w-full"
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <Fade in={true} timeout={1000}>
@@ -46,12 +66,16 @@ const MyOrders = () => {
                 <VerticalLine height={60} />
                 <div className="flex flex-col mx-6">
                   <p className="font-ysabeau font-semibold">
-                    Сформирован: <span className="font-normal mb-[6px]">20.07.2023 16:41</span>
+                    Сформирован:{" "}
+                    <span className="font-normal mb-[6px]">
+                      20.07.2023 16:41
+                    </span>
                   </p>
                   <p className="font-ysabeau font-semibold">
                     Статус:{" "}
                     <span className={`font-normal text-[#905858]`}>
-                      ожидает оплаты                    </span>
+                      ожидает оплаты{" "}
+                    </span>
                   </p>
                 </div>
                 <VerticalLine height={60} />
@@ -63,7 +87,10 @@ const MyOrders = () => {
                     На сумму:
                     <span className="font-medium font-roboto text-[24px]">
                       162 765
-                      <span className="font-bold font-ysabeau text-[18px]"> ₽</span>
+                      <span className="font-bold font-ysabeau text-[18px]">
+                        {" "}
+                        ₽
+                      </span>
                     </span>
                   </p>
                 </div>
@@ -71,14 +98,17 @@ const MyOrders = () => {
               <div className="flex items-center gap-2 min-w-[120px] justify-end">
                 <span
                   className="transition-transform duration-200 cursor-pointer"
-                  style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+                  style={{
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
                   onClick={() => setOpen((prev) => !prev)}
                 >
                   <KeyboardArrowDownIcon />
                 </span>
                 <p
-                  className={`font-roboto ml-1 cursor-pointer select-none transition-colors duration-200 ${open ? "text-black" : "text-[#0000004D] hover:text-black"
-                    }`}
+                  className={`font-roboto ml-1 cursor-pointer select-none transition-colors duration-200 ${
+                    open ? "text-black" : "text-[#0000004D] hover:text-black"
+                  }`}
                   onClick={() => setOpen((prev) => !prev)}
                 >
                   {open ? "скрыть" : "подробнее"}
@@ -106,8 +136,12 @@ const MyOrders = () => {
                         className="w-[60px] h-[60px] object-cover rounded mr-4"
                       />
                       <div className="flex flex-col flex-1">
-                        <span className="font-bold uppercase text-[15px]">{product.name}</span>
-                        <span className="text-[13px] text-[#888]">{product.desc}</span>
+                        <span className="font-bold uppercase text-[15px]">
+                          {product.name}
+                        </span>
+                        <span className="text-[13px] text-[#888]">
+                          {product.desc}
+                        </span>
                       </div>
                       <span className="font-roboto font-semibold text-[20px] min-w-[90px] text-right">
                         {product.price}

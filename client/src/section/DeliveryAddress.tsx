@@ -297,7 +297,21 @@ const DeliveryAddress = () => {
   };
 
   if (isLoading) {
-    return <div>Загрузка...</div>;
+    return (
+      <div className="w-full mb-[89px]">
+        <div className="mb-[19px] w-full">
+          <div className="animate-pulse">
+            <div className="h-10 bg-gray-200 rounded w-1/3 mb-6" />
+            {[...Array(2)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-gray-100 rounded-lg shadow-md mb-4 h-[74px] w-full"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
