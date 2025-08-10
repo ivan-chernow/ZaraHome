@@ -28,7 +28,12 @@ import {
   useDeleteDeliveryAddressMutation,
 } from "@/api/profile.api";
 import { profileApi } from "@/api/profile.api";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import {
+  setSelectedAddress,
+  clearSelectedAddress,
+} from "@/store/features/delivery/delivery.slice";
 
 const emptyAddress: ChangeDeliveryAddressDto = {
   firstName: "",
@@ -58,8 +63,13 @@ const hasChanges = (
 
 const DeliveryAddress = () => {
   const dispatch = useDispatch();
+  const { selectedAddressIndex, selectedAddress } = useSelector(
+    (state: RootState) => state.delivery
+  );
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(
+    selectedAddressIndex
+  );
   const [addMode, setAddMode] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -101,10 +111,32 @@ const DeliveryAddress = () => {
 
   // Инициализируем выбранный адрес при первой загрузке адресов
   useEffect(() => {
-    if (addresses.length > 0 && selectedIndex === null) {
-      setSelectedIndex(0);
+    if (addresses.length > 0) {
+      // Если есть сохраненный адрес, находим его индекс
+      if (selectedAddress && selectedAddressIndex !== null) {
+        const savedIndex = addresses.findIndex(
+          (addr) => addr.id === selectedAddress.id
+        );
+        if (savedIndex !== -1) {
+          setSelectedIndex(savedIndex);
+        } else {
+          // Если сохраненный адрес не найден, выбираем первый
+          setSelectedIndex(0);
+          dispatch(setSelectedAddress({ address: addresses[0], index: 0 }));
+        }
+      } else if (selectedIndex === null) {
+        // Если нет сохраненного адреса, выбираем первый
+        setSelectedIndex(0);
+        dispatch(setSelectedAddress({ address: addresses[0], index: 0 }));
+      }
     }
-  }, [addresses, selectedIndex]);
+  }, [
+    addresses,
+    selectedIndex,
+    selectedAddress,
+    selectedAddressIndex,
+    dispatch,
+  ]);
 
   // Очистка при размонтировании
   useEffect(() => {
@@ -117,6 +149,16 @@ const DeliveryAddress = () => {
       setSuccess(null);
     };
   }, [reset]);
+
+  // Синхронизируем локальное состояние с Redux
+  useEffect(() => {
+    if (
+      selectedAddressIndex !== null &&
+      selectedAddressIndex !== selectedIndex
+    ) {
+      setSelectedIndex(selectedAddressIndex);
+    }
+  }, [selectedAddressIndex, selectedIndex]);
 
   // Отслеживание изменения токена
   useEffect(() => {
@@ -228,6 +270,13 @@ const DeliveryAddress = () => {
 
     try {
       await deleteAddress(addressToDelete).unwrap();
+
+      // Если удаляемый адрес был выбранным, очищаем выбор
+      if (selectedAddress && selectedAddress.id === addressToDelete) {
+        dispatch(clearSelectedAddress());
+        setSelectedIndex(null);
+      }
+
       setSuccess("Адрес успешно удален");
       setDeleteDialogOpen(false);
       setAddressToDelete(null);
@@ -269,7 +318,10 @@ const DeliveryAddress = () => {
               >
                 <div
                   className="bg-white drop-shadow-lg flex items-center justify-between h-[74px] px-[30px] w-full cursor-pointer hover:shadow-lg transition-shadow duration-300 group"
-                  onClick={() => setSelectedIndex(index)}
+                  onClick={() => {
+                    setSelectedIndex(index);
+                    dispatch(setSelectedAddress({ address, index }));
+                  }}
                 >
                   <div className="flex items-center">
                     <div className="bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg mr-[29px] relative flex items-center justify-center">

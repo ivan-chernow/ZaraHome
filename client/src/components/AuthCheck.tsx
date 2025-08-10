@@ -7,6 +7,8 @@ import { RootState } from "@/store/store";
 import { setFavorites } from "@/store/features/favorites/favorites.slice";
 import { getLocalStorage, removeLocalStorage } from "@/utils/storage";
 import { setCartItems } from "@/store/features/cart/cartItems.slice";
+import { clearSelectedAddress } from "@/store/features/delivery/delivery.slice";
+import { setActiveView } from "@/store/features/profile/profile.slice";
 import { useGetFavoritesQuery } from "@/api/favorites.api";
 import { useAddToCartMutation, useGetCartQuery } from "@/api/cart.api";
 import type { Product } from "@/api/products.api";
@@ -145,6 +147,10 @@ const AuthCheck = () => {
     if (prevAuthRef.current === true && isAuthenticated === false) {
       dispatch(setCartItems([]));
       removeLocalStorage("cart");
+      // Очищаем выбранный адрес доставки при выходе
+      dispatch(clearSelectedAddress());
+      // Сбрасываем секцию профиля на "Мои заказы" при выходе
+      dispatch(setActiveView("my-orders"));
     }
     prevAuthRef.current = isAuthenticated;
   }, [isAuthenticated, dispatch]);

@@ -13,6 +13,7 @@ import MainButton from "@/components/Button/MainButton";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { openModalAuth, setView } from "@/store/features/auth/auth.slice";
+import { setSelectedAddress } from "@/store/features/delivery/delivery.slice";
 import {
   selectCartItems,
   selectCartTotalPrice,
@@ -26,6 +27,7 @@ import { Alert } from "@mui/material";
 const Page = () => {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { selectedAddress } = useSelector((state: RootState) => state.delivery);
   const cartItems = useSelector(
     (state: RootState) => selectCartItems(state) as CartItem[]
   );
@@ -100,8 +102,14 @@ const Page = () => {
     useGetDeliveryAddressesQuery(undefined, {
       skip: !isAuthenticated,
     });
-  const primary: DeliveryAddressDto | undefined = addresses[0];
-  const secondary: DeliveryAddressDto | undefined = addresses[1];
+
+  // Определяем primary и secondary адреса
+  const primary: DeliveryAddressDto | undefined =
+    selectedAddress || addresses[0];
+  const secondary: DeliveryAddressDto | undefined =
+    selectedAddress && addresses.length > 1
+      ? addresses.find((addr) => addr.id !== selectedAddress.id) || addresses[1]
+      : addresses[1];
   const formatFullName = (a: DeliveryAddressDto | undefined) => {
     if (!a) return "";
     return `${a.lastName} ${a.firstName} ${a.patronymic}`.trim();
@@ -171,10 +179,22 @@ const Page = () => {
         {isAuthenticated && (
           <div className="flex items-start justify-between mb-[89px]">
             <div className="mb-[19px] ">
-              <div className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px] max-w-[728px]">
+              <div
+                className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px] max-w-[728px] cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                onClick={() =>
+                  primary &&
+                  dispatch(setSelectedAddress({ address: primary, index: 0 }))
+                }
+              >
                 <div className="flex items-center">
                   <div className="bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg mr-[29px] relative flex items-center justify-center">
-                    <span className="bg-gray-300 rounded-full w-[12px] h-[12px]"></span>
+                    <span
+                      className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
+                        selectedAddress && selectedAddress.id === primary?.id
+                          ? "bg-black"
+                          : "bg-gray-300"
+                      }`}
+                    ></span>
                   </div>
                   <div className="flex flex-col">
                     <p className="font-semibold mb-[4px]">
@@ -192,17 +212,54 @@ const Page = () => {
                   sx={{ color: "gray" }}
                 />
               </div>
-              <div className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px] mt-[10px] mb-[42px] max-w-[728px]">
-                <div className="flex items-center">
-                  <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
-                    <span className="bg-gray-300 rounded-full w-[12px] h-[12px] flex items-center justify-center">
-                      <span className="bg-black rounded-full w-[6px] h-[6px]"></span>
-                    </span>
+              {secondary && (
+                <div
+                  className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px] mt-[10px] mb-[42px] max-w-[728px] cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                  onClick={() =>
+                    dispatch(
+                      setSelectedAddress({ address: secondary, index: 1 })
+                    )
+                  }
+                >
+                  <div className="flex items-center">
+                    <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
+                      <span
+                        className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
+                          selectedAddress &&
+                          selectedAddress.id === secondary?.id
+                            ? "bg-black"
+                            : "bg-gray-300"
+                        }`}
+                      ></span>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="font-semibold mb-[4px]">
+                        {formatFullName(secondary)}
+                      </p>
+                      <p className="text-[14px] text-[#00000080]">
+                        {formatAddress(secondary)}
+                      </p>
+                    </div>
                   </div>
-                  <p className="font-semibold">
-                    {formatFullName(secondary) || "Другой адрес"}
-                  </p>
+                  <ModeEditOutlinedIcon
+                    fontSize="medium"
+                    sx={{ color: "gray" }}
+                  />
                 </div>
+              )}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <p className="font-medium text-[#0000004D] mr-[5px]">
+                    Управление адресами
+                  </p>
+                  <HorizontalLine width="200px" />
+                </div>
+                <Link
+                  href="/profile"
+                  className="text-[14px] font-medium text-[#00000099] hover:text-black transition-colors duration-200 underline"
+                >
+                  Редактировать адреса
+                </Link>
               </div>
               <div className="flex items-center justify-start">
                 <p className="font-medium text-[#0000004D] mr-[5px] mb-[19px]">

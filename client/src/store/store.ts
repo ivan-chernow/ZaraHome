@@ -12,6 +12,8 @@ import { promocodesApi } from '@/api/promocodes.api';
 import { favoritesApi } from "@/api/favorites.api";
 import favoritesReducer from "./features/favorites/favorites.slice";
 import cartItemsReducer from './features/cart/cartItems.slice';
+import deliveryReducer from './features/delivery/delivery.slice';
+import profileReducer from './features/profile/profile.slice';
 import { cartApi } from '@/api/cart.api';
 import { setLocalStorage } from "@/utils/storage";
 
@@ -40,6 +42,8 @@ export const store = configureStore({
     navMenu: navMenuReducer,
     productCard: productCardReducer,
     favorites: favoritesReducer,
+    delivery: deliveryReducer,
+    profile: profileReducer,
     [authApi.reducerPath]: authApi.reducer,
     [profileApi.reducerPath]: profileApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
