@@ -6,6 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { findProductById } from "@/store/features/catalog/catalog.utils";
+import type { Product } from "@/api/products.api";
 import {
   addCartItem,
   removeCartItem,
@@ -16,10 +17,12 @@ import {
 import { useState, useCallback, useEffect } from "react";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
+import { useRemoveFromCartMutation } from "@/api/cart.api";
 
 interface CartPageItemProps {
   item: CartItemType;
   isLast?: boolean;
+  product?: Product;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -34,13 +37,18 @@ const getFullImageUrl = (path?: string): string | undefined => {
   }
 };
 
-const CartPageItem: React.FC<CartPageItemProps> = ({ item }) => {
+const CartPageItem: React.FC<CartPageItemProps> = ({
+  item,
+  product: productProp,
+}) => {
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<string>(String(item.quantity));
   const categories = useSelector(
     (state: RootState) => state.catalog.categories
   );
-  const product = findProductById(categories, item.id);
+  const productStore = findProductById(categories, item.id);
+  const product = productProp ?? productStore;
+  const [removeFromCart] = useRemoveFromCartMutation();
 
   // Синхронизируем инпут с количеством из стора (после +/− или внешних изменений)
   useEffect(() => {
@@ -50,7 +58,15 @@ const CartPageItem: React.FC<CartPageItemProps> = ({ item }) => {
   const handleDecrease = () => dispatch(removeCartItem(item.id));
   const handleIncrease = () =>
     dispatch(addCartItem({ id: item.id, price: item.price, img: item.img }));
-  const handleDelete = () => dispatch(deleteCartItem(item.id));
+  const handleDelete = async () => {
+    dispatch(deleteCartItem(item.id));
+    try {
+      await removeFromCart(item.id).unwrap();
+    } catch (error) {
+      // Можно откатить, если нужно: dispatch(addCartItem({ ...item }));
+      console.error("Ошибка удаления из корзины на сервере", error);
+    }
+  };
 
   const commitInput = useCallback(() => {
     const numeric = parseInt(inputValue, 10);
@@ -78,12 +94,21 @@ const CartPageItem: React.FC<CartPageItemProps> = ({ item }) => {
           className="mr-4 rounded object-cover"
         />
         <div className="flex flex-col min-w-0">
-          <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">
-            {product?.name_eng || `Товар #${item.id}`}
-          </h4>
-          <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
-            {product?.name_ru || `id: ${item.id}`}
-          </p>
+          {product ? (
+            <>
+              <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">
+                {product.name_eng}
+              </h4>
+              <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
+                {product.name_ru}
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="h-4 w-48 bg-gray-200 animate-pulse rounded mb-1" />
+              <div className="h-3 w-36 bg-gray-200 animate-pulse rounded" />
+            </>
+          )}
         </div>
       </div>
 

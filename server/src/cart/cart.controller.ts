@@ -1,4 +1,5 @@
 import { Controller, Post, Delete, Get, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { CartService } from './cart.services';
 import { AuthenticatedRequest } from 'src/auth/login/types/authenticated-request.interface';
@@ -22,12 +23,14 @@ export class CartController {
   }
 
   @Get()
+  @SkipThrottle()
   async findAll(@Req() req: AuthenticatedRequest) {
     const userId = req.user.userId;
     return this.cartService.findAll(userId);
   }
 
   @Get('status')
+  @SkipThrottle()
   async status(@Req() req: AuthenticatedRequest, @Query('productIds') productIds: string) {
     const userId = req.user.userId;
     const ids = (productIds || '')

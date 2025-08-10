@@ -92,7 +92,7 @@ const CartButton = ({
     <Button
       onClick={handleClick}
       variant="outlined"
-      disabled={typeof price !== "number"}
+      disabled={false}
       sx={{
         backgroundColor: isInCart ? "white" : "black",
         borderColor: "black",

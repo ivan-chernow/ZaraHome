@@ -67,6 +67,12 @@ export const productsApi = createApi({
 						query: () => '/products/catalog',
 						providesTags: ['Products']
 				}),
+				getProductsByIds: builder.query<Product[], number[]>({
+					query: (ids) => ({
+						url: `/products?ids=${ids.join(',')}`,
+						method: 'GET',
+					}),
+				}),
 				addProduct: builder.mutation<Product, CreateProductDto>({
 						query: (product) => ({
 								url: '/products',
@@ -80,6 +86,7 @@ export const productsApi = createApi({
 
 export const {
 		useGetCatalogQuery,
+		useGetProductsByIdsQuery,
 		useAddProductMutation,
 } = productsApi;
 

@@ -28,9 +28,10 @@ import { CartModule } from './cart/cart.module';
             synchronize: true,
             dropSchema: false,
         }),
+        // Смягчаем глобальный rate limit, чтобы UI мог безопасно рефетчить данные
         ThrottlerModule.forRoot([{
             ttl: 60000, // 1 минута
-            limit: 10, // 10 запросов в минуту
+            limit: 120, // 120 запросов в минуту на IP
         }]),
         AuthModule,
         UsersModule,

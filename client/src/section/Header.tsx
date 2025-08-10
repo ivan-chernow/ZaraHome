@@ -1,21 +1,20 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import VerticalLine from "@/components/ui/VerticalLine";
-import Container from "@mui/material/Container";
 import Logo from "@/components/ui/Logo";
 import CartDetails from "@/components/Cart/cartDetails";
 import Link from "next/link";
-import { AppDispatch, RootState } from "@/store/store";
-import { toggleCart } from "@/store/features/cart/cart.slice";
 import { useSelector, useDispatch } from "react-redux";
+import { toggleCart } from "@/store/features/cart/cart.slice";
 import {
   openModalAuth,
   setView,
   logout,
 } from "@/store/features/auth/auth.slice";
 import { usePathname } from "next/navigation";
+import { RootState, AppDispatch } from "@/store/store";
 import {
   selectCartTotalCount,
   selectCartTotalPrice,
@@ -36,7 +35,56 @@ const Header = () => {
     selectCartTotalPrice(state)
   );
 
+  // Избегаем ошибок гидратации: рендерим счетчики только после монтирования на клиенте
+  const [mounted, setMounted] = useState(false);
+
+  // На сервере всегда показываем 0, на клиенте читаем из localStorage
+  const [initialValues, setInitialValues] = useState({ count: 0, price: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+
+    // Читаем значения из localStorage после монтирования
+    try {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        const cartItems = JSON.parse(savedCart);
+        if (Array.isArray(cartItems) && cartItems.length > 0) {
+          const count = cartItems.reduce(
+            (sum, item) => sum + (item.quantity || 0),
+            0
+          );
+          const price = cartItems.reduce(
+            (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
+            0
+          );
+          setInitialValues({ count, price });
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to load cart from localStorage:", error);
+    }
+  }, []);
+
+  // Мемоизируем значения, чтобы избежать прыжков при обновлении страницы
+  const displayCount = useMemo(() => {
+    if (mounted) {
+      if (totalCount === 0) return 0;
+      if (totalCount > 0) return totalCount;
+    }
+    return initialValues.count;
+  }, [mounted, totalCount, initialValues.count]);
+
+  const displayPrice = useMemo(() => {
+    if (mounted) {
+      if (totalCount === 0) return 0;
+      if (totalPrice > 0) return totalPrice;
+    }
+    return initialValues.price;
+  }, [mounted, totalCount, totalPrice, initialValues.price]);
+
   const isProfilePage = pathname?.startsWith("/profile");
+  const isCartOrOrderPage = pathname === "/cart" || pathname === "/order";
 
   const handleUserIconClick = () => {
     if (isProfilePage) {
@@ -56,11 +104,11 @@ const Header = () => {
 
   return (
     <header className="bg-white drop-shadow-md py-[20px] px-[5px] relative ">
-      <Container maxWidth="lg" className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         <div className="inline-block">
           <Link
             href="https://wa.me/78001236543"
-            className="font-inter text-[20px] hover:text-[#00000080] transition-colors duration-200 ease-in"
+            className="font-inter text-[20px] hover:text-black transition-colors duration-200 ease-in"
             target="_blank"
           >
             8 (800) 123 65 43 <span className="text-green-400">(WhatsApp)</span>
@@ -97,29 +145,55 @@ const Header = () => {
           <VerticalLine height="57px" />
           <div
             ref={cartButtonRef}
-            className="flex items-center mx-7 cursor-pointer "
-            onClick={() => dispatch(toggleCart())}
+            className={`flex items-center mx-7 ${
+              isCartOrOrderPage
+                ? "cursor-not-allowed opacity-50"
+                : "cursor-pointer hover:scale-105 hover:text-black duration-200 ease-in"
+            }`}
+            onClick={() => {
+              if (isCartOrOrderPage) return;
+              dispatch(toggleCart());
+            }}
           >
-            <div className="relative hover:scale-110 duration-200 ease-in">
+            <div className="relative duration-200 ease-in">
               <Image
                 src="/assets/img/Header/cart.svg"
                 alt="Корзина"
                 width={25}
                 height={25}
               />
-              <div className="absolute -top-2 -right-2 flex items-center justify-center">
-                <div className="absolute border-2 border-black rounded-full w-5 h-5"></div>
-                <span className="relative text-black text-[14px] font-bold">
-                  {totalCount}
+              <div className="absolute -top-2 -right-2 w-5 h-5">
+                <div
+                  className="absolute border-2 border-black rounded-full w-5 h-5 bg-white"
+                  style={{ zIndex: 1 }}
+                ></div>
+                <span
+                  className="absolute inset-0 flex items-center justify-center text-black text-[12px] font-bold tabular-nums"
+                  style={{ zIndex: 2 }}
+                >
+                  {!mounted ? (
+                    <span className="animate-pulse bg-gray-200 rounded-full w-5 h-5 block" />
+                  ) : (
+                    displayCount
+                  )}
                 </span>
               </div>
             </div>
-            <p className="ml-[16px] font-roboto font-medium">{totalPrice}₽</p>
+            <p
+              className="ml-[16px] font-roboto font-medium tabular-nums"
+              style={{ minWidth: 72, textAlign: "left" }}
+            >
+              {!mounted ? (
+                <span className="animate-pulse bg-gray-200 rounded w-12 h-5 inline-block" />
+              ) : (
+                `${displayPrice}₽`
+              )}
+            </p>
           </div>
           <VerticalLine height="57px" />
         </div>
         {isOpenCart && <CartDetails cartButtonRef={cartButtonRef} />}
-      </Container>
+      </div>
     </header>
   );
 };

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getLocalStorage } from '@/utils/storage';
 
 // Тип для элемента корзины
 export interface CartItem {
@@ -12,8 +13,24 @@ interface CartItemsState {
   items: CartItem[];
 }
 
+const loadInitialCartItems = (): CartItem[] => {
+  const raw = getLocalStorage('cart', []);
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((i) => i && typeof i.id === 'number' && typeof i.price === 'number')
+    .map((i) => ({
+      id: i.id,
+      price: i.price,
+      img: typeof i.img === 'string' ? i.img : undefined,
+      quantity:
+        typeof i.quantity === 'number' && Number.isFinite(i.quantity) && i.quantity > 0
+          ? Math.floor(i.quantity)
+          : 1,
+    }));
+};
+
 const initialState: CartItemsState = {
-  items: [],
+  items: loadInitialCartItems(),
 };
 
 const cartItemsSlice = createSlice({
