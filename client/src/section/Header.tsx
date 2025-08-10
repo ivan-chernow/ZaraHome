@@ -19,6 +19,8 @@ import {
   selectCartTotalCount,
   selectCartTotalPrice,
 } from "@/store/features/cart/cartItems.slice";
+import { useGetCartQuery } from "@/api/cart.api";
+import { setCartItems } from "@/store/features/cart/cartItems.slice";
 
 const Header = () => {
   const pathname = usePathname();
@@ -34,6 +36,33 @@ const Header = () => {
   const totalPrice = useSelector((state: RootState) =>
     selectCartTotalPrice(state)
   );
+  const { data: serverCart, isLoading: isCartLoading } = useGetCartQuery(
+    undefined,
+    {
+      skip: !isAuthenticated,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }
+  );
+
+  useEffect(() => {
+    if (isAuthenticated && Array.isArray(serverCart)) {
+      const toItems = serverCart.map((p) => ({
+        id: p.id,
+        price: (() => {
+          const sizes = p.size as any;
+          const first =
+            sizes && typeof sizes === "object"
+              ? (Object.values(sizes)[0] as any)
+              : null;
+          return first && typeof first.price === "number" ? first.price : 0;
+        })(),
+        quantity: 1,
+        img: Array.isArray(p.img) ? p.img[0] : undefined,
+      }));
+      dispatch(setCartItems(toItems));
+    }
+  }, [isAuthenticated, serverCart, dispatch]);
 
   // Избегаем ошибок гидратации: рендерим счетчики только после монтирования на клиенте
   const [mounted, setMounted] = useState(false);
@@ -171,7 +200,7 @@ const Header = () => {
                   className="absolute inset-0 flex items-center justify-center text-black text-[12px] font-bold tabular-nums"
                   style={{ zIndex: 2 }}
                 >
-                  {!mounted ? (
+                  {!mounted || isCartLoading ? (
                     <span className="animate-pulse bg-gray-200 rounded-full w-5 h-5 block" />
                   ) : (
                     displayCount
@@ -183,7 +212,7 @@ const Header = () => {
               className="ml-[16px] font-roboto font-medium tabular-nums"
               style={{ minWidth: 72, textAlign: "left" }}
             >
-              {!mounted ? (
+              {!mounted || isCartLoading ? (
                 <span className="animate-pulse bg-gray-200 rounded w-12 h-5 inline-block" />
               ) : (
                 `${displayPrice}₽`
