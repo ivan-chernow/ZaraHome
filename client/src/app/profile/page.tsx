@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import MainLayout from "@/layout/MainLayout";
 import Container from "@mui/material/Container";
@@ -15,30 +15,24 @@ import ChangeEmail from "@/section/ChangeEmail";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setActiveView } from "@/store/features/profile/profile.slice";
+import { useRestoreActiveView } from "@/hooks/useRestoreActiveView";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { activeView } = useSelector((state: RootState) => state.profile);
   const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("profileActiveView");
-      if (
-        saved &&
-        [
-          "my-orders",
-          "delivery-address",
-          "change-password",
-          "change-email",
-        ].includes(saved)
-      ) {
-        dispatch(setActiveView(saved));
-      }
-    }
-    setIsReady(true);
-  }, [dispatch]);
+  const { isReady } = useRestoreActiveView<
+    "my-orders" | "delivery-address" | "change-password" | "change-email"
+  >({
+    localStorageKey: "profileActiveView",
+    validViews: [
+      "my-orders",
+      "delivery-address",
+      "change-password",
+      "change-email",
+    ] as const,
+    setAction: (view) => setActiveView(view),
+  });
 
   if (!isReady) {
     return null;

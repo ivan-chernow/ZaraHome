@@ -389,13 +389,34 @@ const AdminAddProduct = () => {
   };
 
   if (isCatalogLoading) {
-    return <div>Загрузка каталога...</div>;
+    return (
+      <div className="animate-pulse">
+        <div className="flex flex-col items-center">
+            <div className="h-[42px] bg-gray-200 rounded w-[300px] mb-[37px]"></div>
+            <div className="flex items-center justify-center mb-[28px] w-full">
+              <div className="h-[20px] bg-gray-200 rounded w-[200px] mr-[5px]"></div>
+              <div className="h-[2px] bg-gray-200 rounded w-[615px]"></div>
+            </div>
+            <div className="flex flex-col w-full max-w-[1000px]">
+              <div className="flex flex-wrap gap-6 mb-[23px] justify-center">
+                <div className="flex flex-col flex-1 min-w-[300px] max-w-[400px]">
+                  <div className="h-[20px] bg-gray-200 rounded w-[100px] mb-[5px] ml-[20px]"></div>
+                  <div className="h-[48px] bg-gray-200 rounded w-full"></div>
+                </div>
+                <div className="flex flex-col flex-1 min-w-[300px] max-w-[400px]">
+                  <div className="h-[20px] bg-gray-200 rounded w-[140px] mb-[5px] ml-[20px]"></div>
+                  <div className="h-[48px] bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    );
   }
 
-  return (
+    return (
     <Fade in={true} timeout={700}>
-      <div className="max-w-[1200px] mx-auto p-6">
-        <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center">
           <h4 className="font-light text-[42px] mb-[37px] text-center">
             Добавление товара
           </h4>
@@ -856,7 +877,6 @@ const AdminAddProduct = () => {
             </Fade>
           )}
         </div>
-      </div>
     </Fade>
   );
 };

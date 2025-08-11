@@ -34,7 +34,8 @@ const ChangePassword = () => {
 
   const onSubmit = async (data: FormInputs) => {
     await changePassword({
-      newPassword: data.password,
+      currentPassword: data.password, // Временно используем password как currentPassword
+      newPassword: data.confirmPassword,
     }).unwrap();
   };
 
