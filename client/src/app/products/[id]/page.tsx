@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import FavoriteButton from "@/components/Button/FavoriteButton";
 import VerticalLine from "@/components/ui/VerticalLine";
 import Image from "next/image";
@@ -28,6 +28,7 @@ import {
 import SliderSwiper from "@/components/ui/SliderSwiper";
 import Link from "next/link";
 import Skeleton from "@mui/material/Skeleton";
+import { expandCategory, expandSubCategory } from "@/store/features/catalog/catalog.slice";
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const resolvedParams = use(params);
@@ -91,6 +92,17 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     product.size?.[sizeKey]?.price || 0;
   const getSizeName = (sizeKey: string) =>
     product.size?.[sizeKey]?.size || sizeKey;
+
+  // Автораскрытие аккордеона под товар
+  useEffect(() => {
+    if (!pathData) return;
+    // Открываем категорию
+    dispatch(expandCategory(category.id.toString()));
+    // Открываем подкатегорию, если есть
+    if (subCategory && subCategory.id) {
+      dispatch(expandSubCategory(subCategory.id.toString()));
+    }
+  }, [dispatch, pathData, category?.id, subCategory?.id]);
 
   const categorySlug = customSlugify(category.name);
   const subCategorySlug = customSlugify(subCategory.name);

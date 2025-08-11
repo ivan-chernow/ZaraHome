@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   toggleCategory,
   toggleSubCategory,
+  expandCategory,
+  expandSubCategory,
 } from "@/store/features/catalog/catalog.slice";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import {
@@ -51,7 +53,7 @@ const CatalogAccordion = () => {
     if (!category) return;
 
     if (!expandedCategories[category.id]) {
-      dispatch(toggleCategory(category.id.toString()));
+      dispatch(expandCategory(category.id.toString()));
     }
 
     const subSlug = urlParts[3];
@@ -60,7 +62,7 @@ const CatalogAccordion = () => {
         (s) => customSlugify(s.name) === subSlug
       );
       if (sub && !expandedSubCategories[sub.id]) {
-        dispatch(toggleSubCategory(sub.id.toString()));
+        dispatch(expandSubCategory(sub.id.toString()));
       }
     }
   }, [categories, isLoading, urlParts, expandedCategories, expandedSubCategories, dispatch]);

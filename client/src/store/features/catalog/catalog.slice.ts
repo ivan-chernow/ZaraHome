@@ -48,9 +48,32 @@ const catalogSlice = createSlice({
 			state.expandedCategories[clickedCategoryId] = !isCurrentlyExpanded;
 		},
 
-		toggleSubCategory: (state, action: PayloadAction<string>) => {
+			// Явно раскрыть категорию (без инвертирования), закрывая остальные
+			expandCategory: (state, action: PayloadAction<string>) => {
+				const targetId = action.payload;
+				// Сначала свернем все категории
+				Object.keys(state.expandedCategories).forEach(id => {
+					state.expandedCategories[id] = false;
+				});
+				// Свернём подкатегории ранее открытой категории (на всякий случай)
+				const previouslyOpen = state.categories.find(c => state.expandedCategories[c.id.toString()]);
+				if (previouslyOpen) {
+					previouslyOpen.subCategories.forEach(subCat => {
+						state.expandedSubCategories[subCat.id.toString()] = false;
+					});
+				}
+				// Откроем целевую
+				state.expandedCategories[targetId] = true;
+			},
+
+			toggleSubCategory: (state, action: PayloadAction<string>) => {
 			state.expandedSubCategories[action.payload] = !state.expandedSubCategories[action.payload];
 		},
+
+			// Явно раскрыть подкатегорию (без инвертирования)
+			expandSubCategory: (state, action: PayloadAction<string>) => {
+				state.expandedSubCategories[action.payload] = true;
+			},
 
 		setCategories: (state, action: PayloadAction<Category[]>) => {
 			state.categories = action.payload;
@@ -91,7 +114,7 @@ const catalogSlice = createSlice({
 	}
 });
 
-export const {toggleCategory, toggleSubCategory, setCategories, setLoading, setError} = catalogSlice.actions;
+export const {toggleCategory, toggleSubCategory, expandCategory, expandSubCategory, setCategories, setLoading, setError} = catalogSlice.actions;
 export default catalogSlice.reducer;
 
 
