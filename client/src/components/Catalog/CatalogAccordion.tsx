@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import HorizontalLine from "@/components/ui/HorizontalLine";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -18,6 +18,7 @@ import { useGetCatalogQuery } from "@/api/products.api";
 import Link from "next/link";
 import slugify from "slugify";
 import Skeleton from "@mui/material/Skeleton";
+import { usePathname } from "next/navigation";
 
 const CatalogAccordion = () => {
   const { expandedCategories, expandedSubCategories } = useSelector(
@@ -31,6 +32,38 @@ const CatalogAccordion = () => {
       lower: true,
       strict: true,
     });
+
+  // Автораскрытие категории/подкатегории по URL
+  const pathname = usePathname();
+  const urlParts = useMemo(
+    () => decodeURI(pathname).split("/").filter(Boolean),
+    [pathname]
+  );
+
+  useEffect(() => {
+    if (!categories || isLoading) return;
+    if (urlParts[0] !== "products" || urlParts[1] !== "category") return;
+    const categorySlug = urlParts[2];
+    if (!categorySlug) return;
+    const category = categories.find(
+      (c) => customSlugify(c.name) === categorySlug
+    );
+    if (!category) return;
+
+    if (!expandedCategories[category.id]) {
+      dispatch(toggleCategory(category.id.toString()));
+    }
+
+    const subSlug = urlParts[3];
+    if (subSlug) {
+      const sub = category.subCategories.find(
+        (s) => customSlugify(s.name) === subSlug
+      );
+      if (sub && !expandedSubCategories[sub.id]) {
+        dispatch(toggleSubCategory(sub.id.toString()));
+      }
+    }
+  }, [categories, isLoading, urlParts, expandedCategories, expandedSubCategories, dispatch]);
 
   return (
     <div className="max-w-[294px] relative">
