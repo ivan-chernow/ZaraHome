@@ -20,9 +20,11 @@ import {
 import { useApplyPromocodeMutation } from "@/api/promocodes.api";
 import { Alert } from "@mui/material";
 import DeliveryAddress from "@/section/DeliveryAddress";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -264,6 +266,7 @@ const Page = () => {
                   type="button"
                   width="358px"
                   height="56px"
+                  onClick={() => router.push("/payment")}
                 />
               </div>
             )}
