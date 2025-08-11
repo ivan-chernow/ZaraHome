@@ -114,7 +114,7 @@ const Promocodes = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-8">
         <div className="text-lg font-medium text-gray-600">Загрузка...</div>
       </div>
     );
@@ -122,7 +122,7 @@ const Promocodes = () => {
 
   return (
     <Fade in={true} timeout={700}>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div>
         <h4 className="font-light text-[42px] mb-[37px]">
           Управление промокодами
         </h4>

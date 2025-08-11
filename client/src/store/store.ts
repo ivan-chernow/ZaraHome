@@ -14,6 +14,7 @@ import favoritesReducer from "./features/favorites/favorites.slice";
 import cartItemsReducer from './features/cart/cartItems.slice';
 import deliveryReducer from './features/delivery/delivery.slice';
 import profileReducer from './features/profile/profile.slice';
+import adminReducer from './features/profile/admin.slice';
 import { cartApi } from '@/api/cart.api';
 import { setLocalStorage } from "@/utils/storage";
 
@@ -44,6 +45,7 @@ export const store = configureStore({
     favorites: favoritesReducer,
     delivery: deliveryReducer,
     profile: profileReducer,
+    admin: adminReducer,
     [authApi.reducerPath]: authApi.reducer,
     [profileApi.reducerPath]: profileApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
