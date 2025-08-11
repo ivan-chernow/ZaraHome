@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import Container from "@mui/material/Container";
 import MainLayout from "@/layout/MainLayout";
@@ -7,26 +7,27 @@ import HorizontalLine from "@/components/ui/HorizontalLine";
 import { IconButton, TextField } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import MainButton from "@/components/Button/MainButton";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { openModalAuth, setView } from "@/store/features/auth/auth.slice";
-import { setSelectedAddress } from "@/store/features/delivery/delivery.slice";
 import {
   selectCartItems,
   selectCartTotalPrice,
   CartItem,
 } from "@/store/features/cart/cartItems.slice";
 import { useApplyPromocodeMutation } from "@/api/promocodes.api";
-import { useGetDeliveryAddressesQuery } from "@/api/profile.api";
-import type { DeliveryAddressDto } from "@/api/types/profile.types";
 import { Alert } from "@mui/material";
+import DeliveryAddress from "@/section/DeliveryAddress";
 
 const Page = () => {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const { selectedAddress } = useSelector((state: RootState) => state.delivery);
   const cartItems = useSelector(
     (state: RootState) => selectCartItems(state) as CartItem[]
@@ -54,6 +55,7 @@ const Page = () => {
 
   // Промокод
   const [promo, setPromo] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<'card'>("card");
   const [applyPromocode, { isLoading: isApplying }] =
     useApplyPromocodeMutation();
   const [promoError, setPromoError] = useState<string | null>(null);
@@ -98,35 +100,7 @@ const Page = () => {
   }, [promo, cartTotal, applyPromocode]);
 
   // Адреса доставки
-  const { data: addresses = [], isLoading: isAddrLoading } =
-    useGetDeliveryAddressesQuery(undefined, {
-      skip: !isAuthenticated,
-    });
-
-  // Определяем primary и secondary адреса
-  const primary: DeliveryAddressDto | undefined =
-    selectedAddress || addresses[0];
-  const secondary: DeliveryAddressDto | undefined =
-    selectedAddress && addresses.length > 1
-      ? addresses.find((addr) => addr.id !== selectedAddress.id) || addresses[1]
-      : addresses[1];
-  const formatFullName = (a: DeliveryAddressDto | undefined) => {
-    if (!a) return "";
-    return `${a.lastName} ${a.firstName} ${a.patronymic}`.trim();
-  };
-  const formatAddress = (a: DeliveryAddressDto | undefined) => {
-    if (!a) return "";
-    const parts: string[] = ["Россия", a.region, a.city];
-    const street = a.street ? `ул.${a.street}` : "";
-    const house = a.house ? `д.${a.house}` : "";
-    const building = a.building ? `корп.${a.building}` : "";
-    const apartment = a.apartment ? `кв.${a.apartment}` : "";
-    const tail = [street, house, building, apartment]
-      .filter(Boolean)
-      .join(", ");
-    if (tail) parts.push(tail);
-    return parts.filter(Boolean).join(", ");
-  };
+  // DeliveryAddress компонент сам загружает адреса и синхронизирует выбранный адрес с Redux
 
   return (
     <MainLayout>
@@ -149,7 +123,7 @@ const Page = () => {
         </div>
         <p className="font-light text-[42px] mb-[32px]">Оформление заказа</p>
 
-        {!isAuthenticated ? (
+        {mounted && !isAuthenticated ? (
           <div className="bg-white drop-shadow-lg p-6 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="text-sm text-[#00000099]">
               Для оформления заказа нужно войти в аккаунт. Если у вас нет
@@ -176,229 +150,27 @@ const Page = () => {
           </div>
         ) : null}
 
-        {isAuthenticated && (
-          <div className="flex items-start justify-between mb-[89px]">
+        {mounted && isAuthenticated && (
+          <div className="flex items-center justify-between mb-[89px]">
             <div className="mb-[19px] ">
-              <div
-                className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px] max-w-[728px] cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                onClick={() =>
-                  primary &&
-                  dispatch(setSelectedAddress({ address: primary, index: 0 }))
-                }
-              >
-                <div className="flex items-center">
-                  <div className="bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg mr-[29px] relative flex items-center justify-center">
-                    <span
-                      className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
-                        selectedAddress && selectedAddress.id === primary?.id
-                          ? "bg-black"
-                          : "bg-gray-300"
-                      }`}
-                    ></span>
-                  </div>
-                  <div className="flex flex-col">
-                    <p className="font-semibold mb-[4px]">
-                      {isAddrLoading
-                        ? "Загрузка..."
-                        : formatFullName(primary) || "Адрес не указан"}
-                    </p>
-                    <p className="text-[14px] text-[#00000080]">
-                      {isAddrLoading ? "" : formatAddress(primary)}
-                    </p>
-                  </div>
-                </div>
-                <ModeEditOutlinedIcon
-                  fontSize="medium"
-                  sx={{ color: "gray" }}
-                />
-              </div>
-              {secondary && (
-                <div
-                  className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px] mt-[10px] mb-[42px] max-w-[728px] cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                  onClick={() =>
-                    dispatch(
-                      setSelectedAddress({ address: secondary, index: 1 })
-                    )
-                  }
-                >
-                  <div className="flex items-center">
-                    <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
-                      <span
-                        className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
-                          selectedAddress &&
-                          selectedAddress.id === secondary?.id
-                            ? "bg-black"
-                            : "bg-gray-300"
-                        }`}
-                      ></span>
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="font-semibold mb-[4px]">
-                        {formatFullName(secondary)}
-                      </p>
-                      <p className="text-[14px] text-[#00000080]">
-                        {formatAddress(secondary)}
-                      </p>
-                    </div>
-                  </div>
-                  <ModeEditOutlinedIcon
-                    fontSize="medium"
-                    sx={{ color: "gray" }}
-                  />
-                </div>
-              )}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <p className="font-medium text-[#0000004D] mr-[5px]">
-                    Управление адресами
-                  </p>
-                  <HorizontalLine width="200px" />
-                </div>
-                <Link
-                  href="/profile"
-                  className="text-[14px] font-medium text-[#00000099] hover:text-black transition-colors duration-200 underline"
-                >
-                  Редактировать адреса
-                </Link>
-              </div>
-              <div className="flex items-center justify-start">
-                <p className="font-medium text-[#0000004D] mr-[5px] mb-[19px]">
-                  Ваши данные
-                </p>
-                <HorizontalLine width="620px" />
-              </div>
-
-              <form action="" className="flex items-center  mb-[41px]">
-                <div className="flex flex-col mr-[23px]">
-                  <div className="flex flex-col pb-[22px]">
-                    <label
-                      htmlFor=""
-                      className="pl-[20px] mb-[5px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Ваше имя
-                    </label>
-                    <TextField sx={{ width: "350px", height: "48px" }} />
-                  </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor=""
-                      className="pl-[20px] mb-[5px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Ваше отчество
-                    </label>
-                    <TextField sx={{ width: "350px", height: "48px" }} />
-                  </div>
-                </div>
-                <div className="flex-col">
-                  <div className="flex flex-col pb-[22px]">
-                    <label
-                      htmlFor=""
-                      className="pl-[20px] mb-[5px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Ваша фамилия
-                    </label>
-                    <TextField sx={{ width: "350px", height: "48px" }} />
-                  </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor=""
-                      className="pl-[20px] mb-[5px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Номер телефона
-                    </label>
-                    <div className="flex items-center">
-                      <TextField
-                        sx={{
-                          width: "72px",
-                          marginRight: "6px",
-                          height: "48px",
-                        }}
-                      />
-                      <TextField sx={{ width: "270px", height: "48px" }} />
-                    </div>
-                  </div>
-                </div>
-              </form>
-              <div className="flex items-center ">
-                <p className="font-medium text-[#0000004D] mr-[5px] mb-[28px] ">
-                  Адрес доставки
-                </p>
-                <HorizontalLine width="600px" />
-              </div>
-              <form action="" className="flex items-center  mb-[41px]">
-                <div className="mr-[23px] flex flex-col">
-                  <div className="flex flex-col mb-[21px]">
-                    <label
-                      htmlFor=""
-                      className="mb-[5px] pl-[20px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Область
-                    </label>
-                    <TextField sx={{ width: "350px", height: "48px" }} />
-                  </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor=""
-                      className="mb-[5px] pl-[20px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Улица
-                    </label>
-                    <TextField sx={{ width: "350px", height: "48px" }} />
-                  </div>
-                </div>
-                <div className="">
-                  <div className="flex flex-col mb-[21px]">
-                    <label
-                      htmlFor=""
-                      className="mb-[5px] pl-[20px] text-[14px] font-medium text-[#00000099]"
-                    >
-                      Город
-                    </label>
-                    <TextField sx={{ width: "350px", height: "48px" }} />
-                  </div>
-                  <div className="flex items-center">
-                    <div className="flex flex-col items-center justify-center mr-[26px]">
-                      <label
-                        htmlFor=""
-                        className="mb-[5px] text-[14px] font-medium text-[#00000099]"
-                      >
-                        Корпус
-                      </label>
-                      <TextField sx={{ width: "100px", height: "48px" }} />
-                    </div>
-                    <div className="flex flex-col items-center justify-center mr-[26px]">
-                      <label
-                        htmlFor=""
-                        className="mb-[5px] text-[14px] font-medium text-[#00000099] "
-                      >
-                        Дом
-                      </label>
-                      <TextField sx={{ width: "100px", height: "48px" }} />
-                    </div>
-                    <div className="flex flex-col items-center justify-center">
-                      <label
-                        htmlFor=""
-                        className="mb-[5px] text-[14px] font-medium text-[#00000099]"
-                      >
-                        Квартира
-                      </label>
-                      <TextField sx={{ width: "100px", height: "48px" }} />
-                    </div>
-                  </div>
-                </div>
-              </form>
-              <div className="flex items-center ">
-                <p className="font-medium text-[#0000004D] mr-[5px] mb-[28px] ">
+              <DeliveryAddress hideHeader hideLimitInfo compact />
+              <div className="flex items-center mt-0 mb-0">
+                <p className="font-medium text-[#0000004D] mr-[5px] mb-0">
                   Способ оплаты
                 </p>
                 <HorizontalLine width="615px" />
               </div>
-              <div className="bg-white  drop-shadow-lg  flex items-center justify-between h-[74px] px-[30px]">
+              <div
+                className="bg-white drop-shadow-lg flex items-center justify-between h-[74px] px-[30px] cursor-pointer"
+                onClick={() => setPaymentMethod('card')}
+              >
                 <div className="flex items-center">
                   <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
-                    <span className="bg-gray-300 rounded-full w-[12px] h-[12px] flex items-center justify-center">
-                      <span className="bg-black rounded-full w-[6px] h-[6px]"></span>
-                    </span>
+                    <span
+                      className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
+                        paymentMethod === 'card' ? 'bg-black' : 'bg-gray-300'
+                      }`}
+                    ></span>
                   </div>
                   <div className="flex flex-col">
                     <p className="font-semibold mb-[4px]">

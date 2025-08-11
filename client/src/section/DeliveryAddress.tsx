@@ -61,7 +61,13 @@ const hasChanges = (
   });
 };
 
-const DeliveryAddress = () => {
+interface DeliveryAddressProps {
+  hideHeader?: boolean;
+  hideLimitInfo?: boolean;
+  compact?: boolean;
+}
+
+const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = false }: DeliveryAddressProps) => {
   const dispatch = useDispatch();
   const { selectedAddressIndex, selectedAddress } = useSelector(
     (state: RootState) => state.delivery
@@ -110,33 +116,31 @@ const DeliveryAddress = () => {
   }, [editingIndex, watchedFields, addresses]);
 
   // Инициализируем выбранный адрес при первой загрузке адресов
+  // Важно: восстанавливаем по сохраненному адресу (id), даже если индекс не сохранен
   useEffect(() => {
-    if (addresses.length > 0) {
-      // Если есть сохраненный адрес, находим его индекс
-      if (selectedAddress && selectedAddressIndex !== null) {
-        const savedIndex = addresses.findIndex(
-          (addr) => addr.id === selectedAddress.id
-        );
-        if (savedIndex !== -1) {
-          setSelectedIndex(savedIndex);
-        } else {
-          // Если сохраненный адрес не найден, выбираем первый
-          setSelectedIndex(0);
-          dispatch(setSelectedAddress({ address: addresses[0], index: 0 }));
-        }
-      } else if (selectedIndex === null) {
-        // Если нет сохраненного адреса, выбираем первый
-        setSelectedIndex(0);
-        dispatch(setSelectedAddress({ address: addresses[0], index: 0 }));
+    if (addresses.length === 0) return;
+
+    // Если в Redux уже есть сохраненный адрес — пытаемся найти его индекс в свежем списке
+    if (selectedAddress) {
+      const savedIndex = addresses.findIndex(
+        (addr) => addr.id === selectedAddress.id
+      );
+      if (savedIndex !== -1) {
+        setSelectedIndex(savedIndex);
+        return;
       }
+      // Если сохраненный адрес отсутствует в списке (удален/изменился) — выбираем первый
+      setSelectedIndex(0);
+      dispatch(setSelectedAddress({ address: addresses[0], index: 0 }));
+      return;
     }
-  }, [
-    addresses,
-    selectedIndex,
-    selectedAddress,
-    selectedAddressIndex,
-    dispatch,
-  ]);
+
+    // Если сохраненного адреса нет вообще — выбираем первый один раз
+    if (selectedIndex === null) {
+      setSelectedIndex(0);
+      dispatch(setSelectedAddress({ address: addresses[0], index: 0 }));
+    }
+  }, [addresses, selectedAddress, selectedIndex, dispatch]);
 
   // Очистка при размонтировании
   useEffect(() => {
@@ -316,9 +320,11 @@ const DeliveryAddress = () => {
 
   return (
     <Fade in={true} timeout={1000}>
-      <div className="w-full mb-[89px]">
+      <div className={`w-full ${compact ? 'mb-0' : 'mb-[89px]'}`}>
         <div className="mb-[19px] w-full">
-          <h3 className="font-light text-[42px] mb-[32px]">Адреса доставки</h3>
+          {!hideHeader && (
+            <h3 className="font-light text-[42px] mb-[32px]">Адреса доставки</h3>
+          )}
 
           <AnimatePresence>
             {addresses.map((address: DeliveryAddressDto, index: number) => (
@@ -424,7 +430,7 @@ const DeliveryAddress = () => {
             ))}
           </AnimatePresence>
 
-          {!canAddNewAddress && editingIndex === null && (
+          {!hideLimitInfo && !canAddNewAddress && editingIndex === null && (
             <div className="mb-4 text-red-500">
               Достигнут лимит адресов доставки (максимум {MAX_ADDRESSES})
             </div>
