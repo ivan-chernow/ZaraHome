@@ -12,7 +12,7 @@ import {
   selectCartTotalCount,
   selectCartTotalPrice,
 } from "@/entities/cart/model/cartItems.slice";
-import CartPageItem from "@/components/Cart/CartPageItem";
+import CartPageItem from "@/entities/cart/ui/CartPageItem";
 import { useGetProductsByIdsQuery, type Product } from "@/entities/product/api/products.api";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import Link from "next/link";
