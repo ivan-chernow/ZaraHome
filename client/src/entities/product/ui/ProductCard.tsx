@@ -9,7 +9,7 @@ import SliderSwiper from "../../../shared/ui/SliderSwiper";
 import FavoriteButton from "../../../shared/ui/Button/FavoriteButton";
 import Color from "../../../shared/ui/Color";
 import New from "../../../shared/ui/New";
-import { Product } from "@/api/products.api";
+import { Product } from "@/entities/product/api/products.api";
 import Discount from "../../../widgets/discount/Discount";
 
 interface ProductCardProps {

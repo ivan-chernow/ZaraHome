@@ -1,8 +1,8 @@
-import { authApi } from "@/api/auth.api";
+import { authApi } from "@/features/auth/api/auth.api";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { AuthState, ErrorData } from "../../../store/features/auth/types/auth.types";
-import { User } from "@/api/auth.api";
+import { User } from "@/features/auth/api/auth.api";
 
 // Функция для загрузки начального состояния из localStorage
 const loadInitialState = (): AuthState => {

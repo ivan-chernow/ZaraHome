@@ -5,7 +5,7 @@ import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRig
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/shared/config/store/store";
 import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import Link from "next/link";
 import slugify from "slugify";
 import { productAnimation, subCategoryAnimation } from "@/shared/lib/animation";

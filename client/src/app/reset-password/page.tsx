@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Container, TextField, Alert } from '@mui/material';
 import MainLayout from '@/widgets/layout/MainLayout';
-import { useResetPasswordMutation, useVerifyResetTokenMutation } from '@/api/auth.api';
+import { useResetPasswordMutation, useVerifyResetTokenMutation } from '@/features/auth/api/auth.api';
 import { useForm } from 'react-hook-form';
 import { getRepeatPasswordValidation, getPasswordValidation } from '@/shared/lib/validation';
 import MainButton from '@/shared/ui/Button/MainButton';

@@ -8,7 +8,7 @@ import ArrowBackIconCart from '@/shared/ui/ArrowBackIcon';
 import { useDispatch } from 'react-redux';
 import { emailValidation, getRepeatPasswordValidation, getPasswordValidation } from '@/shared/lib/validation';
 import { useForm } from 'react-hook-form';
-import { useCompleteRegistrationMutation, useInitiateRegistrationMutation, useVerifyCodeMutation } from '@/api/auth.api';
+import { useCompleteRegistrationMutation, useInitiateRegistrationMutation, useVerifyCodeMutation } from '@/features/auth/api/auth.api';
 import { closeModalAuth } from '@/features/auth/model/auth.slice';
 import { useClickOutside } from '@/shared/lib/hooks/useClickOutside';
 import { useVerificationCode } from '@/shared/lib/hooks/useVerificationCode';

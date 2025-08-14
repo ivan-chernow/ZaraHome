@@ -11,7 +11,7 @@ import { clearSelectedAddress } from "@/entities/user/model/delivery.slice";
 import { setActiveView } from "@/features/profile/model/profile.slice";
 import { useGetFavoritesQuery } from "@/entities/favorite/api/favorites.api";
 import { useAddToCartMutation, useGetCartQuery } from "@/entities/cart/api/cart.api";
-import type { Product } from "@/api/products.api";
+import type { Product } from "@/entities/product/api/products.api";
 
 /**
  * Компонент AuthCheck:

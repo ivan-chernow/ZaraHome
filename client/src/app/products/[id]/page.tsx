@@ -20,7 +20,7 @@ import { RootState } from "@/shared/config/store/store";
 import { setActiveColor } from "@/entities/favorite/model/productCard.slice";
 import HomeIcon from "@/shared/ui/HomeIcon";
 import MainButton from "@/shared/ui/Button/MainButton";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import {
   findProductPathById,
   customSlugify,

@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { authReducer } from "@/features/auth/model/auth.slice";
-import { authApi } from "@/api/auth.api";
+import { authApi } from "@/features/auth/api/auth.api";
 import { cartReducer } from "../../../entities/cart/model/cart.slice";
 import { navMenuReducer } from '../../../widgets/nav-menu/model/navMenu.slice';
 import catalogReducer from '../../../entities/category/model/catalog.slice';
 import productCardReducer from '../../../entities/favorite/model/productCard.slice';
 import { profileApi } from "@/entities/user/api/profile.api";
-import { productsApi } from "@/api/products.api";
+import { productsApi } from "@/entities/product/api/products.api";
 import { promocodesApi } from '@/entities/promocode/api/promocodes.api';
 import { favoritesApi } from "@/entities/favorite/api/favorites.api";
 import favoritesReducer from "../../../entities/favorite/model/favorites.slice";

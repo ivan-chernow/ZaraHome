@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Discount from "../discount/Discount";
 import New from "../../shared/ui/New";
-import type { Product } from "@/api/products.api";
+import type { Product } from "@/entities/product/api/products.api";
 import { useDispatch } from "react-redux";
 import { closeAllMenus } from "@/widgets/nav-menu/model/navMenu.slice";
 

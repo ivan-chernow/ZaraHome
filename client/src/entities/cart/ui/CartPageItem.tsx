@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/shared/config/store/store";
 import { findProductById } from "@/entities/category/lib/catalog.utils";
-import type { Product } from "@/api/products.api";
+import type { Product } from "@/entities/product/api/products.api";
 import {
   addCartItem,
   removeCartItem,

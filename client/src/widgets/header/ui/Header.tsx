@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import VerticalLine from "@/shared/ui/VerticalLine";
 import Logo from "@/shared/ui/Logo";
-import CartDetails from "@/components/Cart/cartDetails";
+import CartDetails from "@/entities/cart/ui/cartDetails";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleCart } from "@/entities/cart/model/cart.slice";

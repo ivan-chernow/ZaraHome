@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import type { Category } from "@/api/products.api";
-import { productsApi } from "@/api/products.api";
+import type { Category } from "@/entities/product/api/products.api";
+import { productsApi } from "@/entities/product/api/products.api";
 
 interface CatalogState {
 	categories: Category[];

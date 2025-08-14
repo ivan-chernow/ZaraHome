@@ -2,9 +2,9 @@
 import React, { useState, useMemo, useEffect } from "react";
 import SearchInput from "../../features/search/ui/SearchInput";
 import SearchResults from "../search/SearchResults";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import type { Product } from "@/api/products.api";
+import type { Product } from "@/entities/product/api/products.api";
 import useDebounce from "@/shared/lib/hooks/useDebounce";
 
 interface NavMenuSearchWrapperProps {

@@ -2,7 +2,7 @@
 import React, { use, useEffect, useMemo, useRef } from "react";
 import ProductCard from "@/entities/product/ui/ProductCard";
 import HomeIcon from "@/shared/ui/HomeIcon";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getProductsByCategory } from "@/entities/category/lib/catalog.utils";
 import Skeleton from "@mui/material/Skeleton";
 import slugify from "slugify";

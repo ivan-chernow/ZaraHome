@@ -2,7 +2,7 @@
 import React, { use } from "react";
 import ProductCard from "@/entities/product/ui/ProductCard";
 import HomeIcon from "@/shared/ui/HomeIcon";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import slugify from "slugify";
 import Link from "next/link";
 import { getProductsByType } from "@/entities/category/lib/catalog.utils";

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import Container from "@mui/material/Container";
 import ProductCard from "@/entities/product/ui/ProductCard";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import CircularProgress from "@mui/material/CircularProgress";
 

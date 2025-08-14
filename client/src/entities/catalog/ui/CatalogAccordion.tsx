@@ -16,7 +16,7 @@ import {
 } from "@/shared/lib/animation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/shared/config/store/store";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import Link from "next/link";
 import slugify from "slugify";
 import Skeleton from "@mui/material/Skeleton";

@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import NewsBlockSection from "@/widgets/news/NewsBlockSection";
 import ProductCard from "@/entities/product/ui/ProductCard";
 import Container from "@mui/material/Container";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import slugify from "slugify";
 import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";

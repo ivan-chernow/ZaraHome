@@ -26,7 +26,7 @@ import {
   setAuthenticating,
 } from "@/features/auth/model/auth.slice";
 import { RootState } from "@/shared/config/store/store";
-import { useLoginMutation } from "@/api/auth.api";
+import { useLoginMutation } from "@/features/auth/api/auth.api";
 import { LoginRequest } from "@/features/auth/model/auth.types";
 import MainButton from "../../../shared/ui/Button/MainButton";
 

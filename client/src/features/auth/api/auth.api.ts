@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { LoginRequest, RegistrationRequest, VerifyCodeRequest, CompleteRegistrationRequest, PasswordResetRequest, ResetPasswordRequest } from './model/auth.types';
-import { baseQueryWithReauth } from './baseQueryWithReauth';
+import { LoginRequest, RegistrationRequest, VerifyCodeRequest, CompleteRegistrationRequest, PasswordResetRequest, ResetPasswordRequest } from '../model/auth.types';
+import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
 
 export interface User {
     id: string;

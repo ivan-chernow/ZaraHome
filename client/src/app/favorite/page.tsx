@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/shared/config/store/store";
 import { useGetFavoritesQuery } from "@/entities/favorite/api/favorites.api";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";
 import { getLocalStorage } from "@/shared/lib/storage";

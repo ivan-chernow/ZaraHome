@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import MainButton from "@/shared/ui/Button/MainButton";
-import { useAddProductMutation, useGetCatalogQuery } from "@/api/products.api";
+import { useAddProductMutation, useGetCatalogQuery } from "@/entities/product/api/products.api";
 import Image from "next/image";
 import CloseIcon from "@mui/icons-material/Close";
 

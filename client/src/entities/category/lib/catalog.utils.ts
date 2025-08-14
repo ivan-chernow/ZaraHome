@@ -1,4 +1,4 @@
-import type { Category, Product, SubCategory, Type } from "@/api/products.api";
+import type { Category, Product, SubCategory, Type } from "@/entities/product/api/products.api";
 import slugify from "slugify";
 
 export const customSlugify = (text: string) =>

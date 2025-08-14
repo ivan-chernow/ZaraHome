@@ -4,7 +4,7 @@ import { Pagination } from "swiper/modules";
 import Image from "next/image";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Product } from "@/api/products.api";
+import { Product } from "@/entities/product/api/products.api";
 
 interface SliderSwiperProps {
   product: Product;

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { RefObject, useState, useEffect } from "react";
-import CartEmpty from "@/components/Cart/cartEmpty";
 import { useDispatch, useSelector } from "react-redux";
 import { useClickOutside } from "@/shared/lib/hooks/useClickOutside";
 import { closeCart } from "@/entities/cart/model/cart.slice";
@@ -9,6 +8,7 @@ import { Fade } from "@mui/material";
 import { createPortal } from "react-dom";
 import { selectCartItems } from "@/entities/cart/model/cartItems.slice";
 import CartItem from "./cartItem";
+import CartEmpty from "./cartEmpty";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import { useRouter } from "next/navigation";
 

@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/api/products.api";
+import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import NavMenuProductCard from "./NavMenuProductCard";
-import type { Product } from "@/api/products.api";
+import type { Product } from "@/entities/product/api/products.api";
 import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
 import NavMenuGridSkeleton from "../../shared/ui/skeletons/NavMenuGridSkeleton";
 

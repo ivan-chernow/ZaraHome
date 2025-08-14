@@ -1,9 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQueryWithReauth';
+import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
 
 export interface Product {
-		id: number;
-		name_eng: string;
+	id: number;
+	name_eng: string;
 		name_ru: string;
 		img: string[];
 		colors: { [key: string]: string };
@@ -68,13 +68,13 @@ export const productsApi = createApi({
 						providesTags: ['Products']
 				}),
 				getProductsByIds: builder.query<Product[], number[]>({
-					query: (ids) => ({
+					query: (ids: number[]) => ({
 						url: `/products?ids=${ids.join(',')}`,
 						method: 'GET',
 					}),
 				}),
 				addProduct: builder.mutation<Product, CreateProductDto>({
-						query: (product) => ({
+						query: (product: CreateProductDto) => ({
 								url: '/products',
 								method: 'POST',
 								body: product

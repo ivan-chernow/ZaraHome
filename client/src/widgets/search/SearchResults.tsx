@@ -1,5 +1,5 @@
 import React from "react";
-import type { Product } from "@/api/products.api";
+import type { Product } from "@/entities/product/api/products.api";
 import SearchResultProductCard from "../../entities/product/ui/SearchResultProductCard";
 import PaginationBlock from "../../shared/ui/pagination/PaginationBlock";
 import { usePagination } from "@/shared/lib/hooks/usePagination";

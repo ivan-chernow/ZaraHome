@@ -7,7 +7,7 @@ import CloseIconCart from "@/shared/ui/CloseIcon";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { emailValidation } from "@/shared/lib/validation";
-import { useRequestPasswordResetMutation } from '@/api/auth.api';
+import { useRequestPasswordResetMutation } from '@/features/auth/api/auth.api';
 import { useClickOutside } from '@/shared/lib/hooks/useClickOutside';
 import { closeModalAuth } from '@/features/auth/model/auth.slice';
 import { PasswordResetRequest } from '@/features/auth/model/auth.types';

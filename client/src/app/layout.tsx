@@ -4,10 +4,10 @@ import "../../public/assets/styles/globals.css";
 import React from "react";
 import NavigationProgress from "@/shared/ui/NavigationProgress";
 import AuthCheck from "@/processes/session/init-auth-check/ui/AuthCheck";
-import { Providers } from "@/shared/providers/provider";
 import { useSelector } from "react-redux";
 import LoginModal from "@/features/auth/ui/LoginModal";
 import { RootState } from "@/shared/config/store/store";
+import { Providers } from "@/shared/providers/StoreProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
