@@ -1,0 +1,11 @@
+node_modules
+.next
+build
+dist
+out
+coverage
+*.log
+.env*
+.DS_Store
+yarn.lock
+package-lock.json

@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+coverage
+*.log
+.env*
+.DS_Store
+yarn.lock
+package-lock.json
+uploads/
+migrations/
+seeds/
