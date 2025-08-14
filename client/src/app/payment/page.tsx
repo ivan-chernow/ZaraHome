@@ -2,18 +2,18 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Container from "@mui/material/Container";
-import MainLayout from "@/layout/MainLayout";
-import HorizontalLine from "@/components/ui/HorizontalLine";
+import MainLayout from "@/widgets/layout/MainLayout";
+import HorizontalLine from "@/shared/ui/HorizontalLine";
 import { TextField, Alert } from "@mui/material";
 import Image from "next/image";
-import MainButton from "@/components/Button/MainButton";
+import MainButton from "@/shared/ui/Button/MainButton";
 import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { RootState } from "@/shared/config/store/store";
 import {
   selectCartItems,
   selectCartTotalPrice,
   CartItem,
-} from "@/store/features/cart/cartItems.slice";
+} from "@/entities/cart/model/cartItems.slice";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HttpsOutlinedIcon from "@mui/icons-material/HttpsOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";

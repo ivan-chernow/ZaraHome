@@ -1,5 +1,5 @@
-import CatalogAccordion from "@/components/Catalog/CatalogAccordion";
-import MainLayout from "@/layout/MainLayout";
+import CatalogAccordion from "@/entities/catalog/ui/CatalogAccordion";
+import MainLayout from "@/widgets/layout/MainLayout";
 import Container from "@mui/material/Container";
 
 export default function ProductsLayout({

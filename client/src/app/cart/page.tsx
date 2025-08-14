@@ -1,20 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MainLayout from "@/layout/MainLayout";
+import MainLayout from "@/widgets/layout/MainLayout";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import Container from "@mui/material/Container";
-import MainButton from "@/components/Button/MainButton";
+import MainButton from "@/shared/ui/Button/MainButton";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
   selectCartItems,
   selectCartTotalCount,
   selectCartTotalPrice,
-} from "@/store/features/cart/cartItems.slice";
+} from "@/entities/cart/model/cartItems.slice";
 import CartPageItem from "@/components/Cart/CartPageItem";
 import { useGetProductsByIdsQuery, type Product } from "@/api/products.api";
-import HorizontalLine from "@/components/ui/HorizontalLine";
+import HorizontalLine from "@/shared/ui/HorizontalLine";
 import Link from "next/link";
 
 const Page = () => {

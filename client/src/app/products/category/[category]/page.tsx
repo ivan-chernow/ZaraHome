@@ -1,16 +1,16 @@
 "use client";
 import React, { use, useEffect, useMemo, useRef } from "react";
-import ProductCard from "@/components/ProductCard";
-import HomeIcon from "@/components/ui/HomeIcon";
+import ProductCard from "@/entities/product/ui/ProductCard";
+import HomeIcon from "@/shared/ui/HomeIcon";
 import { useGetCatalogQuery } from "@/api/products.api";
-import { getProductsByCategory } from "@/store/features/catalog/catalog.utils";
+import { getProductsByCategory } from "@/entities/category/lib/catalog.utils";
 import Skeleton from "@mui/material/Skeleton";
 import slugify from "slugify";
-import { getAllProducts } from "@/store/features/catalog/catalog.utils";
+import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import { useRouter, useSearchParams } from "next/navigation";
-import PaginationBlock from "@/components/PaginationBlock";
-import { usePagination } from "@/hooks/usePagination";
-import { useSorting } from "@/hooks/useSorting";
+import PaginationBlock from "@/shared/ui/pagination/PaginationBlock";
+import { usePagination } from "@/shared/lib/hooks/usePagination";
+import { useSorting } from "@/shared/lib/hooks/useSorting";
 
 const PAGE_SIZE = 12;
 

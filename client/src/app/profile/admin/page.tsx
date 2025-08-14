@@ -1,17 +1,17 @@
 'use client'
-import MainLayout from '@/layout/MainLayout';
+import MainLayout from '@/widgets/layout/MainLayout';
 import { Container } from '@mui/material';
-import HomeIcon from '@/components/ui/HomeIcon';
+import HomeIcon from '@/shared/ui/HomeIcon';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
-import AdminAddProduct from '@/section/AdminAddProduct';
-import ChangePassword from '@/section/ChangePassword';
+import AdminAddProduct from '@/features/product/create/ui/AdminAddProduct';
+import ChangePassword from '@/features/profile/change-password/ui/ChangePassword';
 import {} from 'react';
-import Promocodes from '@/components/Promocodes';
+import Promocodes from '@/features/promocodes/ui/Promocodes';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
-import { setAdminActiveView } from '@/store/features/profile/admin.slice';
-import { useRestoreActiveView } from '@/hooks/useRestoreActiveView';
+import { RootState } from '@/shared/config/store/store';
+import { setAdminActiveView } from '@/features/admin/model/admin.slice';
+import { useRestoreActiveView } from '@/shared/lib/hooks/useRestoreActiveView';
 // Skeleton is not used during initial restore to avoid style flicker like in user profile
 
 

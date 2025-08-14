@@ -1,12 +1,12 @@
 "use client";
 import React, { use, useEffect, useState } from "react";
-import FavoriteButton from "@/components/Button/FavoriteButton";
-import VerticalLine from "@/components/ui/VerticalLine";
+import FavoriteButton from "@/shared/ui/Button/FavoriteButton";
+import VerticalLine from "@/shared/ui/VerticalLine";
 import Image from "next/image";
-import HorizontalLine from "@/components/ui/HorizontalLine";
-import OftenBought from "@/components/OftenBought";
-import WhyUs from "@/section/WhyUs";
-import Help from "@/section/Help";
+import HorizontalLine from "@/shared/ui/HorizontalLine";
+import OftenBought from "@/widgets/recommendations/OftenBought";
+import WhyUs from "@/widgets/why-us/ui/WhyUs";
+import Help from "@/widgets/help/ui/Help";
 import {
   FormControl,
   MenuItem,
@@ -14,21 +14,21 @@ import {
   SelectChangeEvent,
   Container,
 } from "@mui/material";
-import Color from "@/components/Color";
+import Color from "@/shared/ui/Color";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { setActiveColor } from "@/store/features/catalog/productCard.slice";
-import HomeIcon from "@/components/ui/HomeIcon";
-import MainButton from "@/components/Button/MainButton";
+import { RootState } from "@/shared/config/store/store";
+import { setActiveColor } from "@/entities/favorite/model/productCard.slice";
+import HomeIcon from "@/shared/ui/HomeIcon";
+import MainButton from "@/shared/ui/Button/MainButton";
 import { useGetCatalogQuery } from "@/api/products.api";
 import {
   findProductPathById,
   customSlugify,
-} from "@/store/features/catalog/catalog.utils";
-import SliderSwiper from "@/components/ui/SliderSwiper";
+} from "@/entities/category/lib/catalog.utils";
+import SliderSwiper from "@/shared/ui/SliderSwiper";
 import Link from "next/link";
 import Skeleton from "@mui/material/Skeleton";
-import { expandCategory, expandSubCategory } from "@/store/features/catalog/catalog.slice";
+import { expandCategory, expandSubCategory } from "@/entities/category/model/catalog.slice";
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const resolvedParams = use(params);

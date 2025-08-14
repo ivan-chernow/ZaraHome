@@ -7,8 +7,8 @@ import Rating from "@mui/material/Rating";
 import Avatar from "@mui/material/Avatar";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
-import MainLayout from "@/layout/MainLayout";
-import MainButton from "@/components/Button/MainButton";
+import MainLayout from "@/widgets/layout/MainLayout";
+import MainButton from "@/shared/ui/Button/MainButton";
 
 // Тип отзыва
 interface Review {

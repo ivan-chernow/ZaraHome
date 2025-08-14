@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Container, TextField, Alert } from '@mui/material';
-import MainLayout from '@/layout/MainLayout';
+import MainLayout from '@/widgets/layout/MainLayout';
 import { useResetPasswordMutation, useVerifyResetTokenMutation } from '@/api/auth.api';
 import { useForm } from 'react-hook-form';
-import { getRepeatPasswordValidation, getPasswordValidation } from '@/vaildation/validation';
-import MainButton from '@/components/Button/MainButton';
+import { getRepeatPasswordValidation, getPasswordValidation } from '@/shared/lib/validation';
+import MainButton from '@/shared/ui/Button/MainButton';
 import { useRouter } from 'next/navigation';
 
 interface FormInputs {

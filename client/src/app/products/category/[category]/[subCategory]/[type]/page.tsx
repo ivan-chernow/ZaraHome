@@ -1,14 +1,14 @@
 "use client";
 import React, { use } from "react";
-import ProductCard from "@/components/ProductCard";
-import HomeIcon from "@/components/ui/HomeIcon";
+import ProductCard from "@/entities/product/ui/ProductCard";
+import HomeIcon from "@/shared/ui/HomeIcon";
 import { useGetCatalogQuery } from "@/api/products.api";
 import slugify from "slugify";
 import Link from "next/link";
-import { getProductsByType } from "@/store/features/catalog/catalog.utils";
-import { useSorting } from "@/hooks/useSorting";
-import SortButtons from "@/components/SortButtons";
-import { ProductCardSkeleton } from "@/components/ProductCardSceleton";
+import { getProductsByType } from "@/entities/category/lib/catalog.utils";
+import { useSorting } from "@/shared/lib/hooks/useSorting";
+import SortButtons from "@/shared/ui/SortButtons";
+import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";
 
 const Page = ({
   params,

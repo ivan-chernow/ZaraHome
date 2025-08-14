@@ -2,12 +2,12 @@
 import { Inter, Roboto, Ysabeau_SC } from "next/font/google";
 import "../../public/assets/styles/globals.css";
 import React from "react";
-import NavigationProgress from "@/components/NavigationProgress";
-import AuthCheck from "@/components/AuthCheck";
-import { Providers } from "@/store/provider";
+import NavigationProgress from "@/shared/ui/NavigationProgress";
+import AuthCheck from "@/processes/session/init-auth-check/ui/AuthCheck";
+import { Providers } from "@/shared/providers/provider";
 import { useSelector } from "react-redux";
-import LoginModal from "@/components/Login/LoginModal";
-import { RootState } from "@/store/store";
+import LoginModal from "@/features/auth/ui/LoginModal";
+import { RootState } from "@/shared/config/store/store";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto" });

@@ -1,17 +1,17 @@
 "use client";
 
 import React from "react";
-import MainLayout from "@/layout/MainLayout";
-import ProductCard from "@/components/ProductCard";
+import MainLayout from "@/widgets/layout/MainLayout";
+import ProductCard from "@/entities/product/ui/ProductCard";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
-import { useGetFavoritesQuery } from "@/api/favorites.api";
+import { RootState } from "@/shared/config/store/store";
+import { useGetFavoritesQuery } from "@/entities/favorite/api/favorites.api";
 import { useGetCatalogQuery } from "@/api/products.api";
-import { getAllProducts } from "@/store/features/catalog/catalog.utils";
-import { ProductCardSkeleton } from "@/components/ProductCardSceleton";
-import { getLocalStorage } from "@/utils/storage";
-import { setFavorites } from "@/store/features/favorites/favorites.slice";
+import { getAllProducts } from "@/entities/category/lib/catalog.utils";
+import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";
+import { getLocalStorage } from "@/shared/lib/storage";
+import { setFavorites } from "@/entities/favorite/model/favorites.slice";
 
 const Page = () => {
   const dispatch = useDispatch();

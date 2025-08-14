@@ -1,6 +1,6 @@
 import React from 'react';
-import DeliveryTimeline from "@/components/DeliveryTimeline";
-import PersonalLayer from "@/layout/MainLayout";
+import DeliveryTimeline from "@/shared/ui/DeliveryTimeline";
+import PersonalLayer from "@/widgets/layout/MainLayout";
 
 const Page = () => {
 	return (

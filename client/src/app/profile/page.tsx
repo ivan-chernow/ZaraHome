@@ -1,21 +1,21 @@
 "use client";
 import React, { useState } from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import MainLayout from "@/layout/MainLayout";
+import MainLayout from "@/widgets/layout/MainLayout";
 import Container from "@mui/material/Container";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 import DeliveryDiningOutlinedIcon from "@mui/icons-material/DeliveryDiningOutlined";
 import HttpsOutlinedIcon from "@mui/icons-material/HttpsOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import ChangePassword from "@/section/ChangePassword";
-import DeliveryAddress from "@/section/DeliveryAddress";
-import MyOrders from "@/section/MyOrders";
+import ChangePassword from "@/features/profile/change-password/ui/ChangePassword";
+import DeliveryAddress from "@/features/profile/delivery-address/ui/DeliveryAddress";
+import MyOrders from "@/widgets/personal-account/ui/MyOrders";
 import { useRouter } from "next/navigation";
-import ChangeEmail from "@/section/ChangeEmail";
+import ChangeEmail from "@/features/profile/change-email/ui/ChangeEmail";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { setActiveView } from "@/store/features/profile/profile.slice";
-import { useRestoreActiveView } from "@/hooks/useRestoreActiveView";
+import { RootState } from "@/shared/config/store/store";
+import { setActiveView } from "@/features/profile/model/profile.slice";
+import { useRestoreActiveView } from "@/shared/lib/hooks/useRestoreActiveView";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import MainLayout from "@/layout/MainLayout";
+import MainLayout from "@/widgets/layout/MainLayout";
 const TermsOfServicePage = () => {
 	const currentDate = new Date().toLocaleDateString('ru-RU', {
 		year: 'numeric',

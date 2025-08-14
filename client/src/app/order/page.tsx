@@ -2,24 +2,24 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import Container from "@mui/material/Container";
-import MainLayout from "@/layout/MainLayout";
-import HorizontalLine from "@/components/ui/HorizontalLine";
+import MainLayout from "@/widgets/layout/MainLayout";
+import HorizontalLine from "@/shared/ui/HorizontalLine";
 import { IconButton, TextField } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import ClearIcon from "@mui/icons-material/Clear";
-import MainButton from "@/components/Button/MainButton";
+import MainButton from "@/shared/ui/Button/MainButton";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { openModalAuth, setView } from "@/store/features/auth/auth.slice";
+import { RootState } from "@/shared/config/store/store";
+import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
 import {
   selectCartItems,
   selectCartTotalPrice,
   CartItem,
-} from "@/store/features/cart/cartItems.slice";
-import { useApplyPromocodeMutation } from "@/api/promocodes.api";
+} from "@/entities/cart/model/cartItems.slice";
+import { useApplyPromocodeMutation } from "@/entities/promocode/api/promocodes.api";
 import { Alert } from "@mui/material";
-import DeliveryAddress from "@/section/DeliveryAddress";
+import DeliveryAddress from "@/features/profile/delivery-address/ui/DeliveryAddress";
 import { useRouter } from "next/navigation";
 
 const Page = () => {
