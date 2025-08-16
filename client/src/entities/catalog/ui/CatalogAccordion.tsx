@@ -52,6 +52,7 @@ const CatalogAccordion = () => {
     );
     if (!category) return;
 
+    // Открываем категорию только если она не открыта
     if (!expandedCategories[category.id]) {
       dispatch(expandCategory(category.id.toString()));
     }
@@ -65,7 +66,7 @@ const CatalogAccordion = () => {
         dispatch(expandSubCategory(sub.id.toString()));
       }
     }
-  }, [categories, isLoading, urlParts, expandedCategories, expandedSubCategories, dispatch]);
+  }, [categories, isLoading, urlParts, dispatch]); // Убрали expandedCategories и expandedSubCategories из зависимостей
 
   return (
     <div className="max-w-[294px] relative">

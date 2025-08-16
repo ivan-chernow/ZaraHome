@@ -26,43 +26,42 @@ const catalogSlice = createSlice({
 			const clickedCategoryId = action.payload;
 			const isCurrentlyExpanded = !!state.expandedCategories[clickedCategoryId];
 
-			// Find the ID of the currently open category, if any
-			const currentlyOpenId = Object.keys(state.expandedCategories).find(id => state.expandedCategories[id]);
-
-			// If a category was open, find it and collapse its sub-categories
-			if (currentlyOpenId) {
-				const previouslyOpenCategory = state.categories.find(c => c.id.toString() === currentlyOpenId);
-				if (previouslyOpenCategory) {
-					previouslyOpenCategory.subCategories.forEach(subCat => {
+			// Если категория уже открыта, просто закрываем её
+			if (isCurrentlyExpanded) {
+				state.expandedCategories[clickedCategoryId] = false;
+				// Закрываем и её подкатегории
+				const category = state.categories.find(c => c.id.toString() === clickedCategoryId);
+				if (category) {
+					category.subCategories.forEach(subCat => {
 						state.expandedSubCategories[subCat.id.toString()] = false;
 					});
 				}
+			} else {
+				// Если категория закрыта, закрываем все остальные и открываем эту
+				Object.keys(state.expandedCategories).forEach(id => {
+					state.expandedCategories[id] = false;
+				});
+				// Закрываем все подкатегории
+				Object.keys(state.expandedSubCategories).forEach(id => {
+					state.expandedSubCategories[id] = false;
+				});
+				// Открываем выбранную категорию
+				state.expandedCategories[clickedCategoryId] = true;
 			}
-			
-			// Close all main categories
-			Object.keys(state.expandedCategories).forEach(id => {
-				state.expandedCategories[id] = false;
-			});
-			
-			// Toggle the clicked one based on its original state
-			state.expandedCategories[clickedCategoryId] = !isCurrentlyExpanded;
 		},
 
 			// Явно раскрыть категорию (без инвертирования), закрывая остальные
 			expandCategory: (state, action: PayloadAction<string>) => {
 				const targetId = action.payload;
-				// Сначала свернем все категории
+				// Сначала закрываем все категории
 				Object.keys(state.expandedCategories).forEach(id => {
 					state.expandedCategories[id] = false;
 				});
-				// Свернём подкатегории ранее открытой категории (на всякий случай)
-				const previouslyOpen = state.categories.find(c => state.expandedCategories[c.id.toString()]);
-				if (previouslyOpen) {
-					previouslyOpen.subCategories.forEach(subCat => {
-						state.expandedSubCategories[subCat.id.toString()] = false;
-					});
-				}
-				// Откроем целевую
+				// Закрываем все подкатегории
+				Object.keys(state.expandedSubCategories).forEach(id => {
+					state.expandedSubCategories[id] = false;
+				});
+				// Открываем целевую категорию
 				state.expandedCategories[targetId] = true;
 			},
 
@@ -70,10 +69,20 @@ const catalogSlice = createSlice({
 			state.expandedSubCategories[action.payload] = !state.expandedSubCategories[action.payload];
 		},
 
-			// Явно раскрыть подкатегорию (без инвертирования)
-			expandSubCategory: (state, action: PayloadAction<string>) => {
-				state.expandedSubCategories[action.payload] = true;
-			},
+					// Явно раскрыть подкатегорию (без инвертирования)
+		expandSubCategory: (state, action: PayloadAction<string>) => {
+			state.expandedSubCategories[action.payload] = true;
+		},
+
+		// Закрыть все категории и подкатегории
+		closeAllCategories: (state) => {
+			Object.keys(state.expandedCategories).forEach(id => {
+				state.expandedCategories[id] = false;
+			});
+			Object.keys(state.expandedSubCategories).forEach(id => {
+				state.expandedSubCategories[id] = false;
+			});
+		},
 
 		setCategories: (state, action: PayloadAction<Category[]>) => {
 			state.categories = action.payload;
@@ -114,7 +123,7 @@ const catalogSlice = createSlice({
 	}
 });
 
-export const {toggleCategory, toggleSubCategory, expandCategory, expandSubCategory, setCategories, setLoading, setError} = catalogSlice.actions;
+export const {toggleCategory, toggleSubCategory, expandCategory, expandSubCategory, closeAllCategories, setCategories, setLoading, setError} = catalogSlice.actions;
 export default catalogSlice.reducer;
 
 
