@@ -23,6 +23,7 @@ import { useApplyPromocodeMutation } from "@/entities/promocode/api/promocodes.a
 import { Alert } from "@mui/material";
 import DeliveryAddress from "@/features/profile/delivery-address/ui/DeliveryAddress";
 import { useRouter } from "next/navigation";
+import { useGetDeliveryAddressesQuery } from "@/entities/user/api/profile.api";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -41,6 +42,9 @@ const Page = () => {
   const cartTotal = useSelector(
     (state: RootState) => selectCartTotalPrice(state) as number
   );
+
+  // Получаем адреса доставки
+  const { data: addresses = [] } = useGetDeliveryAddressesQuery();
 
   const totalCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
@@ -122,7 +126,7 @@ const Page = () => {
   return (
     <MainLayout>
       <Container maxWidth="lg" sx={{ pt: "45px" }}>
-        <div className="flex items-center mb-[31px]">
+        <div className="flex items-center mb-4">
           <Link href="/" aria-label="На главную" className="flex items-center">
             <HomeOutlinedIcon fontSize="small" sx={{ color: "gray" }} />
           </Link>
@@ -138,10 +142,10 @@ const Page = () => {
             Оформление заказа
           </span>
         </div>
-        <p className="font-light text-[42px] mb-[32px]">Оформление заказа</p>
+        <p className="font-light text-[42px] mb-4">Оформление заказа</p>
 
         {mounted && !isAuthenticated ? (
-          <div className="bg-white drop-shadow-lg p-6 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="bg-white drop-shadow-lg p-6 mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="text-sm text-[#00000099]">
               Для оформления заказа нужно войти в аккаунт. Если у вас нет
               аккаунта, пожалуйста, зарегистрируйтесь.
@@ -168,146 +172,173 @@ const Page = () => {
         ) : null}
 
         {mounted && isAuthenticated && (
-          <div className="flex items-center justify-between mb-[89px]">
-            <div className="mb-[19px] ">
+          <div className="flex items-start justify-between mb-4">
+            <div className="mb-2 flex-1 mr-4">
               <DeliveryAddress hideHeader hideLimitInfo compact />
-              <div className="flex items-center mt-0 mb-0">
-                <p className="font-medium text-[#0000004D] mr-[5px] mb-0">
-                  Способ оплаты
-                </p>
-                <HorizontalLine width="615px" />
-              </div>
-              <div
-                className="bg-white drop-shadow-lg flex items-center justify-between h-[74px] px-[30px] cursor-pointer"
-                onClick={() => setPaymentMethod('card')}
-              >
-                <div className="flex items-center">
-                  <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
-                    <span
-                      className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
-                        paymentMethod === 'card' ? 'bg-black' : 'bg-gray-300'
-                      }`}
-                    ></span>
-                  </div>
-                  <div className="flex flex-col">
-                    <p className="font-semibold mb-[4px]">
-                      Картами российких банков
+              
+              {/* Показываем способ оплаты если есть адреса */}
+              {addresses && addresses.length > 0 && (
+                <>
+                  <div className="flex items-center mt-3 mb-2">
+                    <p className="font-medium text-[#0000004D] mr-[5px] mb-0">
+                      Способ оплаты
                     </p>
-                    <p className=" text-[#00000080] text-[14px]">
-                      Без комиссий и прочей лабуды!
-                    </p>
+                    <HorizontalLine width="100%" />
                   </div>
-                </div>
-                <Image
-                  src="/assets/img/Order/mir.svg"
-                  alt="img"
-                  width={104}
-                  height={31}
-                />
-              </div>
+                  <div
+                    className="bg-white drop-shadow-lg flex items-center justify-between h-[74px] px-[30px] cursor-pointer"
+                    onClick={() => setPaymentMethod('card')}
+                  >
+                    <div className="flex items-center">
+                      <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
+                        <span
+                          className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
+                            paymentMethod === 'card' ? 'bg-black' : 'bg-gray-300'
+                          }`}
+                        ></span>
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="font-semibold mb-[4px]">
+                          Картами российских банков
+                        </p>
+                        <p className=" text-[#00000080] text-[14px]">
+                          Без комиссий и прочей лабуды!
+                        </p>
+                      </div>
+                    </div>
+                    <Image
+                      src="/assets/img/Order/mir.svg"
+                      alt="img"
+                      width={104}
+                      height={31}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {isAuthenticated && (
-              <div className="flex flex-col w-[413px] h-auto drop-shadow-lg items-center justify-start bg-white py-[22px]">
-                <div className="mb-[16px] flex items-center justify-center">
-                  <HorizontalLine width="141px" />
-                  <p className="font-medium text-[#0000004D] mx-[10px]">
-                    Промокод
-                  </p>
-                  <HorizontalLine width="146px" />
-                </div>
-                {!!promoError && (
-                  <div className="w-full mb-2">
-                    <Alert severity="error">{promoError}</Alert>
+              <div className="flex flex-col w-[380px] h-auto drop-shadow-lg items-center justify-start bg-white py-6">
+                {addresses && addresses.length === 0 ? (
+                  <div className="text-center p-4">
+                    <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                      <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      Невозможно оформить заказ
+                    </h3>
+                    <p className="text-gray-600">
+                      Сначала добавьте адрес доставки
+                    </p>
                   </div>
-                )}
-                <TextField
-                  value={promo}
-                  onChange={(e) => setPromo(e.target.value.toUpperCase())}
-                  placeholder="Введите промокод"
-                  disabled={!!applied || isApplying}
-                  sx={{ width: "359px", height: "48px" }}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton
-                        edge="end"
-                        size="small"
-                        onClick={clearPromo}
-                        aria-label="Очистить промокод"
+                ) : (
+                  <>
+                    <div className="mb-[16px] flex items-center justify-center">
+                      <HorizontalLine width="141px" />
+                      <p className="font-medium text-[#0000004D] mx-[10px]">
+                        Промокод
+                      </p>
+                      <HorizontalLine width="146px" />
+                    </div>
+                    {!!promoError && (
+                      <div className="w-full mb-2">
+                        <Alert severity="error">{promoError}</Alert>
+                      </div>
+                    )}
+                    <TextField
+                      value={promo}
+                      onChange={(e) => setPromo(e.target.value.toUpperCase())}
+                      placeholder="Введите промокод"
+                      disabled={!!applied || isApplying}
+                      sx={{ width: "359px", height: "48px" }}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton
+                            edge="end"
+                            size="small"
+                            onClick={clearPromo}
+                            aria-label="Очистить промокод"
+                            disabled={!!applied || isApplying}
+                          >
+                            <ClearIcon fontSize="small" />
+                          </IconButton>
+                        ),
+                      }}
+                    />
+                    <div className="mt-[18px]">
+                      <MainButton
+                        text={applied ? "Промокод применён" : "Применить промокод"}
                         disabled={!!applied || isApplying}
-                      >
-                        <ClearIcon fontSize="small" />
-                      </IconButton>
-                    ),
-                  }}
-                />
-                <div className="mt-[18px]">
-                  <MainButton
-                    text={applied ? "Промокод применён" : "Применить промокод"}
-                    disabled={!!applied || isApplying}
-                    type="button"
-                    width="359px"
-                    height="42px"
-                    onClick={handleApplyPromo}
-                  />
-                </div>
-                <div className="mb-[10px] flex items-center justify-center mt-[25px]">
-                  <HorizontalLine width="141px" />
-                  <p className="font-medium text-[#0000004D] mx-[10px]">
-                    Ваша скидка
-                  </p>
-                  <HorizontalLine width="146px" />
-                </div>
-                <p className="font-roboto font-medium text-[32px] text-[#C26B6B] mb-[10px]">
-                  {(applied ? applied.discount : 0).toLocaleString("ru-RU")}{" "}
-                  <span className="font-ysabeau font-bold text-[24px]">₽</span>
-                </p>
-                <div className="mb-[10px] flex items-center justify-center ">
-                  <HorizontalLine width="141px" />
-                  <p className="font-medium text-[#0000004D] mx-[10px]">
-                    Итого
-                  </p>
-                  <HorizontalLine width="146px" />
-                </div>
-                <p className="font-medium text-[32px] font-roboto">
-                  {(applied ? applied.finalAmount : cartTotal).toLocaleString(
-                    "ru-RU"
-                  )}
-                </p>
-                <p className="font-medium mb-[28px]">{totalCount} товаров</p>
-                <MainButton
-                  text="Оплатить"
-                  disabled={isCartEmpty || isUpdatingOrder || !currentOrderId}
-                  type="button"
-                  width="358px"
-                  height="56px"
-                  onClick={async () => {
-                    try {
-                      if (!currentOrderId) {
-                        console.error('ID заказа не найден');
-                        return;
-                      }
+                        type="button"
+                        width="359px"
+                        height="42px"
+                        onClick={handleApplyPromo}
+                      />
+                    </div>
+                    <div className="mb-[10px] flex items-center justify-center mt-[25px]">
+                      <HorizontalLine width="141px" />
+                      <p className="font-medium text-[#0000004D] mx-[10px]">
+                        Ваша скидка
+                      </p>
+                      <HorizontalLine width="146px" />
+                    </div>
+                    <p className="font-roboto font-medium text-[32px] text-[#C26B6B] mb-[10px]">
+                      {(applied ? applied.discount : 0).toLocaleString("ru-RU")}{" "}
+                      <span className="font-ysabeau font-bold text-[24px]">₽</span>
+                    </p>
+                    <div className="mb-[10px] flex items-center justify-center ">
+                      <HorizontalLine width="141px" />
+                      <p className="font-medium text-[#0000004D] mx-[10px]">
+                        Итого
+                      </p>
+                      <HorizontalLine width="146px" />
+                    </div>
+                    <p className="font-medium text-[32px] font-roboto">
+                      {(applied ? applied.finalAmount : cartTotal).toLocaleString(
+                        "ru-RU"
+                      )}
+                    </p>
+                    <p className="font-medium mb-[28px]">{totalCount} товаров</p>
+                    <MainButton
+                      text="Оплатить"
+                      disabled={isCartEmpty || isUpdatingOrder || !currentOrderId || !selectedAddress || addresses.length === 0}
+                      type="button"
+                      width="358px"
+                      height="56px"
+                      onClick={async () => {
+                        try {
+                          if (!currentOrderId) {
+                            console.error('ID заказа не найден');
+                            return;
+                          }
 
-                      // Обновляем существующий заказ с адресом доставки
-                      const fullAddress = selectedAddress ? 
-                        `${selectedAddress.region}, ${selectedAddress.city}, ${selectedAddress.street}, ${selectedAddress.building}, ${selectedAddress.house}${selectedAddress.apartment ? `, кв. ${selectedAddress.apartment}` : ''}` : 
-                        '';
-                      
-                      await updateOrder({
-                        id: currentOrderId,
-                        address: fullAddress,
-                        phone: selectedAddress ? `${selectedAddress.phoneCode}${selectedAddress.phone}` : '', // Телефон из выбранного адреса
-                        comment: '', // Можно добавить поле для комментария
-                      }).unwrap();
-                      
-                      // После успешного обновления заказа переходим к оплате
-                      router.push("/payment");
-                    } catch (error) {
-                      console.error('Ошибка при обновлении заказа:', error);
-                      // Здесь можно добавить уведомление об ошибке
-                    }
-                  }}
-                />
+                          if (!selectedAddress) {
+                            console.error('Адрес доставки не выбран');
+                            return;
+                          }
+
+                          // Обновляем существующий заказ с адресом доставки
+                          const fullAddress = `${selectedAddress.region}, ${selectedAddress.city}, ${selectedAddress.street}, ${selectedAddress.building}, ${selectedAddress.house}${selectedAddress.apartment ? `, кв. ${selectedAddress.apartment}` : ''}`;
+                          
+                          await updateOrder({
+                            id: currentOrderId,
+                            address: fullAddress,
+                            phone: `${selectedAddress.phoneCode}${selectedAddress.phone}`,
+                            comment: '',
+                          }).unwrap();
+                          
+                          // После успешного обновления заказа переходим к оплате
+                          router.push("/payment");
+                        } catch (error) {
+                          console.error('Ошибка при обновлении заказа:', error);
+                          // Здесь можно добавить уведомление об ошибке
+                        }
+                      }}
+                    />
+                  </>
+                )}
               </div>
             )}
           </div>
