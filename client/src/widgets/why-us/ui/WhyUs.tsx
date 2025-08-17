@@ -19,14 +19,14 @@ const WhyUs = () => {
         </div>
         <div className="absolute inset-0 z-0">
           <Image
-            src="/assets/img/WhyMe/zara.png"
+            src="/assets/img/WhyUs/zara.png"
             alt="Zara img"
             width={300}
             height={380}
             className="absolute left-[-180px] top-[30px]"
           />
           <Image
-            src="/assets/img/WhyMe/t-bank.png"
+            src="/assets/img/WhyUs/t-bank.png"
             alt="T-Bank img"
             width={133}
             height={118}
