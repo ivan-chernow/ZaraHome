@@ -7,13 +7,14 @@ import HorizontalLine from "@/shared/ui/HorizontalLine";
 import { TextField, Alert } from "@mui/material";
 import Image from "next/image";
 import MainButton from "@/shared/ui/Button/MainButton";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/shared/config/store/store";
 import {
   selectCartItems,
   selectCartTotalPrice,
   CartItem,
 } from "@/entities/cart/model/cartItems.slice";
+import { updateOrderStatus } from "@/entities/order/model/order.slice";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HttpsOutlinedIcon from "@mui/icons-material/HttpsOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -23,6 +24,7 @@ type Step = "form" | "3ds" | "result";
 
 const PaymentPage = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((s: RootState) => s.auth);
   const { selectedAddress } = useSelector((s: RootState) => s.delivery);
   const cartItems = useSelector((s: RootState) => selectCartItems(s) as CartItem[]);
@@ -70,6 +72,13 @@ const PaymentPage = () => {
       setError("Введите 6-значный код подтверждения");
       return;
     }
+    
+    // Обновляем статус заказа на "оплачен"
+    dispatch(updateOrderStatus({
+      orderId: "current", // Обновим текущий заказ
+      status: "paid",
+    }));
+    
     setStep("result");
     setTimeout(() => router.push("/"), 1200);
   };

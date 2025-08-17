@@ -11,6 +11,7 @@ import { DatabaseModule } from './database/database.module';
 import * as entities from './database/entities';
 import { FavoritesModule } from './favorites/favorites.module';
 import { CartModule } from './cart/cart.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { CartModule } from './cart/cart.module';
         DatabaseModule,
         FavoritesModule,
         CartModule,
+        OrdersModule,
     ],
     providers: [
         {

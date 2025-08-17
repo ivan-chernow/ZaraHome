@@ -12,6 +12,8 @@ import MainButton from "@/shared/ui/Button/MainButton";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/shared/config/store/store";
 import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
+import { setCurrentOrderId } from "@/entities/order/model/order.slice";
+import { useUpdateOrderMutation, useGetActiveOrderQuery } from "@/entities/order/api/orders.api";
 import {
   selectCartItems,
   selectCartTotalPrice,
@@ -30,7 +32,9 @@ const Page = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
+  
   const { selectedAddress } = useSelector((state: RootState) => state.delivery);
+  const currentOrderId = useSelector((state: RootState) => state.order.currentOrderId);
   const cartItems = useSelector(
     (state: RootState) => selectCartItems(state) as CartItem[]
   );
@@ -60,12 +64,23 @@ const Page = () => {
   const [paymentMethod, setPaymentMethod] = useState<'card'>("card");
   const [applyPromocode, { isLoading: isApplying }] =
     useApplyPromocodeMutation();
+  const [updateOrder, { isLoading: isUpdatingOrder }] = useUpdateOrderMutation();
   const [promoError, setPromoError] = useState<string | null>(null);
+  
+  // Получаем активный заказ пользователя
+  const { data: activeOrder } = useGetActiveOrderQuery();
   const [applied, setApplied] = useState<null | {
     code: string;
     discount: number;
     finalAmount: number;
   }>(null);
+
+  // Автоматически устанавливаем ID активного заказа, если он есть
+  useEffect(() => {
+    if (activeOrder && !currentOrderId) {
+      dispatch(setCurrentOrderId(activeOrder.id));
+    }
+  }, [activeOrder, currentOrderId, dispatch]);
 
   const clearPromo = useCallback(() => {
     setPromo("");
@@ -262,11 +277,36 @@ const Page = () => {
                 <p className="font-medium mb-[28px]">{totalCount} товаров</p>
                 <MainButton
                   text="Оплатить"
-                  disabled={isCartEmpty}
+                  disabled={isCartEmpty || isUpdatingOrder || !currentOrderId}
                   type="button"
                   width="358px"
                   height="56px"
-                  onClick={() => router.push("/payment")}
+                  onClick={async () => {
+                    try {
+                      if (!currentOrderId) {
+                        console.error('ID заказа не найден');
+                        return;
+                      }
+
+                      // Обновляем существующий заказ с адресом доставки
+                      const fullAddress = selectedAddress ? 
+                        `${selectedAddress.region}, ${selectedAddress.city}, ${selectedAddress.street}, ${selectedAddress.building}, ${selectedAddress.house}${selectedAddress.apartment ? `, кв. ${selectedAddress.apartment}` : ''}` : 
+                        '';
+                      
+                      await updateOrder({
+                        id: currentOrderId,
+                        address: fullAddress,
+                        phone: selectedAddress ? `${selectedAddress.phoneCode}${selectedAddress.phone}` : '', // Телефон из выбранного адреса
+                        comment: '', // Можно добавить поле для комментария
+                      }).unwrap();
+                      
+                      // После успешного обновления заказа переходим к оплате
+                      router.push("/payment");
+                    } catch (error) {
+                      console.error('Ошибка при обновлении заказа:', error);
+                      // Здесь можно добавить уведомление об ошибке
+                    }
+                  }}
                 />
               </div>
             )}

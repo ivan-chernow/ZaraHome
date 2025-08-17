@@ -16,6 +16,8 @@ import deliveryReducer from '../../../entities/user/model/delivery.slice';
 import profileReducer from '../../../features/profile/model/profile.slice';
 import adminReducer from '../../../features/admin/model/admin.slice';
 import { cartApi } from '@/entities/cart/api/cart.api';
+import orderReducer from '@/entities/order/model/order.slice';
+import { ordersApi } from '@/entities/order/api/orders.api';
 import { setLocalStorage } from "@/shared/lib/storage";
 
 // Утилита для санитарной очистки структуры корзины
@@ -46,12 +48,14 @@ export const store = configureStore({
     delivery: deliveryReducer,
     profile: profileReducer,
     admin: adminReducer,
+    order: orderReducer,
     [authApi.reducerPath]: authApi.reducer,
     [profileApi.reducerPath]: profileApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
     [promocodesApi.reducerPath]: promocodesApi.reducer,
     [favoritesApi.reducerPath]: favoritesApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
+    [ordersApi.reducerPath]: ordersApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -61,6 +65,7 @@ export const store = configureStore({
       productsApi.middleware,
       favoritesApi.middleware,
       cartApi.middleware,
+      ordersApi.middleware,
     ),
 })
 

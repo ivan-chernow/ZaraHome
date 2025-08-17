@@ -6,6 +6,7 @@ import { Favorite } from "src/favorites/entity/favorite.entity";
 import { Column } from "typeorm";
 import { DeliveryAddress } from "./delivery-address.entity";
 import { Cart } from "src/cart/entity/cart.entity";
+import { Order } from "src/orders/entity/order.entity";
 
 export enum UserRole {
     USER = 'user',
@@ -49,4 +50,7 @@ export class User {
 
     @OneToMany(() => Cart, cart => cart.user)
     cart: Cart[];
+
+    @OneToMany(() => Order, order => order.user)
+    orders: Order[];
 }
