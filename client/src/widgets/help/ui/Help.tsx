@@ -4,7 +4,7 @@ import HelpElement from "@/shared/ui/HelpElement";
 
 const Help = ({ title, style }) => {
   return (
-    <section className=" mt-[76px]">
+    <section id="help" data-section="help" className=" mt-[76px]">
       <Container maxWidth="lg">
         <div
           className="flex justify-end mb-[71px]"

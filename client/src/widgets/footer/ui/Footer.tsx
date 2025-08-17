@@ -16,7 +16,7 @@ const Footer = () => {
     slugify(text.replace("й", "y"), { lower: true, strict: true });
 
   return (
-    <footer className="pb-[55px] mt-auto ">
+    <footer id="footer" data-section="footer" className="pb-[55px] mt-auto ">
       <div className="flex justify-center w-full">
         <HorizontalLine width="1296px" />
       </div>

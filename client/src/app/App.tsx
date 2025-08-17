@@ -9,6 +9,7 @@ import WhyUs from "@/widgets/why-us/ui/WhyUs";
 import Question from "@/widgets/Question";
 import Help from "@/widgets/help/ui/Help";
 import Footer from "@/widgets/footer/ui/Footer";
+import ScrollToTop from "@/shared/ui/ScrollToTop";
 
 export function App() {
   return (
@@ -23,6 +24,7 @@ export function App() {
         <Help title="Не нашли ответ на свой вопрос?" style="justify-end" />
       </div>
       <Footer />
+      <ScrollToTop />
     </>
   );
 }

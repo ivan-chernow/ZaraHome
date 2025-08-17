@@ -106,7 +106,7 @@ export function Question() {
 	};
 
 	return (
-		<section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+		<section id="faq" data-section="faq" className="py-20 bg-gradient-to-br from-gray-50 to-white">
 			<Container maxWidth='xl'>
 				<div className="text-center mb-20">
 					<h2 className='mb-6 font-light text-[42px] text-gray-900'>Часто задаваемые вопросы</h2>

@@ -37,17 +37,43 @@ body {
     font-family: var(--font-ysabeau);
 }
 
-/* Hide scrollbars but keep scrolling */
+/* Minimal Scrollbar Styles */
 /* Firefox */
 * {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
 }
-/* IE/Edge */
-* {
-  -ms-overflow-style: none;
-}
+
 /* Chrome/Safari/Opera */
 *::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
+  width: 8px;
+  height: 8px;
 }
+
+*::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+  border: 1px solid #f3f4f6;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+*::-webkit-scrollbar-corner {
+  background: #f3f4f6;
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+
+
+

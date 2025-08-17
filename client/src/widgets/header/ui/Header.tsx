@@ -132,7 +132,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white drop-shadow-md py-[20px] px-[5px] relative ">
+    <header id="header" data-section="header" className="bg-white drop-shadow-md py-[20px] px-[5px] relative ">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         <div className="inline-block">
           <Link

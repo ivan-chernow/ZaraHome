@@ -39,7 +39,7 @@ const NewClothes = () => {
     slugify(text.replace("й", "y"), { lower: true, strict: true });
 
   return (
-    <section className="relative">
+    <section id="new-clothes" data-section="new-clothes" className="relative">
       <NewsBlockSection
         title="Новое поступление"
         subtitle="Коллекции этого сезона"

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const WhyUs = () => {
   return (
-    <section className="mb-[120px] mt-[10px]">
+    <section id="why-us" data-section="why-us" className="mb-[120px] mt-[10px]">
       <Container maxWidth="lg" className="relative">
         <div className="flex justify-end mb-[71px] ">
           <div className="text-left">

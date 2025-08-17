@@ -5,7 +5,7 @@ import { catalog } from 'public/assets/data/catalog';
 
 const Catalog = () => {
 	return (
-		<section className='mt-[85px]'>
+		<section id="catalog" data-section="catalog" className='mt-[85px]'>
 			<Container maxWidth='lg'>
 				<h2 className='mb-[50px] text-[42px] font-light'>Каталог товаров</h2>
 			</Container>
