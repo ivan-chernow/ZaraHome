@@ -184,10 +184,11 @@ const Page = () => {
               {addresses && addresses.length > 0 && (
                 <>
                   <div className="flex items-center mt-3 mb-2">
-                    <p className="font-medium text-[#0000004D] mr-[5px] mb-0">
+                    <div className="flex-1"><HorizontalLine width="100%" /></div>
+                    <p className="font-medium text-[#0000004D] mx-[10px] mb-0 whitespace-nowrap">
                       Способ оплаты
                     </p>
-                    <HorizontalLine width="100%" />
+                    <div className="flex-1"><HorizontalLine width="100%" /></div>
                   </div>
                   <div
                     className="bg-white drop-shadow-lg flex items-center justify-between h-[74px] px-[30px] cursor-pointer"
@@ -290,12 +291,12 @@ const Page = () => {
                         onClick={handleApplyPromo}
                       />
                     </div>
-                    <div className="mb-[10px] flex items-center justify-center mt-[25px]">
-                      <HorizontalLine width="141px" />
-                      <p className="font-medium text-[#0000004D] mx-[10px]">
+                    <div className="flex items-center mt-[25px] mb-[10px] w-full">
+                      <div className="flex-1"><HorizontalLine width="100%" /></div>
+                      <p className="font-medium text-[#0000004D] mx-[10px] mb-0 whitespace-nowrap">
                         Ваша скидка
                       </p>
-                      <HorizontalLine width="146px" />
+                      <div className="flex-1"><HorizontalLine width="100%" /></div>
                     </div>
                     <p className="font-roboto font-medium text-[32px] text-[#C26B6B] mb-[10px]">
                       {(applied ? applied.discount : 0).toLocaleString("ru-RU")}{" "}
