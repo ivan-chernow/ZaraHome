@@ -43,8 +43,12 @@ const Page = () => {
     (state: RootState) => selectCartTotalPrice(state) as number
   );
 
-  // Получаем адреса доставки
-  const { data: addresses = [] } = useGetDeliveryAddressesQuery();
+  // Получаем адреса доставки (не подставляем [] по умолчанию, чтобы избежать мерцания UI)
+  const {
+    data: addresses,
+    isLoading: isAddressesLoading,
+    isFetching: isAddressesFetching,
+  } = useGetDeliveryAddressesQuery();
 
   const totalCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
@@ -219,7 +223,16 @@ const Page = () => {
 
             {isAuthenticated && (
               <div className="flex flex-col w-[380px] h-auto drop-shadow-lg items-center justify-start bg-white py-6">
-                {addresses && addresses.length === 0 ? (
+                {isAddressesLoading || isAddressesFetching || addresses === undefined ? (
+                  // Скелетон на время загрузки адресов, чтобы не показывать "невозможно оформить заказ"
+                  <div className="p-4 w-full">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
+                      <div className="h-10 bg-gray-200 rounded w-full mb-3" />
+                      <div className="h-10 bg-gray-200 rounded w-full" />
+                    </div>
+                  </div>
+                ) : addresses && addresses.length === 0 ? (
                   <div className="text-center p-4">
                     <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-3">
                       <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,7 +316,14 @@ const Page = () => {
                     <p className="font-medium mb-[28px]">{totalCount} товаров</p>
                     <MainButton
                       text="Оплатить"
-                      disabled={isCartEmpty || isUpdatingOrder || !currentOrderId || !selectedAddress || addresses.length === 0}
+                      disabled={
+                        isCartEmpty ||
+                        isUpdatingOrder ||
+                        !currentOrderId ||
+                        !selectedAddress ||
+                        !addresses ||
+                        addresses.length === 0
+                      }
                       type="button"
                       width="358px"
                       height="56px"
