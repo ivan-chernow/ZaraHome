@@ -19,6 +19,9 @@ import { useDispatch } from "react-redux";
 import { setCurrentOrderId } from "@/entities/order/model/order.slice";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import Link from "next/link";
+import { RootState } from "@/shared/config/store/store";
+import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const Page = () => {
   const router = useRouter();
@@ -72,6 +75,7 @@ const Page = () => {
   }, []);
 
   const cartItems = useSelector(selectCartItems);
+  const { isAuthenticated } = useSelector((s: RootState) => s.auth);
   const totalCount = useSelector(selectCartTotalCount);
   const totalPrice = useSelector(selectCartTotalPrice);
 
@@ -167,11 +171,25 @@ const Page = () => {
                       : "товаров"}
                   </p>
                   <div>
+                    {!isAuthenticated && (
+                      <div className="w-full bg-gray-50 border border-gray-200 rounded p-3 mb-3 text-center">
+                        <div className="flex items-center justify-center text-[#00000099] mb-1">
+                          <LockOutlinedIcon fontSize="small" className="mr-1" />
+                          <span className="text-sm">Войдите, чтобы оформить заказ</span>
+                        </div>
+                        <div className="text-xs text-[#6b7280]">Если у вас нет аккаунта — можно зарегистрироваться за минуту</div>
+                      </div>
+                    )}
                     <MainButton
-                      text="Перейти к оформлению"
+                      text={isAuthenticated ? "Перейти к оформлению" : "Войти, чтобы оформить"}
                       disabled={cartItems.length === 0 || isCreatingOrder}
                       type="button"
                                         onClick={async () => {
+                    if (!isAuthenticated) {
+                      dispatch(setView('login'));
+                      dispatch(openModalAuth());
+                      return;
+                    }
                     try {
                       // Если у пользователя уже есть активный заказ, проверяем, изменились ли товары
                       if (activeOrder && activeOrder.items) {
@@ -226,6 +244,19 @@ const Page = () => {
                       width="358px"
                       height="56px"
                     />
+                    {!isAuthenticated && (
+                      <div className="mt-2 text-center text-sm">
+                        <button
+                          className="underline cursor-pointer text-[#00000099]"
+                          onClick={() => {
+                            dispatch(setView('signup'));
+                            dispatch(openModalAuth());
+                          }}
+                        >
+                          Зарегистрироваться
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
