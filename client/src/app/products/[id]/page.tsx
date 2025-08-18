@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useMemo, useState, useCallback } from "react";
 import FavoriteButton from "@/shared/ui/Button/FavoriteButton";
 import VerticalLine from "@/shared/ui/VerticalLine";
 import Image from "next/image";
@@ -29,6 +29,9 @@ import SliderSwiper from "@/shared/ui/SliderSwiper";
 import Link from "next/link";
 import Skeleton from "@mui/material/Skeleton";
 import { expandCategory, expandSubCategory } from "@/entities/category/model/catalog.slice";
+import { useAddToCartMutation, useRemoveFromCartMutation } from "@/entities/cart/api/cart.api";
+import { addCartItem, removeCartItem, setCartItems } from "@/entities/cart/model/cartItems.slice";
+import { getLocalStorage, setLocalStorage } from "@/shared/lib/storage";
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const resolvedParams = use(params);
@@ -37,6 +40,8 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const activeColors = useSelector(
     (state: RootState) => state.productCard.activeColors
   );
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const cartItems = useSelector((state: RootState) => state.cartItems.items);
 
   console.log("Resolved params:", resolvedParams);
   console.log("Categories data:", categories);
@@ -80,9 +85,19 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const { product, category, subCategory, type } = pathData;
   const activeColor = activeColors[product.id];
 
-  if (selectedSize === undefined && product.size) {
-    setSelectedSize(Object.keys(product.size)[0]);
-  }
+  const isInCart = useMemo(
+    () => cartItems.some((item: any) => item.id === product.id),
+    [cartItems, product.id]
+  );
+
+  const [addToCart] = useAddToCartMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
+  useEffect(() => {
+    if (selectedSize === undefined && product.size) {
+      setSelectedSize(Object.keys(product.size)[0]);
+    }
+  }, [selectedSize, product]);
 
   const handleSizeChange = (event: SelectChangeEvent<string>) =>
     setSelectedSize(event.target.value);
@@ -92,6 +107,47 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     product.size?.[sizeKey]?.price || 0;
   const getSizeName = (sizeKey: string) =>
     product.size?.[sizeKey]?.size || sizeKey;
+
+  const currentPrice = useMemo(() => {
+    const key = selectedSize || (product.size ? Object.keys(product.size)[0] : "");
+    return key ? getPriceBySize(key) : 0;
+  }, [selectedSize]);
+
+  const handleAuthenticatedToggle = useCallback(async () => {
+    try {
+      if (isInCart) {
+        dispatch(removeCartItem(product.id));
+        await removeFromCart(product.id).unwrap();
+      } else {
+        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0] }));
+        await addToCart(product.id).unwrap();
+      }
+    } catch (error) {
+      if (isInCart) {
+        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0] }));
+      } else {
+        dispatch(removeCartItem(product.id));
+      }
+      console.error("Ошибка при работе с корзиной:", error);
+    }
+  }, [isInCart, product?.id, currentPrice, product?.img, addToCart, removeFromCart, dispatch]);
+
+  const handleGuestToggle = useCallback(() => {
+    const cart = getLocalStorage("cart", []);
+    const updatedCart = isInCart
+      ? cart.filter((item: any) => item.id !== product.id)
+      : [...cart, { id: product.id, price: currentPrice, quantity: 1, img: product.img?.[0] }];
+    setLocalStorage("cart", updatedCart);
+    dispatch(setCartItems(updatedCart));
+  }, [isInCart, product?.id, currentPrice, product?.img, dispatch]);
+
+  const handleCartClick = useCallback(() => {
+    if (isAuthenticated) {
+      handleAuthenticatedToggle();
+    } else {
+      handleGuestToggle();
+    }
+  }, [isAuthenticated, handleAuthenticatedToggle, handleGuestToggle]);
 
   // Автораскрытие аккордеона под товар
   useEffect(() => {
@@ -162,7 +218,6 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
             product={product}
             isHovered={false}
             quantity={product.img.length}
-            width={470}
             height={479}
           />
         </div>
@@ -253,9 +308,9 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
               <FavoriteButton productId={product.id} />
             </div>
             <MainButton
-              text="ДОБАВИТЬ В КОРЗИНУ"
+              text={isInCart ? "В КОРЗИНЕ" : "ДОБАВИТЬ В КОРЗИНУ"}
               disabled={false}
-              onClick={() => {}}
+              onClick={handleCartClick}
               type="button"
               height="56px"
               width="400px"
