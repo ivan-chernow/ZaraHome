@@ -10,7 +10,7 @@ interface SliderSwiperProps {
   product: Product;
   isHovered: boolean;
   quantity: number;
-  width?: number;
+  // Width is derived from the parent; keep only height to lock the visual area
   height?: number;
 }
 
@@ -20,7 +20,6 @@ const SliderSwiper = ({
   product,
   isHovered,
   quantity,
-  width = 326,
   height = 326,
 }: SliderSwiperProps) => {
   // Функция для формирования полного URL изображения
@@ -57,18 +56,18 @@ const SliderSwiper = ({
         },
         modules: [Pagination],
       })}
-      style={{ width: "auto", height: height, overflow: "hidden" }}
+      style={{ width: "100%", height: height, overflow: "hidden" }}
       className={isHovered ? "show-pagination" : "hide-pagination"}
       spaceBetween={0}
       slidesPerView={1}
       loop={showPagination}
     >
       {images.map((img: string, idx: number) => (
-        <SwiperSlide key={idx} style={{ width: width, height: height }}>
+        <SwiperSlide key={idx} style={{ width: "100%", height: "100%" }}>
           <div
             style={{
-              width: "auto",
-              height: height,
+              width: "100%",
+              height: "100%",
               overflow: "hidden",
               position: "relative",
             }}
@@ -76,8 +75,8 @@ const SliderSwiper = ({
             <Image
               src={getImageUrl(img)}
               alt={`${product.name_ru} изображение ${idx + 1}`}
-              width={width}
-              height={height}
+              fill
+              sizes="(max-width: 768px) 100vw, 326px"
               quality={85}
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               draggable={false}
