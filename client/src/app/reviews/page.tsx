@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
 import Rating from "@mui/material/Rating";
 import Avatar from "@mui/material/Avatar";
-import Modal from "@mui/material/Modal";
-import TextField from "@mui/material/TextField";
 import MainLayout from "@/widgets/layout/MainLayout";
 import MainButton from "@/shared/ui/Button/MainButton";
 
@@ -85,64 +83,59 @@ const ReviewCard = ({ review }: { review: Review }) => (
 const REVIEWS_TO_SHOW = 5;
 
 const ReviewsPage = () => {
-  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
-  const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", text: "", rating: 5 });
+  const [reviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [isLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleRating = (
-    _: React.SyntheticEvent<Element, Event>,
-    value: number | null
-  ) => setForm({ ...form, rating: value || 5 });
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setReviews([
-        {
-          id: Date.now(),
-          name: form.name,
-          avatar: undefined,
-          rating: form.rating,
-          date: new Date().toISOString().slice(0, 10),
-          text: form.text,
-        },
-        ...reviews,
-      ]);
-      setForm({ name: "", text: "", rating: 5 });
-      setIsLoading(false);
-      handleClose();
-    }, 800);
-  };
+  const totalReviews = reviews.length;
+  const averageRating = useMemo(
+    () => (totalReviews ? reviews.reduce((s, r) => s + r.rating, 0) / totalReviews : 0),
+    [reviews, totalReviews]
+  );
+  const ratingCounts = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    reviews.forEach((r) => {
+      const idx = Math.min(5, Math.max(1, r.rating)) - 1;
+      counts[idx] += 1;
+    });
+    return counts; // index 0 -> 1★, 4 -> 5★
+  }, [reviews]);
 
   const visibleReviews = showAll ? reviews : reviews.slice(0, REVIEWS_TO_SHOW);
 
   return (
     <MainLayout>
       <Container maxWidth="md" className="py-12">
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col mb-8">
           <h1 className="text-4xl font-light mb-2">Отзывы покупателей</h1>
-          <p className="text-gray-500 mb-4 text-center">
-            Мы ценим ваше мнение! Оставьте отзыв о нашем магазине или прочитайте
-            впечатления других покупателей.
+          <p className="text-gray-500 mb-6">
+            Честные впечатления наших клиентов о сервисе и товарах.
           </p>
-          <div className="w-[220px]">
-            <MainButton
-              text="Оставить отзыв"
-              disabled={false}
-              onClick={handleOpen}
-              type="button"
-              width="220px"
-              height="56px"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center justify-center">
+              <div className="text-5xl font-ysabeau font-semibold mb-2">
+                {averageRating.toFixed(1)}
+              </div>
+              <Rating value={averageRating} precision={0.1} readOnly size="large" />
+              <div className="text-gray-500 text-sm mt-2">
+                {totalReviews} отзывов
+              </div>
+            </div>
+            <div className="md:col-span-2 bg-white rounded-xl shadow p-6">
+              {([5, 4, 3, 2, 1] as const).map((stars) => {
+                const count = ratingCounts[stars - 1];
+                const percent = totalReviews ? Math.round((count / totalReviews) * 100) : 0;
+                return (
+                  <div key={stars} className="flex items-center gap-3 mb-3 last:mb-0">
+                    <div className="w-10 text-sm text-gray-600">{stars}★</div>
+                    <div className="flex-1 h-2 bg-gray-100 rounded">
+                      <div className="h-2 bg-black rounded" style={{ width: `${percent}%` }} />
+                    </div>
+                    <div className="w-14 text-right text-sm text-gray-600">{percent}%</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -176,49 +169,7 @@ const ReviewsPage = () => {
           )}
         </div>
 
-        {/* Модалка для добавления отзыва */}
-        <Modal open={open} onClose={handleClose}>
-          <form
-            onSubmit={handleSubmit}
-            className="absolute left-1/2 top-1/2 bg-white rounded-xl shadow-lg p-8 flex flex-col gap-4"
-            style={{
-              transform: "translate(-50%, -50%)",
-              minWidth: 320,
-              maxWidth: 400,
-            }}
-          >
-            <h2 className="text-2xl font-semibold mb-2">Оставить отзыв</h2>
-            <TextField
-              label="Ваше имя"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-            <TextField
-              label="Ваш отзыв"
-              name="text"
-              value={form.text}
-              onChange={handleChange}
-              required
-              multiline
-              rows={3}
-              fullWidth
-            />
-            <div className="flex items-center gap-2">
-              <span>Оценка:</span>
-              <Rating value={form.rating} onChange={handleRating} />
-            </div>
-            <MainButton
-              text="Отправить"
-              type="submit"
-              disabled={isLoading || !form.name || !form.text}
-              width="100%"
-              height="56px"
-            />
-          </form>
-        </Modal>
+        {/* Форма добавления отключена по требованиям. */}
       </Container>
     </MainLayout>
   );
