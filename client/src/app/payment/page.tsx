@@ -164,14 +164,14 @@ const PaymentPage = () => {
                   <div className="mt-6 flex items-center gap-3">
                     <MainButton
                       text="Оплатить"
-                      disabled={!isAuthenticated || isCartEmpty}
+                      disabled
                       type="button"
                       width="220px"
                       height="48px"
                       onClick={handleSubmitCard}
                     />
                     <button
-                      className="text-sm text-[#00000099] underline"
+                      className="text-sm text-[#00000099] underline cursor-pointer"
                       onClick={() => router.push("/order")}
                     >
                       <span className="inline-flex items-center"><ArrowBackIcon fontSize="small" className="mr-1"/>Назад к оформлению</span>
