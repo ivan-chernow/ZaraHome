@@ -51,7 +51,7 @@ const CartDetails = ({ cartButtonRef }: CartDetailsProps) => {
     <Fade in={true} timeout={500}>
       <div
         ref={cartRef}
-        className="w-[325px] h-[336px] bg-white shadow-lg flex flex-col absolute cursor-default z-[99999] p-4"
+        className="w-[325px] h-[336px] bg-white shadow-lg flex flex-col absolute cursor-default z-[99999] p-4 overflow-hidden"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
@@ -66,7 +66,7 @@ const CartDetails = ({ cartButtonRef }: CartDetailsProps) => {
           </div>
         ) : (
           <>
-            <ul className="w-full flex-1 overflow-y-auto">
+            <ul className="w-full flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
               {cartItems.map((item, idx) => (
                 <React.Fragment key={item.id}>
                   <CartItem item={item} />

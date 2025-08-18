@@ -37,6 +37,15 @@ body {
     font-family: var(--font-ysabeau);
 }
 
+/* Hide scrollbars visually but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
 /* Minimal Scrollbar Styles */
 /* Firefox */
 * {
