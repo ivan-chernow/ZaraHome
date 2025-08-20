@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -12,22 +12,28 @@ import * as entities from './database/entities';
 import { FavoritesModule } from './favorites/favorites.module';
 import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
+import { envValidationSchema } from './config/env.validation';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
+            validationSchema: envValidationSchema,
         }),
-        TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: process.env.DB_HOST || 'localhost',
-            port: parseInt(process.env.DB_PORT || '5432'),
-            username: process.env.DB_USERNAME || 'postgres',
-            password: process.env.DB_PASSWORD || 'postgres',
-            database: process.env.DB_DATABASE || 'zarahome',
-            entities: Object.values(entities),
-            synchronize: true,
-            dropSchema: false,
+        TypeOrmModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                type: 'postgres',
+                host: config.get<string>('DB_HOST'),
+                port: config.get<number>('DB_PORT'),
+                username: config.get<string>('DB_USERNAME'),
+                password: config.get<string>('DB_PASSWORD'),
+                database: config.get<string>('DB_DATABASE'),
+                entities: Object.values(entities),
+                synchronize: config.get<string>('NODE_ENV') !== 'production',
+                dropSchema: false,
+                autoLoadEntities: false,
+            }),
         }),
         // Смягчаем глобальный rate limit, чтобы UI мог безопасно рефетчить данные
         ThrottlerModule.forRoot([{

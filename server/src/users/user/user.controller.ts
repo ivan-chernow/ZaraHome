@@ -10,32 +10,32 @@ export class UserController {
 
     @Get('profile')
     async getProfile(@Request() req) {
-        return this.userService.getProfile(req.user.userId);
+        return this.userService.getProfile(req.user.id);
     }
 
     @Patch('change-password')
     async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
-        return this.userService.changePassword(req.user.userId, dto);
+        return this.userService.changePassword(req.user.id, dto);
     }
 
     @Patch('change-email')
     async changeEmail(@Request() req, @Body() dto: ChangeEmailDto) {
-        return this.userService.changeEmail(req.user.userId, req.user.email, dto.newEmail);
+        return this.userService.changeEmail(req.user.id, req.user.email, dto.newEmail);
     }
 
     @Patch('change-delivery-address')
     async changeDeliveryAddress(@Request() req, @Body() dto: ChangeDeliveryAddressDto) {
-        return this.userService.changeDeliveryAddress(req.user.userId, dto);
+        return this.userService.changeDeliveryAddress(req.user.id, dto);
     }
 
     @Get('delivery-addresses')
     async getDeliveryAddresses(@Request() req) {
-        return this.userService.getDeliveryAddresses(req.user.userId);
+        return this.userService.getDeliveryAddresses(req.user.id);
     }
 
     @Post('delivery-addresses')
     async addDeliveryAddress(@Request() req, @Body() dto: ChangeDeliveryAddressDto) {
-        return this.userService.addDeliveryAddress(req.user.userId, dto);
+        return this.userService.addDeliveryAddress(req.user.id, dto);
     }
 
     @Put('delivery-addresses/:id')
@@ -44,7 +44,7 @@ export class UserController {
         @Param('id') id: number,
         @Body() dto: ChangeDeliveryAddressDto
     ) {
-        return this.userService.updateDeliveryAddress(req.user.userId, id, dto);
+        return this.userService.updateDeliveryAddress(req.user.id, id, dto);
     }
 
     @Delete('delivery-addresses/:id')
@@ -52,6 +52,6 @@ export class UserController {
         @Request() req,
         @Param('id') id: number
     ) {
-        return this.userService.deleteDeliveryAddress(req.user.userId, id);
+        return this.userService.deleteDeliveryAddress(req.user.id, id);
     }
 }

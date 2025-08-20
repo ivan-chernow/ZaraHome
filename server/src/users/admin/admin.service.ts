@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../user/entity/user.entity';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 import { ProductsService } from 'src/products/products.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
@@ -13,12 +14,13 @@ export class AdminService implements OnModuleInit {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        private readonly productsService: ProductsService
+        private readonly productsService: ProductsService,
+        private readonly config: ConfigService,
     ) { }
 
     async onModuleInit() {
-        const adminEmail = process.env.ADMIN_EMAIL;
-        const adminPassword = process.env.ADMIN_PASSWORD;
+        const adminEmail = this.config.get<string>('ADMIN_EMAIL');
+        const adminPassword = this.config.get<string>('ADMIN_PASSWORD');
 
         if (!adminEmail || !adminPassword) {
             return;

@@ -88,7 +88,7 @@ export class LoginService {
 
     async refreshTokens(refreshToken: string, res?: any) {
         try {
-            const payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_SECRET });
+            const payload = this.jwtService.verify(refreshToken);
             const user = await this.userRepository.findOne({ where: { id: payload.sub } });
             if (!user) throw new UnauthorizedException('Пользователь не найден');
 

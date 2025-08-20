@@ -3,16 +3,19 @@ import { Resend } from 'resend';
 import * as hbs from 'hbs';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
   private resend: Resend;
   private readonly logger = new Logger(EmailService.name);
-  private readonly USER_EMAIL = 'sutrame735@gmail.com'; // Замените на ваш email
+  private readonly fromAddress: string;
 
-  constructor() {
-    this.resend = new Resend(process.env.RESEND_API_KEY || 're_2Mw7eJqZ_PZCLX8nPYtcKKj4uuv9oYEKK');
-    this.logger.log('EmailService initialized with API key: ' + (process.env.RESEND_API_KEY ? 'Present' : 'Missing'));
+  constructor(private readonly config: ConfigService) {
+    const apiKey = this.config.get<string>('RESEND_API_KEY');
+    this.resend = new Resend(apiKey);
+    this.fromAddress = this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
+    this.logger.log('EmailService initialized with API key: ' + (apiKey ? 'Present' : 'Missing'));
   }
 
   async sendTemplateEmail(
@@ -38,8 +41,8 @@ export class EmailService {
 
       this.logger.log('Sending email via Resend...');
       const result = await this.resend.emails.send({
-        from: 'onboarding@resend.dev', // Используем тестовый домен Resend
-        to: this.USER_EMAIL, // Все письма будут приходить на ваш email
+        from: this.fromAddress,
+        to: to,
         subject,
         html,
       });

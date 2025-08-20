@@ -11,13 +11,13 @@ export class CartController {
 
   @Post(':productId')
   async add(@Req() req: AuthenticatedRequest, @Param('productId') productId: string) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.cartService.addToCart(userId, Number(productId));
   }
 
   @Delete(':productId')
   async remove(@Req() req: AuthenticatedRequest, @Param('productId') productId: string) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     await this.cartService.removeFromCart(userId, Number(productId));
     return { success: true };
   }
@@ -25,14 +25,14 @@ export class CartController {
   @Get()
   @SkipThrottle()
   async findAll(@Req() req: AuthenticatedRequest) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.cartService.findAll(userId);
   }
 
   @Get('status')
   @SkipThrottle()
   async status(@Req() req: AuthenticatedRequest, @Query('productIds') productIds: string) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const ids = (productIds || '')
       .split(',')
       .map((id) => Number(id))
