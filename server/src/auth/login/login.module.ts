@@ -9,12 +9,14 @@ import { JwtStrategy } from './jwt/jwt.strategy';
 import { User } from 'src/users/user/entity/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthRepository } from '../auth.repository';
+import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({
     imports: [
         ConfigModule,
         TypeOrmModule.forFeature([User, RefreshToken]),
         PassportModule,
+        SharedModule,
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({

@@ -5,8 +5,10 @@ import { RegistrationService } from './register.service';
 import { EmailModule } from 'src/email/email.module';
 import { RegistrationController } from './register.controller';
 import { User } from 'src/users/user/entity/user.entity';
+import { SharedModule } from 'src/shared/modules/shared.module';
+
 @Module({
-    imports: [TypeOrmModule.forFeature([User, EmailVerification]), EmailModule],
+    imports: [TypeOrmModule.forFeature([User, EmailVerification]), EmailModule, SharedModule],
     controllers: [RegistrationController],
     providers: [RegistrationService],
     exports: [RegistrationService],

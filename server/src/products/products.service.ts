@@ -10,12 +10,44 @@ import {
   ISubCategory,
   IType
 } from '../common/interfaces';
+import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 
 @Injectable()
 export class ProductsService implements IProductService {
   constructor(
     private readonly productsRepository: ProductsRepository,
+    private readonly imageOptimizationService: ImageOptimizationService,
   ) {}
+
+  async createProduct(dto: ICreateProductDto, files?: Array<Express.Multer.File>): Promise<IProduct> {
+    // Обработка файлов
+    if (files && files.length > 0) {
+      dto.img = await this.imageOptimizationService.processMany(files);
+    }
+    
+    // Преобразуем строковые значения в числа
+    if (dto.categoryId) dto.categoryId = parseInt(dto.categoryId as any);
+    if (dto.subCategoryId) dto.subCategoryId = parseInt(dto.subCategoryId as any);
+    if (dto.typeId) dto.typeId = parseInt(dto.typeId as any);
+    
+    // Преобразуем JSON-строки в объекты
+    if (typeof dto.colors === 'string') {
+      dto.colors = JSON.parse(dto.colors);
+    }
+    if (typeof dto.size === 'string') {
+      dto.size = JSON.parse(dto.size);
+    }
+
+    // Преобразуем строковые булевы значения
+    if (typeof dto.isNew === 'string') {
+      dto.isNew = dto.isNew === 'true';
+    }
+    if (typeof dto.isAvailable === 'string') {
+      dto.isAvailable = dto.isAvailable === 'true';
+    }
+
+    return this.create(dto);
+  }
 
   async create(data: ICreateProductDto): Promise<IProduct> {
     const { categoryId, subCategoryId, typeId, ...rest } = data;

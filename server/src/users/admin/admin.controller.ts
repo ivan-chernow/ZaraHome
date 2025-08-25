@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { AdminService } from './admin.service';
+import { ResponseService } from 'src/shared/services/response.service';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { UserService } from '../user/user.service';
 import { ChangePasswordDto } from '../user/dto/user.dto';
@@ -16,7 +17,11 @@ import { CreateProductDto } from 'src/products/dto/create-product.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
-    constructor(private readonly adminService: AdminService, private readonly userService: UserService) { }
+    constructor(
+        private readonly adminService: AdminService, 
+        private readonly userService: UserService,
+        private readonly responseService: ResponseService,
+    ) { }
 
     @Post('add')
     @UseInterceptors(FilesInterceptor('images', 12, {
@@ -33,7 +38,11 @@ export class AdminController {
         @UploadedFiles() files: Express.Multer.File[],
         @Body() productData: CreateProductDto
     ) {
-        return this.adminService.addProduct(files, productData);
+        try {
+            const product = await this.adminService.addProduct(files, productData);
+            return this.responseService.success(product, 'Продукт успешно добавлен администратором');
+        } catch (error) {
+            return this.responseService.error('Ошибка при добавлении продукта', error.message);
+        }
     }
-
 } 

@@ -160,7 +160,7 @@ const apiResponseExample = (): ApiResponse<IProduct> => {
 // Пример пагинации
 const paginationExample = (): PaginatedResult<IProduct> => {
   return {
-    data: [],
+    items: [],
     total: 100,
     page: 1,
     limit: 20,
@@ -220,11 +220,19 @@ class ExampleRepository<T> implements RepositoryInterface<T> {
     throw new Error("Method not implemented.");
   }
 
+  async findById(id: number): Promise<T | null> {
+    throw new Error("Method not implemented.");
+  }
+
   async findAll(): Promise<T[]> {
     throw new Error("Method not implemented.");
   }
 
   async create(data: Partial<T>): Promise<T> {
+    throw new Error("Method not implemented.");
+  }
+
+  async save(entity: T): Promise<T> {
     throw new Error("Method not implemented.");
   }
 

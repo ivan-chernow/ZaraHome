@@ -18,7 +18,7 @@ export interface IValidationSchema {
     maxLength?: number;
     min?: number;
     max?: number;
-    pattern?: RegExp;
+    pattern?: string;
     custom?: (value: any) => boolean;
     message?: string;
   };
@@ -55,7 +55,7 @@ export interface IUserValidationSchema extends IValidationSchema {
   email: {
     required: true;
     type: 'email';
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    pattern: '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$';
     message: 'Введите корректный email адрес';
   };
   password: {

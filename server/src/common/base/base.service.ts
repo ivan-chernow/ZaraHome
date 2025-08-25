@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
-import { Repository, FindOptionsWhere, FindManyOptions, FindOneOptions } from 'typeorm';
+import { Repository, FindOptionsWhere, FindManyOptions, FindOneOptions, ObjectLiteral } from 'typeorm';
 import { IBaseService } from '../interfaces';
 
 /**
@@ -7,7 +7,7 @@ import { IBaseService } from '../interfaces';
  * Предоставляет общие методы CRUD операций и базовую функциональность
  */
 @Injectable()
-export abstract class BaseService<T, CreateDto, UpdateDto> implements IBaseService<T> {
+export abstract class BaseService<T extends ObjectLiteral, CreateDto, UpdateDto> implements IBaseService<T> {
   
   constructor(
     protected readonly repository: Repository<T>
@@ -17,15 +17,13 @@ export abstract class BaseService<T, CreateDto, UpdateDto> implements IBaseServi
    * Создать новый элемент
    */
   async create(data: CreateDto): Promise<T> {
-    try {
-      const entity = this.repository.create(data as any);
-      return await this.repository.save(entity);
-    } catch (error) {
-      if (error.code === '23505') { // PostgreSQL unique constraint violation
-        throw new ConflictException('Элемент уже существует');
-      }
-      throw new BadRequestException('Ошибка при создании элемента');
+    const entity = this.repository.create(data as any);
+    const savedEntity = await this.repository.save(entity);
+
+    if (Array.isArray(savedEntity)) {
+      return savedEntity[0];
     }
+    return savedEntity;
   }
 
   /**

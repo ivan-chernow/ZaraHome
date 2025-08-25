@@ -1,19 +1,17 @@
-import { Repository, FindOptionsWhere, FindManyOptions, FindOneOptions, SelectQueryBuilder } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { Repository, SelectQueryBuilder, FindOptionsWhere, FindOptionsOrder, FindManyOptions, ObjectLiteral, In } from 'typeorm';
 import { IBaseService } from '../interfaces';
 
 /**
  * Базовый абстрактный класс для всех репозиториев
- * Предоставляет общие методы для работы с данными и расширенную функциональность
+ * Предоставляет общие методы CRUD операций и базовую функциональность
  */
-export abstract class BaseRepository<T> {
-  
+@Injectable()
+export abstract class BaseRepository<T extends ObjectLiteral> {
   constructor(
     protected readonly repository: Repository<T>
   ) {}
 
-  /**
-   * Создать QueryBuilder для сложных запросов
-   */
   protected createQueryBuilder(alias?: string): SelectQueryBuilder<T> {
     return this.repository.createQueryBuilder(alias);
   }
@@ -35,7 +33,7 @@ export abstract class BaseRepository<T> {
    * Найти один элемент с отношениями
    */
   async findOneWithRelations(
-    options: FindOneOptions<T> = {},
+    options: FindManyOptions<T> = {},
     relations: string[] = []
   ): Promise<T | null> {
     return await this.repository.findOne({
@@ -51,7 +49,11 @@ export abstract class BaseRepository<T> {
     ids: number[],
     relations: string[] = []
   ): Promise<T[]> {
-    return await this.repository.findByIds(ids, { relations });
+    if (!ids.length) return [];
+    return await this.repository.find({
+      where: { id: In(ids) } as any,
+      relations
+    });
   }
 
   /**
@@ -59,7 +61,7 @@ export abstract class BaseRepository<T> {
    */
   async findByConditionWithSort(
     condition: FindOptionsWhere<T>,
-    sortOptions: { [key: string]: 'ASC' | 'DESC' } = {},
+    sortOptions: FindOptionsOrder<T> = {},
     relations: string[] = []
   ): Promise<T[]> {
     return await this.repository.find({
@@ -75,7 +77,7 @@ export abstract class BaseRepository<T> {
   async findWithPaginationAndSort(
     page: number = 1,
     limit: number = 10,
-    sortOptions: { [key: string]: 'ASC' | 'DESC' } = {},
+    sortOptions: FindOptionsOrder<T> = {},
     relations: string[] = [],
     where?: FindOptionsWhere<T>
   ): Promise<{ data: T[]; total: number; page: number; limit: number; pages: number }> {
@@ -233,12 +235,19 @@ export abstract class BaseRepository<T> {
   /**
    * Обновить элементы по условию
    */
-  async updateByCondition(
-    condition: FindOptionsWhere<T>,
-    updateData: Partial<T>
-  ): Promise<number> {
-    const result = await this.repository.update(condition, updateData);
-    return result.affected || 0;
+  async update(condition: FindOptionsWhere<T>, updateData: Partial<T>): Promise<T | null> {
+    const result = await this.repository.update(condition, updateData as any);
+    if (result.affected === 0) return null;
+    
+    // Возвращаем обновленную сущность
+    const whereKeys = Object.keys(condition);
+    if (whereKeys.length > 0) {
+      const firstKey = whereKeys[0];
+      const firstValue = (condition as any)[firstKey];
+      return await this.repository.findOne({ where: { [firstKey]: firstValue } as any });
+    }
+    
+    return null;
   }
 
   /**
@@ -269,5 +278,56 @@ export abstract class BaseRepository<T> {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async findByIds(
+    ids: number[],
+    relations: string[] = []
+  ): Promise<T[]> {
+    if (!ids.length) return [];
+    return await this.repository.find({
+      where: { id: In(ids) } as any,
+      relations
+    });
+  }
+
+  async findAllWithPagination(
+    page: number = 1,
+    limit: number = 10,
+    where: FindOptionsWhere<T> = {},
+    relations: string[] = [],
+    sortOptions: FindOptionsOrder<T> = {}
+  ): Promise<{ items: T[]; total: number; page: number; limit: number; totalPages: number }> {
+    const skip = (page - 1) * limit;
+    
+    const [items, total] = await this.repository.findAndCount({
+      where,
+      relations,
+      skip,
+      take: limit,
+      order: sortOptions,
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages
+    };
+  }
+
+  async findAllWithSort(
+    where: FindOptionsWhere<T> = {},
+    relations: string[] = [],
+    sortOptions: FindOptionsOrder<T> = {}
+  ): Promise<T[]> {
+    return await this.repository.find({
+      where,
+      relations,
+      order: sortOptions,
+    });
   }
 }

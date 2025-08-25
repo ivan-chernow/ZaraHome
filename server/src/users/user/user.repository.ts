@@ -73,8 +73,13 @@ export class UserRepository {
   }
 
   async createAddress(addressData: any): Promise<DeliveryAddress> {
-    const deliveryAddress = this.addressRepository.create(addressData);
-    return this.addressRepository.save(deliveryAddress);
+    const result = await this.addressRepository.insert(addressData);
+    const id = result.identifiers[0].id;
+    const savedAddress = await this.addressRepository.findOne({ where: { id } });
+    if (!savedAddress) {
+      throw new Error('Failed to create delivery address');
+    }
+    return savedAddress;
   }
 
   async removeAddress(address: DeliveryAddress): Promise<void> {

@@ -6,9 +6,10 @@ import { FavoritesController } from './favorites.controller';
 import { Favorite } from './entity/favorite.entity';
 import { User } from '../users/user/entity/user.entity';
 import { Product } from '../products/entity/products.entity';
+import { SharedModule } from '../shared/modules/shared.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Favorite, User, Product])],
+  imports: [TypeOrmModule.forFeature([Favorite, User, Product]), SharedModule],
   controllers: [FavoritesController],
   providers: [FavoritesService, FavoritesRepository],
 })

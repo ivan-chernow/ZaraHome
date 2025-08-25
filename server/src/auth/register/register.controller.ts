@@ -1,26 +1,37 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { RegistrationService } from './register.service';
+import { ResponseService } from 'src/shared/services/response.service';
 import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth/registration')
 export class RegistrationController {
-    constructor(private readonly registrationService: RegistrationService) { }
+    constructor(
+        private readonly registrationService: RegistrationService,
+        private readonly responseService: ResponseService,
+    ) { }
 
     @Post('initiate')
     @HttpCode(HttpStatus.OK)
     @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
     async initiate(@Body('email') email: string) {
-        await this.registrationService.initiateRegistration(email);
-        return { success: true, message: `Код подтверждения отправлен на email ${email}` };
+        try {
+            await this.registrationService.initiateRegistration(email);
+            return this.responseService.success(undefined, `Код подтверждения отправлен на email ${email}`);
+        } catch (error) {
+            return this.responseService.error('Ошибка при инициации регистрации', error.message);
+        }
     }   
 
     @Post('verify-code')
     @HttpCode(HttpStatus.OK)
     @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
-
     async verifyCode(@Body('email') email: string, @Body('code') code: string) {
-        const sessionToken = await this.registrationService.verifyByCode(email, code);
-        return { success: true, sessionToken, message: `Код подтверждения подтвержден, токен сессии ${sessionToken}` };
+        try {
+            const sessionToken = await this.registrationService.verifyByCode(email, code);
+            return this.responseService.success({ sessionToken }, `Код подтверждения подтвержден, токен сессии ${sessionToken}`);
+        } catch (error) {
+            return this.responseService.error('Ошибка при проверке кода', error.message);
+        }
     }
 
     @Post('complete')
@@ -30,7 +41,11 @@ export class RegistrationController {
         @Body('sessionToken') sessionToken: string,
         @Body('password') password: string,
     ) {
-        const user = await this.registrationService.completeRegistration(sessionToken, password);
-        return { success: true, user, message: `Регистрация завершена, пользователь ${user.email} создан` };
+        try {
+            const user = await this.registrationService.completeRegistration(sessionToken, password);
+            return this.responseService.success({ user }, `Регистрация завершена, пользователь ${user.email} создан`);
+        } catch (error) {
+            return this.responseService.error('Ошибка при завершении регистрации', error.message);
+        }
     }
 }

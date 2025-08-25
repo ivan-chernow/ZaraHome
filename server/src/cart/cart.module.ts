@@ -6,12 +6,14 @@ import { Cart } from './entity/cart.entity';
 import { CartController } from './cart.controller';
 import { UsersModule } from '../users/users.module';
 import { ProductsModule } from '../products/products.module';
+import { SharedModule } from '../shared/modules/shared.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Cart]),
     UsersModule,
-    ProductsModule
+    ProductsModule,
+    SharedModule
   ],
   providers: [CartService, CartRepository],
   controllers: [CartController],

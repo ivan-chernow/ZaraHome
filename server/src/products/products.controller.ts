@@ -7,7 +7,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
+import { ResponseService } from 'src/shared/services/response.service';
 import { 
   ICreateProductDto, 
   IUpdateProductDto, 
@@ -20,7 +20,7 @@ import {
 export class ProductsController {
     constructor(
         private readonly productsService: ProductsService,
-        private readonly imageOptimizationService: ImageOptimizationService
+        private readonly responseService: ResponseService,
     ) { }
 
     @Post()
@@ -41,44 +41,11 @@ export class ProductsController {
         @UploadedFiles() files: Array<Express.Multer.File>
     ): Promise<ApiResponse<IProduct>> {
         try {
-            if (files && files.length > 0) {
-                dto.img = await this.imageOptimizationService.processMany(files);
-            }
-            
-            // Преобразуем строковые значения в числа
-            if (dto.categoryId) dto.categoryId = parseInt(dto.categoryId as any);
-            if (dto.subCategoryId) dto.subCategoryId = parseInt(dto.subCategoryId as any);
-            if (dto.typeId) dto.typeId = parseInt(dto.typeId as any);
-            
-            // Преобразуем JSON-строки в объекты
-            if (typeof dto.colors === 'string') {
-                dto.colors = JSON.parse(dto.colors);
-            }
-            if (typeof dto.size === 'string') {
-                dto.size = JSON.parse(dto.size);
-            }
-
-            // Преобразуем строковые булевы значения
-            if (typeof dto.isNew === 'string') {
-                dto.isNew = dto.isNew === 'true';
-            }
-            if (typeof dto.isAvailable === 'string') {
-                dto.isAvailable = dto.isAvailable === 'true';
-            }
-            
-            const product = await this.productsService.create(dto);
-            return {
-                success: true,
-                data: product,
-                message: 'Продукт успешно создан'
-            };
+            const product = await this.productsService.createProduct(dto, files);
+            return this.responseService.success(product, 'Продукт успешно создан');
         } catch (error) {
             console.error('Ошибка при создании продукта:', error);
-            return {
-                success: false,
-                message: 'Ошибка при создании продукта',
-                error: error.message
-            };
+            return this.responseService.error('Ошибка при создании продукта', error.message);
         }
     }
 
@@ -86,17 +53,9 @@ export class ProductsController {
     async findAll(): Promise<ApiResponse<IProduct[]>> {
         try {
             const products = await this.productsService.findAll();
-            return {
-                success: true,
-                data: products,
-                message: 'Продукты успешно загружены'
-            };
+            return this.responseService.success(products, 'Продукты успешно загружены');
         } catch (error) {
-            return {
-                success: false,
-                message: 'Ошибка при загрузке продуктов',
-                error: error.message
-            };
+            return this.responseService.error('Ошибка при загрузке продуктов', error.message);
         }
     }
 
@@ -105,22 +64,11 @@ export class ProductsController {
         try {
             const product = await this.productsService.findOne(+id);
             if (!product) {
-                return {
-                    success: false,
-                    message: 'Продукт не найден'
-                };
+                return this.responseService.error('Продукт не найден');
             }
-            return {
-                success: true,
-                data: product,
-                message: 'Продукт найден'
-            };
+            return this.responseService.success(product, 'Продукт найден');
         } catch (error) {
-            return {
-                success: false,
-                message: 'Ошибка при поиске продукта',
-                error: error.message
-            };
+            return this.responseService.error('Ошибка при поиске продукта', error.message);
         }
     }
 
@@ -133,17 +81,9 @@ export class ProductsController {
     ): Promise<ApiResponse<IProduct>> {
         try {
             const product = await this.productsService.update(+id, dto);
-            return {
-                success: true,
-                data: product,
-                message: 'Продукт успешно обновлен'
-            };
+            return this.responseService.success(product, 'Продукт успешно обновлен');
         } catch (error) {
-            return {
-                success: false,
-                message: 'Ошибка при обновлении продукта',
-                error: error.message
-            };
+            return this.responseService.error('Ошибка при обновлении продукта', error.message);
         }
     }
 
@@ -153,16 +93,9 @@ export class ProductsController {
     async deleteProduct(@Param('id') id: string): Promise<ApiResponse<void>> {
         try {
             await this.productsService.delete(+id);
-            return {
-                success: true,
-                message: 'Продукт успешно удален'
-            };
+            return this.responseService.success(undefined, 'Продукт успешно удален');
         } catch (error) {
-            return {
-                success: false,
-                message: 'Ошибка при удалении продукта',
-                error: error.message
-            };
+            return this.responseService.error('Ошибка при удалении продукта', error.message);
         }
     }
 
@@ -170,17 +103,9 @@ export class ProductsController {
     async getCatalog(): Promise<ApiResponse<ICategory[]>> {
         try {
             const catalog = await this.productsService.getCatalog();
-            return {
-                success: true,
-                data: catalog,
-                message: 'Каталог успешно загружен'
-            };
+            return this.responseService.success(catalog, 'Каталог успешно загружен');
         } catch (error) {
-            return {
-                success: false,
-                message: 'Ошибка при загрузке каталога',
-                error: error.message
-            };
+            return this.responseService.error('Ошибка при загрузке каталога', error.message);
         }
     }
 }
