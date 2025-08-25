@@ -8,11 +8,13 @@ import { Product } from 'src/products/entity/products.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { User } from './user/entity/user.entity';
 import { DeliveryAddress } from './user/entity/delivery-address.entity';
+import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User, DeliveryAddress, Product]),
-        ProductsModule
+        ProductsModule,
+        SharedModule
     ],
     controllers: [UserController, AdminController],
     providers: [UserService, AdminService,],

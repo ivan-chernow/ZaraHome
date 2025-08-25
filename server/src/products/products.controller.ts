@@ -5,41 +5,36 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/users/user/entity/user.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
+import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 
 @Controller('products')
 export class ProductsController {
     constructor(
         private readonly productsService: ProductsService,
+        private readonly imageOptimizationService: ImageOptimizationService,
     ) { }
 
     @Post()
     @UseGuards(JwtAuthGuard)
     @Roles(UserRole.ADMIN)
     @UseInterceptors(FilesInterceptor('images', 10, {
-        storage: diskStorage({
-            destination: './uploads/products',
-            filename: (req, file, callback) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-                callback(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
-            }
-        }),
+        storage: memoryStorage(),
         fileFilter: (req, file, callback) => {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
                 return callback(new Error('Разрешены только файлы изображений!'), false);
             }
             callback(null, true);
         },
+        limits: { fileSize: 10 * 1024 * 1024 }
     }))
     async createProduct(
         @Body() dto: CreateProductDto,
         @UploadedFiles() files: Array<Express.Multer.File>
     ) {
         try {
-            // Добавляем пути к изображениям в DTO
             if (files && files.length > 0) {
-                dto.img = files.map(file => `/uploads/products/${file.filename}`);
+                dto.img = await this.imageOptimizationService.processMany(files);
             }
             
             // Преобразуем строковые значения в числа

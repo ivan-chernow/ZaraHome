@@ -1,13 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { DatabaseSeeder } from './seeds';
 import { Category } from '../products/entity/category.entity';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
     constructor(
-        private readonly dataSource: DataSource,
+        @InjectDataSource() private readonly dataSource: DataSource,
         private readonly configService: ConfigService,
     ) {}
 

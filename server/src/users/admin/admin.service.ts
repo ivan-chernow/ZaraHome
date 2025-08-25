@@ -6,6 +6,7 @@ import { User, UserRole } from '../user/entity/user.entity';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 import { ProductsService } from 'src/products/products.service';
 import { ConfigService } from '@nestjs/config';
+import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
@@ -16,6 +17,7 @@ export class AdminService implements OnModuleInit {
         private userRepository: Repository<User>,
         private readonly productsService: ProductsService,
         private readonly config: ConfigService,
+        private readonly imageOptimizationService: ImageOptimizationService,
     ) { }
 
     async onModuleInit() {
@@ -50,8 +52,8 @@ export class AdminService implements OnModuleInit {
             throw new BadRequestException('No files uploaded');
         }
 
-        // Process uploaded files and get their paths
-        const imagePaths = files.map(file => `/uploads/products/${file.filename}`);
+        // Process uploaded files and get their optimized paths
+        const imagePaths = await this.imageOptimizationService.processMany(files);
         
         // Create product data with image paths
         const productWithImages: CreateProductDto = {

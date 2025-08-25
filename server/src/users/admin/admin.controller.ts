@@ -8,8 +8,7 @@ import { UserService } from '../user/user.service';
 import { ChangePasswordDto } from '../user/dto/user.dto';
 import { Product } from 'src/products/entity/products.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
 import type { Multer } from 'multer';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 
@@ -21,22 +20,14 @@ export class AdminController {
 
     @Post('add')
     @UseInterceptors(FilesInterceptor('images', 12, {
-        storage: diskStorage({
-            destination: './uploads/products',
-            filename: (req, file, callback) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-                callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
-            },
-        }),
+        storage: memoryStorage(),
         fileFilter: (req, file, callback) => {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
                 return callback(new Error('Only image files are allowed!'), false);
             }
             callback(null, true);
         },
-        limits: {
-            fileSize: 5 * 1024 * 1024 // 5MB
-        }
+        limits: { fileSize: 10 * 1024 * 1024 }
     }))
     async addProduct(
         @UploadedFiles() files: Express.Multer.File[],

@@ -8,7 +8,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import * as fs from 'fs';
 import helmet from 'helmet';
-import compression from 'compression';
+import * as compression from 'compression';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
