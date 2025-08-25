@@ -26,7 +26,7 @@ export type OrderPaymentMethod =
   | 'digital_wallet'
   | 'cryptocurrency';
 
-export type OrderItem = {
+export type OrderItemType = {
   productId: number;
   quantity: number;
   price: number;
@@ -84,7 +84,7 @@ export type OrderSortOptions =
   | 'updated_at_desc';
 
 // Типы для корзины
-export type CartItem = {
+export type CartItemType = {
   productId: number;
   quantity: number;
   size: string;
@@ -93,7 +93,7 @@ export type CartItem = {
   updatedAt: Date;
 };
 
-export type CartSummary = {
+export type CartSummaryType = {
   itemCount: number;
   subtotal: number;
   tax: number;
@@ -102,7 +102,7 @@ export type CartSummary = {
   total: number;
 };
 
-export type CartValidation = {
+export type CartValidationType = {
   isValid: boolean;
   errors: string[];
   warnings: string[];

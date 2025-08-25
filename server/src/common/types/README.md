@@ -52,9 +52,9 @@
 - `OrderHistory` - история заказа
 - `OrderFilters` - фильтры для заказов
 - `OrderSortOptions` - опции сортировки заказов
-- `CartItem` - элемент корзины
-- `CartSummary` - сводка корзины
-- `CartValidation` - валидация корзины
+- `CartItemType` - элемент корзины
+- `CartSummaryType` - сводка корзины
+- `CartValidationType` - валидация корзины
 
 ## Использование
 

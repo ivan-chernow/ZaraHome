@@ -1,11 +1,8 @@
-// Enums
-export * from './enums';
-
-// DTOs
-export * from './dto';
-
-// Interfaces
+// Экспорт всех интерфейсов
 export * from './interfaces';
 
-// Types
+// Экспорт всех типов
 export * from './types';
+
+// Экспорт всех базовых классов
+export * from './base';
