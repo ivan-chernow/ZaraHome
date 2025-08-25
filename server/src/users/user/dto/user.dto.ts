@@ -1,32 +1,8 @@
-import { MinLength } from "class-validator";
-
-import { IsString } from "class-validator";
-
-import { IsEmail } from "class-validator";
-import { UserRole } from "../entity/user.entity";
+import { UserRole } from "src/common/enums/user-role.enum";
 import { DeliveryAddress } from "../entity/delivery-address.entity";
+import { ChangePasswordDto, ChangeEmailDto, AddressDto } from "src/common/dto/validation.dto";
 
-export class ChangePasswordDto {
-    @IsString()
-    @MinLength(12)
-    newPassword: string;
-}
-
-export class ChangeEmailDto {
-    @IsEmail()
-    newEmail: string;
-}
-
-export class ChangeDeliveryAddressDto {
-    @IsString()
-    region: string;
-
-    @IsString()
-    city: string;
-
-    @IsString()
-    street: string;
-}
+export class ChangeDeliveryAddressDto extends AddressDto {}
 
 export class ProfileDto {
     id: number;
@@ -36,3 +12,6 @@ export class ProfileDto {
     phone?: string;
     deliveryAddresses?: DeliveryAddress[];
 }
+
+// Re-export common DTOs
+export { ChangePasswordDto, ChangeEmailDto };

@@ -2,7 +2,8 @@ import { Injectable, NotFoundException, OnModuleInit, Logger, BadRequestExceptio
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User, UserRole } from '../user/entity/user.entity';
+import { User } from '../user/entity/user.entity';
+import { UserRole } from 'src/common/enums/user-role.enum';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 import { ProductsService } from 'src/products/products.service';
 import { ConfigService } from '@nestjs/config';

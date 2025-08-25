@@ -1,9 +1,10 @@
-import { Controller, Post, Body, UseGuards, Get, Param, UseInterceptors, UploadedFiles, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/users/user/entity/user.entity';
 import { CreateProductDto } from './dto/create-product.dto';
+import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/common/enums/user-role.enum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
@@ -12,7 +13,7 @@ import { ImageOptimizationService } from 'src/shared/services/image-optimization
 export class ProductsController {
     constructor(
         private readonly productsService: ProductsService,
-        private readonly imageOptimizationService: ImageOptimizationService,
+        private readonly imageOptimizationService: ImageOptimizationService
     ) { }
 
     @Post()
@@ -65,21 +66,13 @@ export class ProductsController {
         }
     }
 
-    
-    @Get('catalog')
-    async getCatalog() {
-        return this.productsService.getCatalog();
-    }
-
     @Get()
-    async getProductsByIds(@Query('ids') ids: string) {
-        if (!ids) return [];
-        const idsArray = ids.split(',').map(id => Number(id)).filter(Boolean);
-        return this.productsService.findByIds(idsArray);
+    async findAll() {
+        return this.productsService.findAll();
     }
 
-    @Delete(':id')
-    async deleteProduct(@Param('id') id: string) {
-        return this.productsService.deleteProduct(parseInt(id));
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return this.productsService.findOne(+id);
     }
 }

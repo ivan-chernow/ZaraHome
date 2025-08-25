@@ -1,12 +1,7 @@
+import { OrderItem } from 'src/common/interfaces/order-item.interface';
+
 export class CreateOrderDto {
-  items: Array<{
-    productId: number;
-    productName: string;
-    quantity: number;
-    price: number;
-    size?: string;
-    color?: string;
-  }>;
+  items: OrderItem[];
   
   totalPrice: number;
   totalCount: number;

@@ -1,13 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { User } from "src/users/user/entity/user.entity";
-
-export enum OrderStatus {
-  PENDING = "pending",
-  PAID = "paid",
-  SHIPPED = "shipped",
-  DELIVERED = "delivered",
-  CANCELLED = "cancelled"
-}
+import { OrderItem } from "src/common/interfaces/order-item.interface";
+import { OrderStatus } from "src/common/enums/order-status.enum";
 
 @Entity()
 export class Order {
@@ -19,14 +13,7 @@ export class Order {
   user: User;
 
   @Column('jsonb')
-  items: Array<{
-    productId: number;
-    productName: string;
-    quantity: number;
-    price: number;
-    size?: string;
-    color?: string;
-  }>;
+  items: OrderItem[];
 
   @Column('decimal', { precision: 10, scale: 2 })
   totalPrice: number;

@@ -45,5 +45,3 @@ export class ImageOptimizationService {
     return Promise.all(tasks);
   }
 }
-
-

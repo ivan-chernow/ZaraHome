@@ -7,11 +7,7 @@ import { Column } from "typeorm";
 import { DeliveryAddress } from "./delivery-address.entity";
 import { Cart } from "src/cart/entity/cart.entity";
 import { Order } from "src/orders/entity/order.entity";
-
-export enum UserRole {
-    USER = 'user',
-    ADMIN = 'admin',
-}
+import { UserRole } from "src/common/enums/user-role.enum";
 
 @Entity()
 export class User {

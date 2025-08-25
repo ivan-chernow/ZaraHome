@@ -6,5 +6,3 @@ import { ImageOptimizationService } from '../services/image-optimization.service
   exports: [ImageOptimizationService],
 })
 export class SharedModule {}
-
-

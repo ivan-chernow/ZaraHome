@@ -37,16 +37,27 @@ export class ProductsService {
     return this.productRepo.save(product);
   }
 
-
-async deleteProduct(id: number) {
-  const product = await this.productRepo.findOneBy({id})
-  if (!product) {
-    throw new Error('Продукт не найден')
+  async findAll(): Promise<Product[]> {
+    return this.productRepo.find({
+      relations: ['category', 'subCategory', 'type']
+    });
   }
-  await this.productRepo.remove(product)
-  return {message: 'Продукт успешно удален '}
-  
-}
+
+  async findOne(id: number): Promise<Product | null> {
+    return this.productRepo.findOne({
+      where: { id },
+      relations: ['category', 'subCategory', 'type']
+    });
+  }
+
+  async deleteProduct(id: number) {
+    const product = await this.productRepo.findOneBy({id})
+    if (!product) {
+      throw new Error('Продукт не найден')
+    }
+    await this.productRepo.remove(product)
+    return {message: 'Продукт успешно удален '}
+  }
 
   async getCatalog() {
     const categories = await this.categoryRepo.find({

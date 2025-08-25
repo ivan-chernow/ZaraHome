@@ -1,11 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { EmailService } from 'src/email/email.service';
+import * as crypto from 'crypto';
+import { EmailService } from '../../email/email.service';
 import { ResetPassword } from './entity/reset-password.entity';
-import { User, UserRole } from 'src/users/user/entity/user.entity';
+import { User } from 'src/users/user/entity/user.entity';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 @Injectable()
 export class ResetPasswordService {

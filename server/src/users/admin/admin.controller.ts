@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { AdminService } from './admin.service';
-import { UserRole } from '../user/entity/user.entity';
+import { UserRole } from 'src/common/enums/user-role.enum';
 import { UserService } from '../user/user.service';
 import { ChangePasswordDto } from '../user/dto/user.dto';
 import { Product } from 'src/products/entity/products.entity';

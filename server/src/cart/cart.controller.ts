@@ -2,7 +2,7 @@ import { Controller, Post, Delete, Get, Param, Query, UseGuards, Req } from '@ne
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { CartService } from './cart.services';
-import { AuthenticatedRequest } from 'src/auth/login/types/authenticated-request.interface';
+import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 
 @Controller('cart')
 @UseGuards(JwtAuthGuard)

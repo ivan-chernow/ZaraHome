@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Order, OrderStatus } from './entity/order.entity';
+import { Order } from './entity/order.entity';
+import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { User } from 'src/users/user/entity/user.entity';
@@ -11,13 +12,21 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto, user: User): Promise<Order> {
+  async createOrder(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
+    // Получаем пользователя
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     // Проверяем, есть ли уже активный заказ у пользователя
     const existingActiveOrder = await this.orderRepository.findOne({
       where: { 
-        user: { id: user.id },
+        user: { id: userId },
         status: OrderStatus.PENDING
       },
       order: { createdAt: 'DESC' }
