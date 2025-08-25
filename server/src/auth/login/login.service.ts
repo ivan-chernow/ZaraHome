@@ -57,15 +57,6 @@ export class LoginService {
                 path: '/',
                 secure: false, // В DEV! Только в проде true
             });
-            res.json({
-                accessToken,
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    role: user.role,
-                },
-            });
-            return;
         }
 
         return {
@@ -103,15 +94,6 @@ export class LoginService {
                     expires: expiresAt,
                     path: '/',
                 });
-                res.json({
-                    accessToken: this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }, { expiresIn: '15m' }),
-                    user: {
-                        id: user.id,
-                        email: user.email,
-                        role: user.role,
-                    },
-                });
-                return;
             }
 
             return {
@@ -136,8 +118,6 @@ export class LoginService {
                 path: '/',
                 secure: false, // В DEV! Только в проде true
             });
-            res.json({ success: true, message: 'Вы успешно вышли из системы' });
-            return;
         }
         return { success: true, message: 'Вы успешно вышли из системы' };
     }
