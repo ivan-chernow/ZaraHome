@@ -5,6 +5,8 @@ import { CartService } from './cart.services';
 import { ResponseService } from 'src/shared/services/response.service';
 import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { AddToCartDto, UpdateCartItemDto } from './dto';
+import { ProductIdDto } from './dto/product-id.dto';
+import { ProductIdsQueryDto } from './dto/product-ids-query.dto';
 
 @Controller('cart')
 @UseGuards(JwtAuthGuard)
@@ -17,12 +19,12 @@ export class CartController {
   @Post(':productId')
   async add(
     @Req() req: AuthenticatedRequest, 
-    @Param('productId') productId: string,
+    @Param() params: ProductIdDto,
     @Body() dto: AddToCartDto
   ) {
     try {
       const userId = req.user.id;
-      const result = await this.cartService.addToCart(userId, Number(productId));
+      const result = await this.cartService.addToCart(userId, params.productId);
       return this.responseService.success(result, 'Товар добавлен в корзину');
     } catch (error) {
       return this.responseService.error('Ошибка при добавлении товара в корзину', error.message);
@@ -30,10 +32,10 @@ export class CartController {
   }
 
   @Delete(':productId')
-  async remove(@Req() req: AuthenticatedRequest, @Param('productId') productId: string) {
+  async remove(@Req() req: AuthenticatedRequest, @Param() params: ProductIdDto) {
     try {
       const userId = req.user.id;
-      await this.cartService.removeFromCart(userId, Number(productId));
+      await this.cartService.removeFromCart(userId, params.productId);
       return this.responseService.success(undefined, 'Товар удален из корзины');
     } catch (error) {
       return this.responseService.error('Ошибка при удалении товара из корзины', error.message);
@@ -54,14 +56,10 @@ export class CartController {
 
   @Get('status')
   @SkipThrottle()
-  async status(@Req() req: AuthenticatedRequest, @Query('productIds') productIds: string) {
+  async status(@Req() req: AuthenticatedRequest, @Query() query: ProductIdsQueryDto) {
     try {
       const userId = req.user.id;
-      const ids = (productIds || '')
-        .split(',')
-        .map((id) => Number(id))
-        .filter((n) => !Number.isNaN(n));
-      const status = await this.cartService.getCartStatus(userId, ids);
+      const status = await this.cartService.getCartStatus(userId, query.productIds);
       return this.responseService.success(status, 'Статус корзины получен');
     } catch (error) {
       return this.responseService.error('Ошибка при получении статуса корзины', error.message);

@@ -3,6 +3,7 @@ import { FavoritesService } from './favorites.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { JwtAuthGuard } from '../auth/login/jwt/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
+import { FavoriteProductIdDto } from './dto/product-id.dto';
 
 @Controller('favorites')
 @UseGuards(JwtAuthGuard)
@@ -13,9 +14,9 @@ export class FavoritesController {
   ) {}
 
   @Post(':productId')
-  async add(@Param('productId') productId: string, @Req() req: AuthenticatedRequest) {
+  async add(@Param() params: FavoriteProductIdDto, @Req() req: AuthenticatedRequest) {
     try {
-      const result = await this.favoritesService.add(req.user.id, +productId);
+      const result = await this.favoritesService.add(req.user.id, params.productId);
       return this.responseService.success(result, 'Товар добавлен в избранное');
     } catch (error) {
       return this.responseService.error('Ошибка при добавлении товара в избранное', error.message);
@@ -23,9 +24,9 @@ export class FavoritesController {
   }
 
   @Delete(':productId')
-  async remove(@Param('productId') productId: string, @Req() req: AuthenticatedRequest) {
+  async remove(@Param() params: FavoriteProductIdDto, @Req() req: AuthenticatedRequest) {
     try {
-      await this.favoritesService.remove(req.user.id, +productId);
+      await this.favoritesService.remove(req.user.id, params.productId);
       return this.responseService.success(undefined, 'Товар удален из избранного');
     } catch (error) {
       return this.responseService.error('Ошибка при удалении товара из избранного', error.message);

@@ -2,6 +2,7 @@ import { Controller, Post, Get, Put, Body, Param, UseGuards, Request } from '@ne
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { OrderIdDto } from './dto/order-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { ResponseService } from 'src/shared/services/response.service';
@@ -46,9 +47,9 @@ export class OrdersController {
   }
 
   @Get(':id')
-  async getOrderById(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+  async getOrderById(@Param() params: OrderIdDto, @Request() req: AuthenticatedRequest) {
     try {
-      const order = await this.ordersService.getOrderById(parseInt(id), req.user.id);
+      const order = await this.ordersService.getOrderById(params.id, req.user.id);
       return this.responseService.success(order, 'Заказ найден');
     } catch (error) {
       return this.responseService.error('Ошибка при поиске заказа', error.message);
@@ -57,12 +58,12 @@ export class OrdersController {
 
   @Put(':id/status')
   async updateOrderStatus(
-    @Param('id') id: string,
+    @Param() params: OrderIdDto,
     @Body('status') status: OrderStatus,
     @Request() req: AuthenticatedRequest
   ) {
     try {
-      const order = await this.ordersService.updateOrderStatus(parseInt(id), status, req.user.id);
+      const order = await this.ordersService.updateOrderStatus(params.id, status, req.user.id);
       return this.responseService.success(order, 'Статус заказа обновлен');
     } catch (error) {
       return this.responseService.error('Ошибка при обновлении статуса заказа', error.message);
@@ -70,9 +71,9 @@ export class OrdersController {
   }
 
   @Put(':id/cancel')
-  async cancelOrder(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+  async cancelOrder(@Param() params: OrderIdDto, @Request() req: AuthenticatedRequest) {
     try {
-      const order = await this.ordersService.cancelOrder(parseInt(id), req.user.id);
+      const order = await this.ordersService.cancelOrder(params.id, req.user.id);
       return this.responseService.success(order, 'Заказ отменен');
     } catch (error) {
       return this.responseService.error('Ошибка при отмене заказа', error.message);
@@ -81,12 +82,12 @@ export class OrdersController {
 
   @Put(':id')
   async updateOrder(
-    @Param('id') id: string,
+    @Param() params: OrderIdDto,
     @Body() updateOrderDto: UpdateOrderDto,
     @Request() req: AuthenticatedRequest
   ) {
     try {
-      const order = await this.ordersService.updateOrder(parseInt(id), updateOrderDto, req.user.id);
+      const order = await this.ordersService.updateOrder(params.id, updateOrderDto, req.user.id);
       return this.responseService.success(order, 'Заказ обновлен');
     } catch (error) {
       return this.responseService.error('Ошибка при обновлении заказа', error.message);

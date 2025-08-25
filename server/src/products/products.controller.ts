@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, UseGuards, UseInterceptors, UploadedFiles, Put, Delete } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ProductIdDto } from './dto/product-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -60,9 +61,9 @@ export class ProductsController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<ApiResponse<IProduct>> {
+    async findOne(@Param() params: ProductIdDto): Promise<ApiResponse<IProduct>> {
         try {
-            const product = await this.productsService.findOne(+id);
+            const product = await this.productsService.findOne(params.id);
             if (!product) {
                 return this.responseService.error('Продукт не найден');
             }
@@ -76,11 +77,11 @@ export class ProductsController {
     @UseGuards(JwtAuthGuard)
     @Roles(UserRole.ADMIN)
     async updateProduct(
-        @Param('id') id: string,
+        @Param() params: ProductIdDto,
         @Body() dto: IUpdateProductDto
     ): Promise<ApiResponse<IProduct>> {
         try {
-            const product = await this.productsService.update(+id, dto);
+            const product = await this.productsService.update(params.id, dto);
             return this.responseService.success(product, 'Продукт успешно обновлен');
         } catch (error) {
             return this.responseService.error('Ошибка при обновлении продукта', error.message);
@@ -90,9 +91,9 @@ export class ProductsController {
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
     @Roles(UserRole.ADMIN)
-    async deleteProduct(@Param('id') id: string): Promise<ApiResponse<void>> {
+    async deleteProduct(@Param() params: ProductIdDto): Promise<ApiResponse<void>> {
         try {
-            await this.productsService.delete(+id);
+            await this.productsService.delete(params.id);
             return this.responseService.success(undefined, 'Продукт успешно удален');
         } catch (error) {
             return this.responseService.error('Ошибка при удалении продукта', error.message);

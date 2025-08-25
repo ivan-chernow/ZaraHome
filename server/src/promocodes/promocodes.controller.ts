@@ -6,6 +6,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { CreatePromocodeDto, ValidatePromocodeDto } from './dto';
+import { PromocodeCodeDto } from './dto/promocode-code.dto';
 
 @Controller('promocodes')
 export class PromocodesController {
@@ -33,9 +34,9 @@ export class PromocodesController {
   @Delete(':code')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  async deactivatePromocode(@Param('code') code: string) {
+  async deactivatePromocode(@Param() params: PromocodeCodeDto) {
     try {
-      await this.promocodesService.deactivate(code);
+      await this.promocodesService.deactivate(params.code);
       return this.responseService.success(undefined, 'Промокод успешно деактивирован');
     } catch (error) {
       return this.responseService.error('Ошибка при деактивации промокода', error.message);
