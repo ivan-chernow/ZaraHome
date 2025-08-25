@@ -1,36 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Order } from './entity/order.entity';
 import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { User } from 'src/users/user/entity/user.entity';
+import { OrdersRepository } from './orders.repository';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly ordersRepository: OrdersRepository,
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
-    // Получаем пользователя
-    const user = await this.userRepository.findOneBy({ id: userId });
+    // Получаем пользователя через репозиторий
+    const user = await this.ordersRepository.findUserById(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
     // Проверяем, есть ли уже активный заказ у пользователя
-    const existingActiveOrder = await this.orderRepository.findOne({
-      where: { 
-        user: { id: userId },
-        status: OrderStatus.PENDING
-      },
-      order: { createdAt: 'DESC' }
-    });
+    const existingActiveOrder = await this.ordersRepository.findActiveOrderByUser(userId);
 
     // Если есть активный заказ, проверяем, изменились ли товары
     if (existingActiveOrder) {
@@ -47,40 +36,29 @@ export class OrdersService {
       
       // Если товары изменились, отменяем старый заказ
       existingActiveOrder.status = OrderStatus.CANCELLED;
-      await this.orderRepository.save(existingActiveOrder);
+      await this.ordersRepository.updateOrder(existingActiveOrder);
     }
 
     // Создаем новый заказ
-    const order = this.orderRepository.create({
+    const order = await this.ordersRepository.createOrder({
       ...createOrderDto,
       user,
       status: OrderStatus.PENDING,
     });
 
-    return await this.orderRepository.save(order);
+    return order;
   }
 
   async getUserOrders(userId: number): Promise<Order[]> {
-    return await this.orderRepository.find({
-      where: { user: { id: userId } },
-      order: { createdAt: 'DESC' },
-    });
+    return await this.ordersRepository.findOrdersByUser(userId);
   }
 
   async getActiveOrder(userId: number): Promise<Order | null> {
-    return await this.orderRepository.findOne({
-      where: { 
-        user: { id: userId },
-        status: OrderStatus.PENDING
-      },
-      order: { createdAt: 'DESC' }
-    });
+    return await this.ordersRepository.findActiveOrderByUser(userId);
   }
 
   async getOrderById(orderId: number, userId: number): Promise<Order | null> {
-    return await this.orderRepository.findOne({
-      where: { id: orderId, user: { id: userId } },
-    });
+    return await this.ordersRepository.findOrderByIdAndUser(orderId, userId);
   }
 
   async updateOrderStatus(orderId: number, status: OrderStatus, userId: number): Promise<Order> {
@@ -89,8 +67,9 @@ export class OrdersService {
       throw new Error('Order not found');
     }
 
+    await this.ordersRepository.updateOrderStatus(orderId, status);
     order.status = status;
-    return await this.orderRepository.save(order);
+    return order;
   }
 
   async cancelOrder(orderId: number, userId: number): Promise<Order> {
@@ -114,7 +93,7 @@ export class OrdersService {
       order.comment = updateOrderDto.comment;
     }
 
-    return await this.orderRepository.save(order);
+    return await this.ordersRepository.updateOrder(order);
   }
 
   private haveItemsChanged(currentItems: any[], newItems: any[]): boolean {

@@ -4,6 +4,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { UserRole } from 'src/common/enums/user-role.enum';
+import { CreatePromocodeDto, ValidatePromocodeDto } from './dto';
 
 @Controller('promocodes')
 export class PromocodesController {
@@ -13,14 +14,13 @@ export class PromocodesController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  async createPromocode(
-    @Body() createPromocodeDto: { code: string; discount: number }
-  ) {
+  async createPromocode(@Body() createPromocodeDto: CreatePromocodeDto) {
     return await this.promocodesService.create(
       createPromocodeDto.code,
       createPromocodeDto.discount
     );
   }
+
   @Delete(':code')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -31,9 +31,7 @@ export class PromocodesController {
 
   // Применение промокода (доступно всем пользователям)
   @Post('apply')
-  async applyPromocode(
-    @Body() applyPromocodeDto: { code: string; orderAmount: number }
-  ) {
+  async applyPromocode(@Body() applyPromocodeDto: ValidatePromocodeDto) {
     return await this.promocodesService.validateAndApply(
       applyPromocodeDto.code,
       applyPromocodeDto.orderAmount

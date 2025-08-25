@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
+import { UserRepository } from './user/user.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
@@ -17,7 +18,7 @@ import { SharedModule } from 'src/shared/modules/shared.module';
         SharedModule
     ],
     controllers: [UserController, AdminController],
-    providers: [UserService, AdminService,],
+    providers: [UserService, UserRepository, AdminService],
     exports: [UserService, AdminService]
 })
 export class UsersModule { }

@@ -1,33 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Promocode } from './entity/promocode.entity';
+import { PromocodesRepository } from './promocodes.repository';
 
 @Injectable()
 export class PromocodesService {
   constructor(
-    @InjectRepository(Promocode)
-    private promocodeRepository: Repository<Promocode>,
+    private readonly promocodesRepository: PromocodesRepository,
   ) {}
 
   // Создание промокода (для админа)
   async create(code: string, discount: number): Promise<Promocode> {
     // Проверяем, не существует ли уже такой промокод
-    const existingPromocode = await this.promocodeRepository.findOne({
-      where: { code: code.toUpperCase() }
-    });
+    const existingPromocode = await this.promocodesRepository.findByCode(code);
 
     if (existingPromocode) {
       throw new Error('Промокод с таким кодом уже существует');
     }
 
-    const promocode = this.promocodeRepository.create({
+    return this.promocodesRepository.createPromocode({
       code: code.toUpperCase(),
       discount,
       isActive: true
     });
-
-    return await this.promocodeRepository.save(promocode);
   }
 
   // Проверка и применение промокода
@@ -37,12 +31,7 @@ export class PromocodesService {
     discount?: number;
     finalAmount?: number;
   }> {
-    const promocode = await this.promocodeRepository.findOne({
-      where: { 
-        code: code.toUpperCase(),
-        isActive: true 
-      }
-    });
+    const promocode = await this.promocodesRepository.findActiveByCode(code);
 
     if (!promocode) {
       return { 
@@ -79,34 +68,23 @@ export class PromocodesService {
 
   // Получение всех активных промокодов
   async getAllActive(): Promise<Promocode[]> {
-    return await this.promocodeRepository.find({
-      where: { isActive: true },
-      order: {
-        createdAt: 'DESC' // Сначала показываем новые промокоды
-      }
-    });
+    return await this.promocodesRepository.findAllActive();
   }
 
   // Получение всех промокодов (активных и неактивных)
   async getAll(): Promise<Promocode[]> {
-    return await this.promocodeRepository.find({
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+    return await this.promocodesRepository.findAll();
   }
 
   // Деактивация/удаление промокода (для админа)
   async deactivate(code: string): Promise<void> {
-    const promocode = await this.promocodeRepository.findOne({
-      where: { code: code.toUpperCase() }
-    });
+    const promocode = await this.promocodesRepository.findByCode(code);
 
     if (!promocode) {
       throw new Error('Промокод не найден');
     }
 
     // Жёсткое удаление записи из БД по запросу "деактивировать"
-    await this.promocodeRepository.delete({ code: code.toUpperCase() });
+    await this.promocodesRepository.deleteByCode(code);
   }
 } 

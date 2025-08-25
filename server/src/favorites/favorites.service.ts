@@ -1,58 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
 import { Favorite } from './entity/favorite.entity';
-import { User } from '../users/user/entity/user.entity';
 import { Product } from '../products/entity/products.entity';
+import { FavoritesRepository } from './favorites.repository';
 
 @Injectable()
 export class FavoritesService {
   constructor(
-    @InjectRepository(Favorite)
-    private readonly favoriteRepository: Repository<Favorite>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    private readonly favoritesRepository: FavoritesRepository,
   ) {}
 
   async add(userId: number, productId: number): Promise<Favorite> {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user = await this.favoritesRepository.findUserById(userId);
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    const product = await this.productRepository.findOneBy({ id: productId });
+    const product = await this.favoritesRepository.findProductById(productId);
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
     }
 
-    const existingFavorite = await this.favoriteRepository.findOne({ where: { user: { id: userId }, product: { id: productId } } });
+    const existingFavorite = await this.favoritesRepository.findFavoriteByUserAndProduct(userId, productId);
     if (existingFavorite) {
       return existingFavorite; // Уже в избранном
     }
 
-    const favorite = this.favoriteRepository.create({ user, product });
-    return this.favoriteRepository.save(favorite);
+    return this.favoritesRepository.createFavorite(user, product);
   }
 
   async remove(userId: number, productId: number): Promise<void> {
-    const favorite = await this.favoriteRepository.findOne({
-      where: { user: { id: userId }, product: { id: productId } },
-    });
+    const favorite = await this.favoritesRepository.findFavoriteByUserAndProduct(userId, productId);
 
     if (!favorite) {
       throw new NotFoundException('Favorite entry not found');
     }
 
-    await this.favoriteRepository.remove(favorite);
+    await this.favoritesRepository.removeFavorite(favorite);
   }
 
   async findAll(userId: number): Promise<Product[]> {
-    const favorites = await this.favoriteRepository.find({
-      where: { user: { id: userId } },
-      relations: ['product'],
-    });
+    const favorites = await this.favoritesRepository.findFavoritesByUser(userId);
     return favorites.map((fav) => fav.product);
   }
 
@@ -60,13 +47,7 @@ export class FavoritesService {
     if (!productIds.length) {
       return {};
     }
-    const favorites = await this.favoriteRepository.find({
-      where: {
-        user: { id: userId },
-        product: { id: In(productIds) },
-      },
-      relations: ['product'],
-    });
+    const favorites = await this.favoritesRepository.findFavoritesByUserAndProducts(userId, productIds);
     const favoriteMap = favorites.reduce((acc, fav) => {
       acc[fav.product.id] = true;
       return acc;

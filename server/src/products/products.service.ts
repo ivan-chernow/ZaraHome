@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
-import { Category } from './entity/category.entity';
-import { SubCategory } from './entity/sub-category.entity';
-import { Type } from './entity/type.entity';
-import { Product } from './entity/products.entity';
+import { ProductsRepository } from './products.repository';
 import { CreateProductDto } from './dto/create-product.dto';
 import { 
   IProduct, 
@@ -19,78 +14,63 @@ import {
 @Injectable()
 export class ProductsService implements IProductService {
   constructor(
-    @InjectRepository(Category) private categoryRepo: Repository<Category>,
-    @InjectRepository(SubCategory) private subCategoryRepo: Repository<SubCategory>,
-    @InjectRepository(Type) private typeRepo: Repository<Type>,
-    @InjectRepository(Product) private productRepo: Repository<Product>,
+    private readonly productsRepository: ProductsRepository,
   ) {}
 
   async create(data: ICreateProductDto): Promise<IProduct> {
     const { categoryId, subCategoryId, typeId, ...rest } = data;
-    const product = this.productRepo.create(rest);
-
-    // Найти объекты по id
+    
+    // Создаем объект для передачи в репозиторий
+    const productData: any = { ...rest };
+    
+    // Найти объекты по id через репозиторий
     if (categoryId) {
-      const category = await this.categoryRepo.findOneBy({ id: categoryId });
-      if (category) product.category = category;
+      const category = await this.productsRepository.findCategoryById(categoryId);
+      if (category) productData.category = category;
     }
     if (subCategoryId) {
-      const subCategory = await this.subCategoryRepo.findOneBy({ id: subCategoryId });
-      if (subCategory) product.subCategory = subCategory;
+      const subCategory = await this.productsRepository.findSubCategoryById(subCategoryId);
+      if (subCategory) productData.subCategory = subCategory;
     }
     if (typeId) {
-      const type = await this.typeRepo.findOneBy({ id: typeId });
-      if (type) product.type = type;
+      const type = await this.productsRepository.findTypeById(typeId);
+      if (type) productData.type = type;
     }
 
-    return this.productRepo.save(product);
+    return this.productsRepository.createProduct(productData);
   }
 
   async findAll(): Promise<IProduct[]> {
-    return this.productRepo.find({
-      relations: ['category', 'subCategory', 'type']
-    });
+    return this.productsRepository.findAllProducts();
   }
 
   async findOne(id: number): Promise<IProduct | null> {
-    return this.productRepo.findOne({
-      where: { id },
-      relations: ['category', 'subCategory', 'type']
-    });
+    return this.productsRepository.findProductById(id);
   }
 
   async update(id: number, data: Partial<ICreateProductDto>): Promise<IProduct> {
-    const product = await this.productRepo.findOneBy({ id });
+    const product = await this.productsRepository.findProductById(id);
     if (!product) {
       throw new Error('Продукт не найден');
     }
     
-    Object.assign(product, data);
-    return this.productRepo.save(product);
+    const updatedProduct = await this.productsRepository.updateProduct(id, data);
+    if (!updatedProduct) {
+      throw new Error('Не удалось обновить продукт');
+    }
+    return updatedProduct;
   }
 
   async delete(id: number): Promise<void> {
-    const product = await this.productRepo.findOneBy({id})
-    if (!product) {
-      throw new Error('Продукт не найден')
-    }
-    await this.productRepo.remove(product)
+    await this.productsRepository.removeProduct(id);
   }
 
   async getCatalog(): Promise<ICategory[]> {
-    const categories = await this.categoryRepo.find({
-      relations: [
-        'subCategories', 
-        'subCategories.products',
-        'subCategories.types', 
-        'subCategories.types.products',
-        'products'
-      ],
-    });
+    const categories = await this.productsRepository.findAllCategories();
+    const newProducts = await this.productsRepository.findNewProducts();
+    const discountedProducts = await this.productsRepository.findDiscountedProducts();
 
-    const newProducts = await this.productRepo.find({ where: { isNew: true } });
-    const discountedProducts = await this.productRepo.find({ where: { discount: MoreThan(0) } });
-
+    // Бизнес-логика: добавление новинок и скидок в соответствующие категории
     const novinkiCategory = categories.find(c => c.name === 'Новинки');
     if (novinkiCategory) {
       novinkiCategory.products = newProducts;
@@ -105,7 +85,6 @@ export class ProductsService implements IProductService {
   }
 
   async findByIds(ids: number[]): Promise<IProduct[]> {
-    if (!ids.length) return [];
-    return this.productRepo.findByIds(ids);
+    return this.productsRepository.findProductsByIds(ids);
   }
 }
