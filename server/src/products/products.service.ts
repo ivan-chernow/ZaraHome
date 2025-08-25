@@ -6,9 +6,18 @@ import { SubCategory } from './entity/sub-category.entity';
 import { Type } from './entity/type.entity';
 import { Product } from './entity/products.entity';
 import { CreateProductDto } from './dto/create-product.dto';
+import { 
+  IProduct, 
+  IProductService, 
+  ICreateProductDto,
+  IProductWithRelations,
+  ICategory,
+  ISubCategory,
+  IType
+} from '../common/interfaces';
 
 @Injectable()
-export class ProductsService {
+export class ProductsService implements IProductService {
   constructor(
     @InjectRepository(Category) private categoryRepo: Repository<Category>,
     @InjectRepository(SubCategory) private subCategoryRepo: Repository<SubCategory>,
@@ -16,8 +25,8 @@ export class ProductsService {
     @InjectRepository(Product) private productRepo: Repository<Product>,
   ) {}
 
-  async createProduct(dto: CreateProductDto) {
-    const { categoryId, subCategoryId, typeId, ...rest } = dto;
+  async create(data: ICreateProductDto): Promise<IProduct> {
+    const { categoryId, subCategoryId, typeId, ...rest } = data;
     const product = this.productRepo.create(rest);
 
     // Найти объекты по id
@@ -37,29 +46,38 @@ export class ProductsService {
     return this.productRepo.save(product);
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(): Promise<IProduct[]> {
     return this.productRepo.find({
       relations: ['category', 'subCategory', 'type']
     });
   }
 
-  async findOne(id: number): Promise<Product | null> {
+  async findOne(id: number): Promise<IProduct | null> {
     return this.productRepo.findOne({
       where: { id },
       relations: ['category', 'subCategory', 'type']
     });
   }
 
-  async deleteProduct(id: number) {
+  async update(id: number, data: Partial<ICreateProductDto>): Promise<IProduct> {
+    const product = await this.productRepo.findOneBy({ id });
+    if (!product) {
+      throw new Error('Продукт не найден');
+    }
+    
+    Object.assign(product, data);
+    return this.productRepo.save(product);
+  }
+
+  async delete(id: number): Promise<void> {
     const product = await this.productRepo.findOneBy({id})
     if (!product) {
       throw new Error('Продукт не найден')
     }
     await this.productRepo.remove(product)
-    return {message: 'Продукт успешно удален '}
   }
 
-  async getCatalog() {
+  async getCatalog(): Promise<ICategory[]> {
     const categories = await this.categoryRepo.find({
       relations: [
         'subCategories', 
@@ -86,7 +104,7 @@ export class ProductsService {
     return categories;
   }
 
-  async findByIds(ids: number[]): Promise<Product[]> {
+  async findByIds(ids: number[]): Promise<IProduct[]> {
     if (!ids.length) return [];
     return this.productRepo.findByIds(ids);
   }
