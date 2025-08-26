@@ -4,6 +4,7 @@ import { ResponseService } from 'src/shared/services/response.service';
 import { Response, Request } from 'express';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class LoginController {
@@ -27,10 +28,10 @@ export class LoginController {
     }
 
     @Post('refresh')
-    async refresh(@Req() req: Request, @Res() res: Response) {
+    async refresh(@Req() req: Request, @Body() body: RefreshTokenDto, @Res() res: Response) {
         try {
             // Безопасно получаем refreshToken из cookies или body
-            const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+            const refreshToken = req.cookies?.refreshToken || body?.refreshToken;
 
             // Проверяем наличие токена
             if (!refreshToken) {
