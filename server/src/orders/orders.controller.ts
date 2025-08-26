@@ -4,9 +4,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderIdDto } from './dto/order-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
-import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { ResponseService } from 'src/shared/services/response.service';
 import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -59,11 +59,11 @@ export class OrdersController {
   @Put(':id/status')
   async updateOrderStatus(
     @Param() params: OrderIdDto,
-    @Body('status') status: OrderStatus,
+    @Body() body: UpdateOrderStatusDto,
     @Request() req: AuthenticatedRequest
   ) {
     try {
-      const order = await this.ordersService.updateOrderStatus(params.id, status, req.user.id);
+      const order = await this.ordersService.updateOrderStatus(params.id, body.status, req.user.id);
       return this.responseService.success(order, 'Статус заказа обновлен');
     } catch (error) {
       return this.responseService.error('Ошибка при обновлении статуса заказа', error.message);

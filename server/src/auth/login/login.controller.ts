@@ -3,6 +3,7 @@ import { LoginService } from './login.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { Response, Request } from 'express';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class LoginController {
@@ -12,7 +13,7 @@ export class LoginController {
     ) { }
 
     @Post('login')
-    async login(@Body() body: { email: string, password: string }, @Res() res: Response) {
+    async login(@Body() body: LoginDto, @Res() res: Response) {
         try {
             const user = await this.loginService.validateUser(body.email, body.password);
             const result = await this.loginService.login(user, res);
