@@ -158,4 +158,25 @@ export class UserService implements IUserService {
 
     await this.userRepository.removeAddress(address);
   }
+
+  // Реализация методов из IBaseService
+  async create(data: unknown): Promise<unknown> {
+    // Этот метод не используется в UserService, но требуется интерфейсом
+    throw new Error('Method not implemented');
+  }
+
+  async findAll(): Promise<unknown[]> {
+    // Этот метод не используется в UserService, но требуется интерфейсом
+    throw new Error('Method not implemented');
+  }
+
+  async update(id: number, data: unknown): Promise<unknown> {
+    // Этот метод не используется в UserService, но требуется интерфейсом
+    throw new Error('Method not implemented');
+  }
+
+  async delete(id: number): Promise<void> {
+    // Этот метод не используется в UserService, но требуется интерфейсом
+    throw new Error('Method not implemented');
+  }
 }

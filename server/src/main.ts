@@ -57,11 +57,12 @@ async function bootstrap() {
 
   // Swagger (API Documentation)
   const swaggerEnabled = (config.get<string>('SWAGGER_ENABLED') ?? process.env.NODE_ENV !== 'production') === 'true' || process.env.NODE_ENV !== 'production';
+  const swaggerPath = config.get<string>('SWAGGER_PATH') || 'api-docs';
+  
   if (swaggerEnabled) {
     const swaggerTitle = config.get<string>('SWAGGER_TITLE') || 'ZaraHome ECOM API';
     const swaggerDesc = config.get<string>('SWAGGER_DESCRIPTION') || 'API документация ZaraHome ECOM';
     const swaggerVersion = config.get<string>('SWAGGER_VERSION') || '1.0';
-    const swaggerPath = config.get<string>('SWAGGER_PATH') || 'api-docs';
 
     const swaggerConfig = new DocumentBuilder()
       .setTitle(swaggerTitle)
@@ -85,9 +86,9 @@ async function bootstrap() {
     });
 
     // JSON спецификация для интеграций/SDK
-    app.getHttpAdapter().get(`/api-docs-json`, (req, res) => {
-      res.type('application/json').send(swaggerDocument);
-    });
+    // app.getHttpAdapter().get(`/api-docs-json`, (req, res) => {
+    //   res.status(200).json(swaggerDocument);
+    // });
 
     Logger.log(`Swagger available at http://localhost:${config.get<number>('PORT') || 3001}/${swaggerPath}`);
   }
@@ -95,6 +96,10 @@ async function bootstrap() {
   const port = config.get<number>('PORT') || 3001;
   await app.listen(port);
   Logger.log(`Server started on http://localhost:${port}`);
-  Logger.log(`Swagger available at http://localhost:${port}/${swaggerPath}`);
+  
+  // Логируем Swagger только если он включен
+  if (swaggerEnabled) {
+    Logger.log(`Swagger available at http://localhost:${port}/${swaggerPath}`);
+  }
 }
 bootstrap();  
