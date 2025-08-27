@@ -22,7 +22,8 @@ export class CartService implements ICartService {
   }
 
   async findAll(): Promise<ICartItem[]> {
-    throw new Error('Method not implemented. Use getUserCart(userId) instead.');
+    // Метод не используется. Возвращаем пустой массив, чтобы не выбрасывать Error
+    return [];
   }
 
   async findOne(id: number): Promise<ICartItem | null> {

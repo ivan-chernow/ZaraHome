@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConflictException, ResourceNotFoundException, BadRequestException } from 'src/common/base/base.exceptions';
 import { Promocode } from './entity/promocode.entity';
 import { PromocodesRepository } from './promocodes.repository';
 import { IPromocodeService } from 'src/common/interfaces/service.interface';
@@ -15,7 +16,7 @@ export class PromocodesService implements IPromocodeService {
     const existingPromocode = await this.promocodesRepository.findByCode(code);
 
     if (existingPromocode) {
-      throw new Error('Промокод с таким кодом уже существует');
+      throw new ConflictException('Промокод с таким кодом уже существует');
     }
 
     return this.promocodesRepository.createPromocode({
@@ -35,26 +36,17 @@ export class PromocodesService implements IPromocodeService {
     const promocode = await this.promocodesRepository.findActiveByCode(code);
 
     if (!promocode) {
-      return { 
-        isValid: false, 
-        message: 'Промокод не найден или недействителен' 
-      };
+      return { isValid: false, message: 'Промокод не найден или недействителен' };
     }
 
     // Проверяем, что сумма заказа больше 0
     if (orderAmount <= 0) {
-      return {
-        isValid: false,
-        message: 'Сумма заказа должна быть больше 0'
-      };
+      return { isValid: false, message: 'Сумма заказа должна быть больше 0' };
     }
 
     // Проверяем, что скидка не больше 100%
     if (promocode.discount > 100) {
-      return {
-        isValid: false,
-        message: 'Некорректный размер скидки'
-      };
+      return { isValid: false, message: 'Некорректный размер скидки' };
     }
 
     const discount = (orderAmount * promocode.discount) / 100;
@@ -82,7 +74,7 @@ export class PromocodesService implements IPromocodeService {
     const promocode = await this.promocodesRepository.findByCode(code);
 
     if (!promocode) {
-      throw new Error('Промокод не найден');
+      throw new ResourceNotFoundException('Промокод', code);
     }
 
     // Жёсткое удаление записи из БД по запросу "деактивировать"

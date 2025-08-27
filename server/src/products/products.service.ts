@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ResourceNotFoundException, ConflictException } from 'src/common/base/base.exceptions';
 import { ProductsRepository } from './products.repository';
 import { CreateProductDto } from './dto/create-product.dto';
 import { 
@@ -61,12 +62,12 @@ export class ProductsService implements IProductService {
   async update(id: number, data: Partial<ICreateProductDto>): Promise<IProduct> {
     const product = await this.productsRepository.findProductById(id);
     if (!product) {
-      throw new Error('Продукт не найден');
+      throw new ResourceNotFoundException('Продукт', id);
     }
     
     const updatedProduct = await this.productsRepository.updateProduct(id, data);
     if (!updatedProduct) {
-      throw new Error('Не удалось обновить продукт');
+      throw new ConflictException('Не удалось обновить продукт');
     }
     return updatedProduct;
   }

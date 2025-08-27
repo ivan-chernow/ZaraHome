@@ -15,44 +15,25 @@ export class LoginController {
 
     @Post('login')
     async login(@Body() body: LoginDto, @Res() res: Response) {
-        try {
-            const user = await this.loginService.validateUser(body.email, body.password);
-            const result = await this.loginService.login(user, res);
-            return res.json(this.responseService.success(result, 'Успешная авторизация'));
-        } catch (error) {
-            if (error instanceof UnauthorizedException) {
-                return res.status(401).json(this.responseService.error('Неверный email или пароль'));
-            }
-            return res.status(500).json(this.responseService.error('Ошибка авторизации', error.message));
-        }
+        const user = await this.loginService.validateUser(body.email, body.password);
+        const result = await this.loginService.login(user, res);
+        return res.json(this.responseService.success(result, 'Успешная авторизация'));
     }
 
     @Post('refresh')
     async refresh(@Req() req: Request, @Body() body: RefreshTokenDto, @Res() res: Response) {
-        try {
-            // Безопасно получаем refreshToken из cookies или body
-            const refreshToken = req.cookies?.refreshToken || body?.refreshToken;
-
-            // Проверяем наличие токена
-            if (!refreshToken) {
-                return res.status(400).json(this.responseService.error('Refresh token is required'));
-            }
-
-            const result = await this.loginService.refreshTokens(refreshToken, res);
-            return res.json(this.responseService.success(result, 'Токены обновлены'));
-        } catch (error) {
-            return res.status(500).json(this.responseService.error('Ошибка обновления токенов', error.message));
+        const refreshToken = req.cookies?.refreshToken || body?.refreshToken;
+        if (!refreshToken) {
+            return res.status(400).json(this.responseService.error('Refresh token is required'));
         }
+        const result = await this.loginService.refreshTokens(refreshToken, res);
+        return res.json(this.responseService.success(result, 'Токены обновлены'));
     }
 
     @Post('logout')
     @UseGuards(JwtAuthGuard)
     async logout(@Req() req: any, @Res() res: Response) {
-        try {
-            await this.loginService.logout(req.user.id, res);
-            return res.json(this.responseService.success(undefined, 'Успешный выход'));
-        } catch (error) {
-            return res.status(500).json(this.responseService.error('Ошибка при выходе', error.message));
-        }
+        await this.loginService.logout(req.user.id, res);
+        return res.json(this.responseService.success(undefined, 'Успешный выход'));
     }
 }

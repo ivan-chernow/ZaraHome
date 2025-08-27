@@ -20,52 +20,36 @@ export class PromocodesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async createPromocode(@Body() createPromocodeDto: CreatePromocodeDto) {
-    try {
-      const promocode = await this.promocodesService.create(
-        createPromocodeDto.code,
-        createPromocodeDto.discount
-      );
-      return this.responseService.success(promocode, 'Промокод успешно создан');
-    } catch (error) {
-      return this.responseService.error('Ошибка при создании промокода', error.message);
-    }
+    const promocode = await this.promocodesService.create(
+      createPromocodeDto.code,
+      createPromocodeDto.discount
+    );
+    return this.responseService.success(promocode, 'Промокод успешно создан');
   }
 
   @Delete(':code')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async deactivatePromocode(@Param() params: PromocodeCodeDto) {
-    try {
-      await this.promocodesService.deactivate(params.code);
-      return this.responseService.success(undefined, 'Промокод успешно деактивирован');
-    } catch (error) {
-      return this.responseService.error('Ошибка при деактивации промокода', error.message);
-    }
+    await this.promocodesService.deactivate(params.code);
+    return this.responseService.success(undefined, 'Промокод успешно деактивирован');
   }
 
   // Применение промокода (доступно всем пользователям)
   @Post('apply')
   async applyPromocode(@Body() applyPromocodeDto: ValidatePromocodeDto) {
-    try {
-      const result = await this.promocodesService.validateAndApply(
-        applyPromocodeDto.code,
-        applyPromocodeDto.orderAmount
-      );
-      return this.responseService.success(result, 'Промокод успешно применен');
-    } catch (error) {
-      return this.responseService.error('Ошибка при применении промокода', error.message);
-    }
+    const result = await this.promocodesService.validateAndApply(
+      applyPromocodeDto.code,
+      applyPromocodeDto.orderAmount
+    );
+    return this.responseService.success(result, 'Промокод успешно применен');
   }
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAllActive() {
-    try {
-      const promocodes = await this.promocodesService.getAll();
-      return this.responseService.success(promocodes, 'Активные промокоды загружены');
-    } catch (error) {
-      return this.responseService.error('Ошибка при загрузке промокодов', error.message);
-    }
+    const promocodes = await this.promocodesService.getAll();
+    return this.responseService.success(promocodes, 'Активные промокоды загружены');
   }
 } 

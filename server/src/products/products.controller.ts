@@ -10,6 +10,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ResponseService } from 'src/shared/services/response.service';
 import { IProduct, ICategory, ApiResponse } from '../common/interfaces';
+import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
 
 @Controller('products')
 export class ProductsController {
@@ -35,36 +36,23 @@ export class ProductsController {
         @Body() dto: CreateProductDto,
         @UploadedFiles() files: Array<Express.Multer.File>
     ): Promise<ApiResponse<IProduct>> {
-        try {
-            const product = await this.productsService.createProduct(dto, files);
-            return this.responseService.success(product, 'Продукт успешно создан');
-        } catch (error) {
-            // лог уже формируется централизованно, возвращаем унифицированный ответ
-            return this.responseService.error('Ошибка при создании продукта', error.message);
-        }
+        const product = await this.productsService.createProduct(dto, files);
+        return this.responseService.success(product, 'Продукт успешно создан');
     }
 
     @Get()
     async findAll(): Promise<ApiResponse<IProduct[]>> {
-        try {
-            const products = await this.productsService.findAll();
-            return this.responseService.success(products, 'Продукты успешно загружены');
-        } catch (error) {
-            return this.responseService.error('Ошибка при загрузке продуктов', error.message);
-        }
+        const products = await this.productsService.findAll();
+        return this.responseService.success(products, 'Продукты успешно загружены');
     }
 
     @Get(':id')
     async findOne(@Param() params: ProductIdDto): Promise<ApiResponse<IProduct>> {
-        try {
-            const product = await this.productsService.findOne(params.id);
-            if (!product) {
-                return this.responseService.error('Продукт не найден');
-            }
-            return this.responseService.success(product, 'Продукт найден');
-        } catch (error) {
-            return this.responseService.error('Ошибка при поиске продукта', error.message);
+        const product = await this.productsService.findOne(params.id);
+        if (!product) {
+            throw new ResourceNotFoundException('Продукт', params.id);
         }
+        return this.responseService.success(product, 'Продукт найден');
     }
 
     @Put(':id')
@@ -74,33 +62,21 @@ export class ProductsController {
         @Param() params: ProductIdDto,
         @Body() dto: UpdateProductDto
     ): Promise<ApiResponse<IProduct>> {
-        try {
-            const product = await this.productsService.update(params.id, dto);
-            return this.responseService.success(product, 'Продукт успешно обновлен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при обновлении продукта', error.message);
-        }
+        const product = await this.productsService.update(params.id, dto);
+        return this.responseService.success(product, 'Продукт успешно обновлен');
     }
 
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
     @Roles(UserRole.ADMIN)
     async deleteProduct(@Param() params: ProductIdDto): Promise<ApiResponse<void>> {
-        try {
-            await this.productsService.delete(params.id);
-            return this.responseService.success(undefined, 'Продукт успешно удален');
-        } catch (error) {
-            return this.responseService.error('Ошибка при удалении продукта', error.message);
-        }
+        await this.productsService.delete(params.id);
+        return this.responseService.success(undefined, 'Продукт успешно удален');
     }
 
     @Get('catalog/all')
     async getCatalog(): Promise<ApiResponse<ICategory[]>> {
-        try {
-            const catalog = await this.productsService.getCatalog();
-            return this.responseService.success(catalog, 'Каталог успешно загружен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при загрузке каталога', error.message);
-        }
+        const catalog = await this.productsService.getCatalog();
+        return this.responseService.success(catalog, 'Каталог успешно загружен');
     }
 }

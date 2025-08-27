@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
 import { Order } from './entity/order.entity';
 import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -17,7 +18,7 @@ export class OrdersService implements IOrderService {
     // Получаем пользователя через репозиторий
     const user = await this.ordersRepository.findUserById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new ResourceNotFoundException('Пользователь', userId);
     }
 
     // Проверяем, есть ли уже активный заказ у пользователя
@@ -66,7 +67,7 @@ export class OrdersService implements IOrderService {
   async updateOrderStatus(orderId: number, status: OrderStatus, userId: number): Promise<Order> {
     const order = await this.getOrderById(orderId, userId);
     if (!order) {
-      throw new Error('Order not found');
+      throw new ResourceNotFoundException('Заказ', orderId);
     }
 
     await this.ordersRepository.updateOrderStatus(orderId, status);
@@ -81,7 +82,7 @@ export class OrdersService implements IOrderService {
   async updateOrder(orderId: number, updateOrderDto: UpdateOrderDto, userId: number): Promise<Order> {
     const order = await this.getOrderById(orderId, userId);
     if (!order) {
-      throw new Error('Order not found');
+      throw new ResourceNotFoundException('Заказ', orderId);
     }
 
     // Обновляем только переданные поля

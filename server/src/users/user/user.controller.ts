@@ -15,62 +15,38 @@ export class UserController {
 
     @Get('profile')
     async getProfile(@Request() req: AuthenticatedRequest) {
-        try {
-            const profile = await this.userService.getProfile(req.user.id);
-            return this.responseService.success(profile, 'Профиль пользователя загружен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при загрузке профиля', error.message);
-        }
+        const profile = await this.userService.getProfile(req.user.id);
+        return this.responseService.success(profile, 'Профиль пользователя загружен');
     }
 
     @Patch('change-password')
     async changePassword(@Request() req: AuthenticatedRequest, @Body() dto: ChangePasswordDto) {
-        try {
-            const result = await this.userService.changePassword(req.user.id, dto);
-            return this.responseService.success(result, 'Пароль успешно изменен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при изменении пароля', error.message);
-        }
+        const result = await this.userService.changePassword(req.user.id, dto);
+        return this.responseService.success(result, 'Пароль успешно изменен');
     }
 
     @Patch('change-email')
     async changeEmail(@Request() req: AuthenticatedRequest, @Body() dto: ChangeEmailDto) {
-        try {
-            const result = await this.userService.changeEmail(req.user.id, req.user.email, dto.newEmail);
-            return this.responseService.success(result, 'Email успешно изменен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при изменении email', error.message);
-        }
+        const result = await this.userService.changeEmail(req.user.id, req.user.email, dto.newEmail);
+        return this.responseService.success(result, 'Email успешно изменен');
     }
 
     @Patch('change-delivery-address')
     async changeDeliveryAddress(@Request() req: AuthenticatedRequest, @Body() dto: ChangeDeliveryAddressDto) {
-        try {
-            const result = await this.userService.changeDeliveryAddress(req.user.id, dto);
-            return this.responseService.success(result, 'Адрес доставки успешно изменен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при изменении адреса доставки', error.message);
-        }
+        const result = await this.userService.changeDeliveryAddress(req.user.id, dto);
+        return this.responseService.success(result, 'Адрес доставки успешно изменен');
     }
 
     @Get('delivery-addresses')
     async getDeliveryAddresses(@Request() req: AuthenticatedRequest) {
-        try {
-            const addresses = await this.userService.getDeliveryAddresses(req.user.id);
-            return this.responseService.success(addresses, 'Адреса доставки загружены');
-        } catch (error) {
-            return this.responseService.error('Ошибка при загрузке адресов доставки', error.message);
-        }
+        const addresses = await this.userService.getDeliveryAddresses(req.user.id);
+        return this.responseService.success(addresses, 'Адреса доставки загружены');
     }
 
     @Post('delivery-addresses')
     async addDeliveryAddress(@Request() req: AuthenticatedRequest, @Body() dto: ChangeDeliveryAddressDto) {
-        try {
-            const result = await this.userService.addDeliveryAddress(req.user.id, dto);
-            return this.responseService.success(result, 'Адрес доставки успешно добавлен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при добавлении адреса доставки', error.message);
-        }
+        const result = await this.userService.addDeliveryAddress(req.user.id, dto);
+        return this.responseService.success(result, 'Адрес доставки успешно добавлен');
     }
 
     @Put('delivery-addresses/:id')
@@ -79,12 +55,8 @@ export class UserController {
         @Param('id') id: number,
         @Body() dto: ChangeDeliveryAddressDto
     ) {
-        try {
-            const result = await this.userService.updateDeliveryAddress(req.user.id, id, dto);
-            return this.responseService.success(result, 'Адрес доставки успешно обновлен');
-        } catch (error) {
-            return this.responseService.error('Ошибка при обновлении адреса доставки', error.message);
-        }
+        const result = await this.userService.updateDeliveryAddress(req.user.id, id, dto);
+        return this.responseService.success(result, 'Адрес доставки успешно обновлен');
     }
 
     @Delete('delivery-addresses/:id')
@@ -92,11 +64,7 @@ export class UserController {
         @Request() req: AuthenticatedRequest,
         @Param('id') id: number
     ) {
-        try {
-            await this.userService.deleteDeliveryAddress(req.user.id, id);
-            return this.responseService.success(undefined, 'Адрес доставки успешно удален');
-        } catch (error) {
-            return this.responseService.error('Ошибка при удалении адреса доставки', error.message);
-        }
+        await this.userService.deleteDeliveryAddress(req.user.id, id);
+        return this.responseService.success(undefined, 'Адрес доставки успешно удален');
     }
 }

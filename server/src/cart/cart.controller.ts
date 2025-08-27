@@ -22,47 +22,31 @@ export class CartController {
     @Param() params: ProductIdDto,
     @Body() dto: AddToCartDto
   ) {
-    try {
-      const userId = req.user.id;
-      const result = await this.cartService.addToCart(userId, params.productId);
-      return this.responseService.success(result, 'Товар добавлен в корзину');
-    } catch (error) {
-      return this.responseService.error('Ошибка при добавлении товара в корзину', error.message);
-    }
+    const userId = req.user.id;
+    const result = await this.cartService.addToCart(userId, params.productId);
+    return this.responseService.success(result, 'Товар добавлен в корзину');
   }
 
   @Delete(':productId')
   async remove(@Req() req: AuthenticatedRequest, @Param() params: ProductIdDto) {
-    try {
-      const userId = req.user.id;
-      await this.cartService.removeFromCart(userId, params.productId);
-      return this.responseService.success(undefined, 'Товар удален из корзины');
-    } catch (error) {
-      return this.responseService.error('Ошибка при удалении товара из корзины', error.message);
-    }
+    const userId = req.user.id;
+    await this.cartService.removeFromCart(userId, params.productId);
+    return this.responseService.success(undefined, 'Товар удален из корзины');
   }
 
   @Get()
   @SkipThrottle()
   async getUserCart(@Req() req: AuthenticatedRequest) {
-    try {
-      const userId = req.user.id;
-      const cart = await this.cartService.getUserCart(userId);
-      return this.responseService.success(cart, 'Корзина загружена');
-    } catch (error) {
-      return this.responseService.error('Ошибка при загрузке корзины', error.message);
-    }
+    const userId = req.user.id;
+    const cart = await this.cartService.getUserCart(userId);
+    return this.responseService.success(cart, 'Корзина загружена');
   }
 
   @Get('status')
   @SkipThrottle()
   async status(@Req() req: AuthenticatedRequest, @Query() query: ProductIdsQueryDto) {
-    try {
-      const userId = req.user.id;
-      const status = await this.cartService.getCartStatus(userId, query.productIds);
-      return this.responseService.success(status, 'Статус корзины получен');
-    } catch (error) {
-      return this.responseService.error('Ошибка при получении статуса корзины', error.message);
-    }
+    const userId = req.user.id;
+    const status = await this.cartService.getCartStatus(userId, query.productIds);
+    return this.responseService.success(status, 'Статус корзины получен');
   }
 }

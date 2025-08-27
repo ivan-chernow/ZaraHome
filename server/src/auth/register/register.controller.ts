@@ -15,35 +15,23 @@ export class RegistrationController {
     @HttpCode(HttpStatus.OK)
     @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
     async initiate(@Body() dto: RegistrationInitiateDto) {
-        try {
-            await this.registrationService.initiateRegistration(dto.email);
-            return this.responseService.success(undefined, `Код подтверждения отправлен на email ${dto.email}`);
-        } catch (error) {
-            return this.responseService.error('Ошибка при инициации регистрации', error.message);
-        }
+        await this.registrationService.initiateRegistration(dto.email);
+        return this.responseService.success(undefined, `Код подтверждения отправлен на email ${dto.email}`);
     }   
 
     @Post('verify-code')
     @HttpCode(HttpStatus.OK)
     @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
     async verifyCode(@Body() dto: RegistrationVerifyDto) {
-        try {
-            const sessionToken = await this.registrationService.verifyByCode(dto.email, dto.code);
-            return this.responseService.success({ sessionToken }, `Код подтверждения подтвержден, токен сессии ${sessionToken}`);
-        } catch (error) {
-            return this.responseService.error('Ошибка при проверке кода', error.message);
-        }
+        const sessionToken = await this.registrationService.verifyByCode(dto.email, dto.code);
+        return this.responseService.success({ sessionToken }, `Код подтверждения подтвержден, токен сессии ${sessionToken}`);
     }
 
     @Post('complete')
     @HttpCode(HttpStatus.OK)
     @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
     async complete(@Body() dto: RegistrationCompleteDto) {
-        try {
-            const user = await this.registrationService.completeRegistration(dto.sessionToken, dto.password);
-            return this.responseService.success({ user }, `Регистрация завершена, пользователь ${user.email} создан`);
-        } catch (error) {
-            return this.responseService.error('Ошибка при завершении регистрации', error.message);
-        }
+        const user = await this.registrationService.completeRegistration(dto.sessionToken, dto.password);
+        return this.responseService.success({ user }, `Регистрация завершена, пользователь ${user.email} создан`);
     }
 }

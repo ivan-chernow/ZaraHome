@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { InternalServerException } from 'src/common/base/base.exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
@@ -77,7 +78,8 @@ export class UserRepository {
     const id = result.identifiers[0].id;
     const savedAddress = await this.addressRepository.findOne({ where: { id } });
     if (!savedAddress) {
-      throw new Error('Failed to create delivery address');
+      // Непредвиденная ситуация при вставке адреса
+      throw new InternalServerException('Не удалось создать адрес доставки');
     }
     return savedAddress;
   }

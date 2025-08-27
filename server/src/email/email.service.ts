@@ -32,7 +32,7 @@ export class EmailService {
       this.logger.log(`Template path: ${templatePath}`);
 
       if (!fs.existsSync(templatePath)) {
-        throw new Error(`Template file not found at path: ${templatePath}`);
+        throw new InternalServerErrorException(`Template file not found at path: ${templatePath}`);
       }
 
       const templateSource = fs.readFileSync(templatePath, 'utf8');

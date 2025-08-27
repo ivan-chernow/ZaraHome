@@ -38,11 +38,7 @@ export class AdminController {
         @UploadedFiles() files: Express.Multer.File[],
         @Body() productData: CreateProductDto
     ) {
-        try {
-            const product = await this.adminService.addProduct(files, productData);
-            return this.responseService.success(product, 'Продукт успешно добавлен администратором');
-        } catch (error) {
-            return this.responseService.error('Ошибка при добавлении продукта', error.message);
-        }
+        const product = await this.adminService.addProduct(files, productData);
+        return this.responseService.success(product, 'Продукт успешно добавлен администратором');
     }
 } 

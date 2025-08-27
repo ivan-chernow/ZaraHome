@@ -18,42 +18,26 @@ export class OrdersController {
 
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto, @Request() req: AuthenticatedRequest) {
-    try {
-      const order = await this.ordersService.createOrder(createOrderDto, req.user.id);
-      return this.responseService.success(order, 'Заказ успешно создан');
-    } catch (error) {
-      return this.responseService.error('Ошибка при создании заказа', error.message);
-    }
+    const order = await this.ordersService.createOrder(createOrderDto, req.user.id);
+    return this.responseService.success(order, 'Заказ успешно создан');
   }
 
   @Get('my')
   async getUserOrders(@Request() req: AuthenticatedRequest) {
-    try {
-      const orders = await this.ordersService.getUserOrders(req.user.id);
-      return this.responseService.success(orders, 'Заказы пользователя загружены');
-    } catch (error) {
-      return this.responseService.error('Ошибка при загрузке заказов', error.message);
-    }
+    const orders = await this.ordersService.getUserOrders(req.user.id);
+    return this.responseService.success(orders, 'Заказы пользователя загружены');
   }
 
   @Get('active')
   async getActiveOrder(@Request() req: AuthenticatedRequest) {
-    try {
-      const order = await this.ordersService.getActiveOrder(req.user.id);
-      return this.responseService.success(order, 'Активный заказ загружен');
-    } catch (error) {
-      return this.responseService.error('Ошибка при загрузке активного заказа', error.message);
-    }
+    const order = await this.ordersService.getActiveOrder(req.user.id);
+    return this.responseService.success(order, 'Активный заказ загружен');
   }
 
   @Get(':id')
   async getOrderById(@Param() params: OrderIdDto, @Request() req: AuthenticatedRequest) {
-    try {
-      const order = await this.ordersService.getOrderById(params.id, req.user.id);
-      return this.responseService.success(order, 'Заказ найден');
-    } catch (error) {
-      return this.responseService.error('Ошибка при поиске заказа', error.message);
-    }
+    const order = await this.ordersService.getOrderById(params.id, req.user.id);
+    return this.responseService.success(order, 'Заказ найден');
   }
 
   @Put(':id/status')
@@ -62,22 +46,14 @@ export class OrdersController {
     @Body() body: UpdateOrderStatusDto,
     @Request() req: AuthenticatedRequest
   ) {
-    try {
-      const order = await this.ordersService.updateOrderStatus(params.id, body.status, req.user.id);
-      return this.responseService.success(order, 'Статус заказа обновлен');
-    } catch (error) {
-      return this.responseService.error('Ошибка при обновлении статуса заказа', error.message);
-    }
+    const order = await this.ordersService.updateOrderStatus(params.id, body.status, req.user.id);
+    return this.responseService.success(order, 'Статус заказа обновлен');
   }
 
   @Put(':id/cancel')
   async cancelOrder(@Param() params: OrderIdDto, @Request() req: AuthenticatedRequest) {
-    try {
-      const order = await this.ordersService.cancelOrder(params.id, req.user.id);
-      return this.responseService.success(order, 'Заказ отменен');
-    } catch (error) {
-      return this.responseService.error('Ошибка при отмене заказа', error.message);
-    }
+    const order = await this.ordersService.cancelOrder(params.id, req.user.id);
+    return this.responseService.success(order, 'Заказ отменен');
   }
 
   @Put(':id')
@@ -86,11 +62,7 @@ export class OrdersController {
     @Body() updateOrderDto: UpdateOrderDto,
     @Request() req: AuthenticatedRequest
   ) {
-    try {
-      const order = await this.ordersService.updateOrder(params.id, updateOrderDto, req.user.id);
-      return this.responseService.success(order, 'Заказ обновлен');
-    } catch (error) {
-      return this.responseService.error('Ошибка при обновлении заказа', error.message);
-    }
+    const order = await this.ordersService.updateOrder(params.id, updateOrderDto, req.user.id);
+    return this.responseService.success(order, 'Заказ обновлен');
   }
 }
