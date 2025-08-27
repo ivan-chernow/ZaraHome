@@ -8,9 +8,11 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { ImagesUploadInterceptor } from 'src/shared/upload/file-upload.helper';
 import { IProduct, ICategory, ApiResponse } from '../common/interfaces';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseService } from 'src/shared/services/response.service';
 import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
 
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
     constructor(
@@ -20,8 +22,13 @@ export class ProductsController {
 
     @Post()
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Roles(UserRole.ADMIN)
     @UseInterceptors(ImagesUploadInterceptor({ fieldName: 'images', maxCount: 10, maxSizeMB: 10 }))
+    @ApiOperation({ summary: 'Создать продукт' })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({ description: 'Данные продукта и изображения', type: CreateProductDto })
+    @ApiCreatedResponse({ description: 'Продукт успешно создан' })
     async createProduct(
         @Body() dto: CreateProductDto,
         @UploadedFiles() files: Array<Express.Multer.File>
@@ -31,12 +38,18 @@ export class ProductsController {
     }
 
     @Get()
+    @ApiOperation({ summary: 'Получить все продукты' })
+    @ApiOkResponse({ description: 'Продукты успешно загружены' })
     async findAll(): Promise<ApiResponse<IProduct[]>> {
         const products = await this.productsService.findAll();
         return this.responseService.success(products, 'Продукты успешно загружены');
     }
 
     @Get(':id')
+    @ApiOperation({ summary: 'Получить продукт по id' })
+    @ApiOkResponse({ description: 'Продукт найден' })
+    @ApiNotFoundResponse({ description: 'Продукт не найден' })
+    @ApiParam({ name: 'id', type: Number, description: 'ID продукта' })
     async findOne(@Param() params: ProductIdDto): Promise<ApiResponse<IProduct>> {
         const product = await this.productsService.findOne(params.id);
         if (!product) {
@@ -47,7 +60,11 @@ export class ProductsController {
 
     @Put(':id')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: 'Обновить продукт' })
+    @ApiOkResponse({ description: 'Продукт успешно обновлен' })
+    @ApiParam({ name: 'id', type: Number, description: 'ID продукта' })
     async updateProduct(
         @Param() params: ProductIdDto,
         @Body() dto: UpdateProductDto
@@ -58,13 +75,19 @@ export class ProductsController {
 
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: 'Удалить продукт' })
+    @ApiOkResponse({ description: 'Продукт успешно удален' })
+    @ApiParam({ name: 'id', type: Number, description: 'ID продукта' })
     async deleteProduct(@Param() params: ProductIdDto): Promise<ApiResponse<void>> {
         await this.productsService.delete(params.id);
         return this.responseService.success(undefined, 'Продукт успешно удален');
     }
 
     @Get('catalog/all')
+    @ApiOperation({ summary: 'Получить весь каталог с категориями' })
+    @ApiOkResponse({ description: 'Каталог успешно загружен' })
     async getCatalog(): Promise<ApiResponse<ICategory[]>> {
         const catalog = await this.productsService.getCatalog();
         return this.responseService.success(catalog, 'Каталог успешно загружен');

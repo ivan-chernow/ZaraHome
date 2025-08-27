@@ -9,6 +9,7 @@
         "include": "email/templates/**/*.hbs",
         "outDir": "dist/"
       }
-    ]
+    ],
+    "plugins": ["@nestjs/swagger/plugin"]
   }
 }
