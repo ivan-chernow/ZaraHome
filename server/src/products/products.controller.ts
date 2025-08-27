@@ -6,9 +6,7 @@ import { ProductIdDto } from './dto/product-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
-import { ResponseService } from 'src/shared/services/response.service';
+import { ImagesUploadInterceptor } from 'src/shared/upload/file-upload.helper';
 import { IProduct, ICategory, ApiResponse } from '../common/interfaces';
 import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
 
@@ -22,16 +20,7 @@ export class ProductsController {
     @Post()
     @UseGuards(JwtAuthGuard)
     @Roles(UserRole.ADMIN)
-    @UseInterceptors(FilesInterceptor('images', 10, {
-        storage: memoryStorage(),
-        fileFilter: (req, file, callback) => {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-                return callback(new Error('Разрешены только файлы изображений!'), false);
-            }
-            callback(null, true);
-        },
-        limits: { fileSize: 10 * 1024 * 1024 }
-    }))
+    @UseInterceptors(ImagesUploadInterceptor({ fieldName: 'images', maxCount: 10, maxSizeMB: 10 }))
     async createProduct(
         @Body() dto: CreateProductDto,
         @UploadedFiles() files: Array<Express.Multer.File>
