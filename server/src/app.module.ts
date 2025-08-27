@@ -33,6 +33,9 @@ import { envValidationSchema } from './config/env.validation';
                 synchronize: config.get<string>('NODE_ENV') !== 'production',
                 dropSchema: false,
                 autoLoadEntities: false,
+                // Добавляем поддержку миграций
+                migrations: ['src/database/migrations/*.ts'],
+                migrationsRun: config.get<string>('NODE_ENV') === 'production',
             }),
         }),
         // Смягчаем глобальный rate limit, чтобы UI мог безопасно рефетчить данные
