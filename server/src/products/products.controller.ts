@@ -1,21 +1,15 @@
 import { Controller, Get, Post, Body, Param, UseGuards, UseInterceptors, UploadedFiles, Put, Delete } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductIdDto } from './dto/product-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ResponseService } from 'src/shared/services/response.service';
-import { 
-  ICreateProductDto, 
-  IUpdateProductDto, 
-  IProduct, 
-  ICategory,
-  ApiResponse 
-} from '../common/interfaces';
+import { IProduct, ICategory, ApiResponse } from '../common/interfaces';
 
 @Controller('products')
 export class ProductsController {
@@ -38,14 +32,14 @@ export class ProductsController {
         limits: { fileSize: 10 * 1024 * 1024 }
     }))
     async createProduct(
-        @Body() dto: ICreateProductDto,
+        @Body() dto: CreateProductDto,
         @UploadedFiles() files: Array<Express.Multer.File>
     ): Promise<ApiResponse<IProduct>> {
         try {
             const product = await this.productsService.createProduct(dto, files);
             return this.responseService.success(product, 'Продукт успешно создан');
         } catch (error) {
-            console.error('Ошибка при создании продукта:', error);
+            // лог уже формируется централизованно, возвращаем унифицированный ответ
             return this.responseService.error('Ошибка при создании продукта', error.message);
         }
     }
@@ -78,7 +72,7 @@ export class ProductsController {
     @Roles(UserRole.ADMIN)
     async updateProduct(
         @Param() params: ProductIdDto,
-        @Body() dto: IUpdateProductDto
+        @Body() dto: UpdateProductDto
     ): Promise<ApiResponse<IProduct>> {
         try {
             const product = await this.productsService.update(params.id, dto);
