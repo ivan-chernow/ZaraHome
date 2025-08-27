@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, Logger } from '@nestjs/common';
 import { join } from 'path';
 import * as fs from 'fs/promises';
 import sharp from 'sharp';
@@ -16,6 +16,7 @@ export interface ImageProcessingOptions {
 
 @Injectable()
 export class ImageOptimizationService {
+  private readonly logger = new Logger(ImageOptimizationService.name);
   private readonly outputDir = join(__dirname, '..', '..', '..', 'uploads', 'products');
   private readonly thumbnailsDir = join(this.outputDir, 'thumbnails');
 
@@ -164,16 +165,70 @@ export class ImageOptimizationService {
     files: Express.Multer.File[], 
     options: ImageProcessingOptions = {}
   ): Promise<string[]> {
-    try {
-      const tasks = files.map(async (file) => {
-        const result = await this.processAndSave(file.buffer, file.originalname, options);
-        return result.mainPath;
-      });
+    const results: string[] = [];
+    const processedFiles: string[] = [];
 
-      return await Promise.all(tasks);
-    } catch (error) {
-      throw new InternalServerErrorException('Ошибка обработки изображений: ' + error.message);
+    for (const file of files) {
+      try {
+        const result = await this.processAndSave(file.buffer, file.originalname, options);
+        results.push(result.mainPath);
+        processedFiles.push(result.mainPath);
+        
+        // Если создана миниатюра, добавляем её в список для возможной очистки
+        if (result.thumbnailPath) {
+          processedFiles.push(result.thumbnailPath);
+        }
+      } catch (error) {
+        this.logger.error(`Ошибка обработки файла ${file.originalname}:`, error.message);
+        
+        // Удаляем уже обработанные файлы при ошибке
+        if (processedFiles.length > 0) {
+          await this.deleteFiles(processedFiles);
+        }
+        
+        throw new InternalServerErrorException(
+          `Ошибка обработки изображения ${file.originalname}: ${error.message}`
+        );
+      }
     }
+
+    return results;
+  }
+
+  async processManyWithFallback(
+    files: Express.Multer.File[], 
+    options: ImageProcessingOptions = {}
+  ): Promise<{ success: boolean; paths: string[]; errors: string[] }> {
+    const paths: string[] = [];
+    const errors: string[] = [];
+    const processedFiles: string[] = [];
+
+    for (const file of files) {
+      try {
+        const result = await this.processAndSave(file.buffer, file.originalname, options);
+        paths.push(result.mainPath);
+        processedFiles.push(result.mainPath);
+        
+        if (result.thumbnailPath) {
+          processedFiles.push(result.thumbnailPath);
+        }
+      } catch (error) {
+        this.logger.error(`Ошибка обработки файла ${file.originalname}:`, error.message);
+        errors.push(`${file.originalname}: ${error.message}`);
+        
+        // Удаляем файлы, обработанные в этой итерации
+        if (processedFiles.length > 0) {
+          await this.deleteFiles(processedFiles);
+          processedFiles.length = 0; // Очищаем массив
+        }
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      paths,
+      errors,
+    };
   }
 
   // Удаление файлов

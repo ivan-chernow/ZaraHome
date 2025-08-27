@@ -13,33 +13,56 @@ import {
 } from '../common/interfaces';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
+import { FileUploadErrorHandlerService } from 'src/shared/services/file-upload-error-handler.service';
 
 @Injectable()
 export class ProductsService implements IProductService {
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly imageOptimizationService: ImageOptimizationService,
+    private readonly errorHandlerService: FileUploadErrorHandlerService,
   ) {}
 
   async createProduct(dto: ICreateProductDto, files?: Express.Multer.File[]): Promise<IProduct> {
     if (files && files.length > 0) {
-      // Валидируем загруженные файлы
-      validateUploadedFiles(files, {
-        maxCount: 10,
-        maxSizeMB: 10,
-        allowedExt: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        allowedMime: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-      });
+      // Валидируем загруженные файлы с graceful fallback
+      const validationResults = await Promise.all(
+        files.map(file => this.errorHandlerService.validateFileWithFallback(file))
+      );
 
-      // Обрабатываем изображения с улучшенными настройками
-      dto.img = await this.imageOptimizationService.processMany(files, {
-        quality: 80,
-        maxWidth: 1600,
-        maxHeight: 1600,
-        format: 'webp',
-        generateThumbnail: true,
-        thumbnailSize: 300
-      });
+      const validFiles = files.filter((_, index) => validationResults[index].valid);
+      
+      if (validFiles.length === 0) {
+        throw new BadRequestException('Нет валидных файлов для загрузки');
+      }
+
+      // Обрабатываем изображения с обработкой ошибок
+      const uploadResult = await this.errorHandlerService.handleUploadErrors(
+        validFiles,
+        async (file) => {
+          const result = await this.imageOptimizationService.processAndSave(
+            file.buffer,
+            file.originalname,
+            {
+              quality: 80,
+              maxWidth: 1600,
+              maxHeight: 1600,
+              format: 'webp',
+              generateThumbnail: true,
+              thumbnailSize: 300
+            }
+          );
+          return result.mainPath;
+        }
+      );
+
+      // Получаем успешно загруженные файлы
+      const successfulUploads = uploadResult.filter(r => r.success);
+      dto.img = successfulUploads.map(r => r.filePath!);
+
+      if (dto.img.length === 0) {
+        throw new BadRequestException('Не удалось загрузить ни одного изображения');
+      }
     }
 
     return this.create(dto);

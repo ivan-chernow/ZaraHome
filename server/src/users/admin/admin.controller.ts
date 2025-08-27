@@ -1,4 +1,4 @@
-import { Controller, Body, UseGuards, Post, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Body, UseGuards, Post, Get, UseInterceptors, UploadedFiles, Delete } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -27,5 +27,23 @@ export class AdminController {
     ) {
         const product = await this.adminService.addProduct(files, productData);
         return this.responseService.success(product, 'Продукт успешно добавлен администратором');
+    }
+
+    @Get('upload-stats')
+    async getUploadStatistics() {
+        const stats = this.adminService.getUploadStatistics();
+        return this.responseService.success(stats, 'Статистика загрузок получена');
+    }
+
+    @Get('system-warnings')
+    async getSystemWarnings() {
+        const warnings = this.adminService.getSystemWarnings();
+        return this.responseService.success(warnings, 'Предупреждения системы получены');
+    }
+
+    @Delete('upload-history')
+    async clearUploadHistory() {
+        this.adminService.clearUploadHistory();
+        return this.responseService.success(null, 'История загрузок очищена');
     }
 } 
