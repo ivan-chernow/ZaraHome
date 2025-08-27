@@ -1,4 +1,4 @@
-import { Controller, Patch, Body, UseGuards, Req, Post, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Body, UseGuards, Post, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -6,10 +6,7 @@ import { AdminService } from './admin.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { UserService } from '../user/user.service';
-import { ChangePasswordDto } from '../user/dto/user.dto';
-import { Product } from 'src/products/entity/products.entity';
 import { ImagesUploadInterceptor } from 'src/shared/upload/file-upload.helper';
-import type { Multer } from 'multer';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 
 @Controller('admin')
