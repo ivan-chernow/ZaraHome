@@ -1,43 +1,50 @@
 export interface IBaseService<T> {
-  create(data: any): Promise<T>;
+  create(_data: unknown): Promise<T>;
   findAll(): Promise<T[]>;
-  findOne(id: number): Promise<T | null>;
-  update(id: number, data: any): Promise<T>;
-  delete(id: number): Promise<void>;
+  findOne(_id: number): Promise<T | null>;
+  update(_id: number, _data: unknown): Promise<T>;
+  delete(_id: number): Promise<void>;
 }
 
 export interface IAuthService {
-  validateUser(email: string, password: string): Promise<any>;
-  login(user: any, res?: any): Promise<any>;
-  refreshTokens(refreshToken: string, res?: any): Promise<any>;
-  logout(userId: number, res?: any): Promise<any>;
+  validateUser(_email: string, _password: string): Promise<unknown>;
+  login(_user: unknown, _res?: unknown): Promise<unknown>;
+  refreshTokens(_refreshToken: string, _res?: unknown): Promise<unknown>;
+  logout(_userId: number, _res?: unknown): Promise<unknown>;
 }
 
-export interface IProductService extends IBaseService<any> {
-  getCatalog(): Promise<any[]>;
-  findByIds(ids: number[]): Promise<any[]>;
+export interface IProductService extends IBaseService<unknown> {
+  getCatalog(): Promise<unknown[]>;
+  findByIds(_ids: number[]): Promise<unknown[]>;
 }
 
-export interface IUserService extends IBaseService<any> {
-  findByEmail(email: string): Promise<any | null>;
-  verifyEmail(userId: number): Promise<boolean>;
-  changePassword(userId: number, oldPassword: string, newPassword: string): Promise<boolean>;
-  changeEmail(userId: number, newEmail: string): Promise<boolean>;
+import { ChangePasswordDto, ProfileDto, ChangeDeliveryAddressDto } from 'src/users/user/dto/user.dto';
+
+export interface IUserService extends IBaseService<unknown> {
+  findOne(_userId: number): Promise<unknown>;
+  getProfile(_userId: number): Promise<ProfileDto>;
+  changePassword(_userId: number, _dto: ChangePasswordDto): Promise<{ message: string }>;
+  changeEmail(_userId: number, _currentEmail: string, _newEmail: string): Promise<{ message: string }>;
+  changeDeliveryAddress(_userId: number, _addressData: ChangeDeliveryAddressDto): Promise<{ message: string }>;
+  getDeliveryAddresses(_userId: number): Promise<unknown[]>;
+  addDeliveryAddress(_userId: number, _addressData: ChangeDeliveryAddressDto): Promise<unknown>;
+  updateDeliveryAddress(_userId: number, _addressId: number, _addressData: ChangeDeliveryAddressDto): Promise<unknown>;
+  deleteDeliveryAddress(_userId: number, _addressId: number): Promise<void>;
 }
 
-export interface ICartService extends IBaseService<any> {
-  getUserCart(userId: number): Promise<any[]>;
-  addToCart(userId: number, productId: number): Promise<any>;
-  removeFromCart(userId: number, productId: number): Promise<void>;
-  clearCart(userId: number): Promise<void>;
-  getCartStatus(userId: number, productIds: number[]): Promise<Record<number, boolean>>;
+export interface ICartService extends IBaseService<unknown> {
+  getUserCart(_userId: number): Promise<unknown[]>;
+  addToCart(_userId: number, _productId: number): Promise<unknown>;
+  removeFromCart(_userId: number, _productId: number): Promise<void>;
+  clearCart(_userId: number): Promise<void>;
+  getCartStatus(_userId: number, _productIds: number[]): Promise<Record<number, boolean>>;
 }
 
 export interface IFavoritesService {
-  add(userId: number, productId: number): Promise<any>;
-  remove(userId: number, productId: number): Promise<void>;
-  findAll(userId: number): Promise<any[]>;
-  getFavoriteStatus(userId: number, productIds: number[]): Promise<Record<number, boolean>>;
+  add(_userId: number, _productId: number): Promise<unknown>;
+  remove(_userId: number, _productId: number): Promise<void>;
+  findAll(_userId: number): Promise<unknown[]>;
+  getFavoriteStatus(_userId: number, _productIds: number[]): Promise<Record<number, boolean>>;
 }
 
 import { OrderStatus } from 'src/common/enums/order-status.enum';
@@ -46,24 +53,28 @@ import { CreateOrderDto } from 'src/orders/dto/create-order.dto';
 import { UpdateOrderDto } from 'src/orders/dto/update-order.dto';
 
 export interface IOrderService {
-  createOrder(createOrderDto: CreateOrderDto, userId: number): Promise<Order>;
-  getUserOrders(userId: number): Promise<Order[]>;
-  getActiveOrder(userId: number): Promise<Order | null>;
-  getOrderById(orderId: number, userId: number): Promise<Order | null>;
-  updateOrderStatus(orderId: number, status: OrderStatus, userId: number): Promise<Order>;
-  cancelOrder(orderId: number, userId: number): Promise<Order>;
-  updateOrder(orderId: number, updateOrderDto: UpdateOrderDto, userId: number): Promise<Order>;
+  createOrder(_createOrderDto: CreateOrderDto, _userId: number): Promise<Order>;
+  getUserOrders(_userId: number): Promise<Order[]>;
+  getActiveOrder(_userId: number): Promise<Order | null>;
+  getOrderById(_orderId: number, _userId: number): Promise<Order | null>;
+  updateOrderStatus(_orderId: number, _status: OrderStatus, _userId: number): Promise<Order>;
+  cancelOrder(_orderId: number, _userId: number): Promise<Order>;
+  updateOrder(_orderId: number, _updateOrderDto: UpdateOrderDto, _userId: number): Promise<Order>;
 }
 
 export interface IPromocodeService {
-  create(code: string, discount: number): Promise<any>;
-  validateAndApply(code: string, orderAmount: number): Promise<{ 
+  create(_code: string, _discount: number): Promise<unknown>;
+  validateAndApply(_code: string, _orderAmount: number): Promise<{ 
     isValid: boolean; 
     message?: string; 
     discount?: number;
     finalAmount?: number;
   }>;
-  getAllActive(): Promise<any[]>;
-  getAll(): Promise<any[]>;
-  deactivate(code: string): Promise<void>;
+  getAllActive(): Promise<unknown[]>;
+  getAll(): Promise<unknown[]>;
+  deactivate(_code: string): Promise<void>;
+}
+
+export interface IAdminService {
+  addProduct(_files: Express.Multer.File[], _productData: unknown): Promise<unknown>;
 }

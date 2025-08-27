@@ -8,9 +8,10 @@ import { CreateProductDto } from 'src/products/dto/create-product.dto';
 import { ProductsService } from 'src/products/products.service';
 import { ConfigService } from '@nestjs/config';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
+import { IAdminService } from 'src/common/interfaces/service.interface';
 
 @Injectable()
-export class AdminService implements OnModuleInit {
+export class AdminService implements OnModuleInit, IAdminService {
     private readonly logger = new Logger(AdminService.name);
 
     constructor(
