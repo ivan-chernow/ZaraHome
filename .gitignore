@@ -10,7 +10,7 @@ pnpm-debug.log*
 out/
 .cursor/
 /.cursor/
-
+yarn.lock/
 # Build output (на всякий случай)
 dist/
 build/
