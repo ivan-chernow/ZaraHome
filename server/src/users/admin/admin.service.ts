@@ -9,6 +9,7 @@ import { ProductsService } from 'src/products/products.service';
 import { ConfigService } from '@nestjs/config';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 import { IAdminService } from 'src/common/interfaces/service.interface';
+import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
 
 @Injectable()
 export class AdminService implements OnModuleInit, IAdminService {
@@ -51,19 +52,43 @@ export class AdminService implements OnModuleInit, IAdminService {
 
     async addProduct(files: Express.Multer.File[], productData: CreateProductDto) {
         if (!files || files.length === 0) {
-            throw new BadRequestException('No files uploaded');
+            throw new BadRequestException('Необходимо загрузить хотя бы одно изображение');
         }
 
-        // Process uploaded files and get their optimized paths
-        const imagePaths = await this.imageOptimizationService.processMany(files);
-        
-        // Create product data with image paths
-        const productWithImages: CreateProductDto = {
-            ...productData,
-            img: imagePaths
-        };
-        
-        // Use the products service to create the product
-        return this.productsService.createProduct(productWithImages);
+        // Валидируем загруженные файлы
+        validateUploadedFiles(files, {
+            maxCount: 12,
+            maxSizeMB: 10,
+            allowedExt: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+            allowedMime: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        });
+
+        try {
+            // Обрабатываем изображения с улучшенными настройками
+            const imagePaths = await this.imageOptimizationService.processMany(files, {
+                quality: 80,
+                maxWidth: 1600,
+                maxHeight: 1600,
+                format: 'webp',
+                generateThumbnail: true,
+                thumbnailSize: 300
+            });
+            
+            // Создаем данные продукта с путями к изображениям
+            const productWithImages: CreateProductDto = {
+                ...productData,
+                img: imagePaths
+            };
+            
+            // Используем сервис продуктов для создания продукта
+            const product = await this.productsService.createProduct(productWithImages);
+            
+            this.logger.log(`Product created successfully: ${product.id} with ${imagePaths.length} images`);
+            
+            return product;
+        } catch (error) {
+            this.logger.error(`Failed to create product: ${error.message}`);
+            throw error;
+        }
     }
 } 

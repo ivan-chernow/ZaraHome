@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { ResourceNotFoundException, ConflictException } from 'src/common/base/base.exceptions';
 import { ProductsRepository } from './products.repository';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -12,6 +12,7 @@ import {
   IType
 } from '../common/interfaces';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
+import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
 
 @Injectable()
 export class ProductsService implements IProductService {
@@ -22,7 +23,23 @@ export class ProductsService implements IProductService {
 
   async createProduct(dto: ICreateProductDto, files?: Express.Multer.File[]): Promise<IProduct> {
     if (files && files.length > 0) {
-      dto.img = await this.imageOptimizationService.processMany(files);
+      // Валидируем загруженные файлы
+      validateUploadedFiles(files, {
+        maxCount: 10,
+        maxSizeMB: 10,
+        allowedExt: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        allowedMime: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+      });
+
+      // Обрабатываем изображения с улучшенными настройками
+      dto.img = await this.imageOptimizationService.processMany(files, {
+        quality: 80,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        format: 'webp',
+        generateThumbnail: true,
+        thumbnailSize: 300
+      });
     }
 
     return this.create(dto);
