@@ -7,13 +7,15 @@ import { CartController } from './cart.controller';
 import { UsersModule } from '../users/users.module';
 import { ProductsModule } from '../products/products.module';
 import { SharedModule } from '../shared/modules/shared.module';
+import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Cart]),
     UsersModule,
     ProductsModule,
-    SharedModule
+    SharedModule,
+    AppCacheModule
   ],
   providers: [CartService, CartRepository],
   controllers: [CartController],

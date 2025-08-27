@@ -7,9 +7,14 @@ import { Favorite } from './entity/favorite.entity';
 import { User } from '../users/user/entity/user.entity';
 import { Product } from '../products/entity/products.entity';
 import { SharedModule } from '../shared/modules/shared.module';
+import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Favorite, User, Product]), SharedModule],
+  imports: [
+    TypeOrmModule.forFeature([Favorite, User, Product]), 
+    SharedModule,
+    AppCacheModule
+  ],
   controllers: [FavoritesController],
   providers: [FavoritesService, FavoritesRepository],
 })

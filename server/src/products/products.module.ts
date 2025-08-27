@@ -10,9 +10,14 @@ import { Type } from './entity/type.entity';
 import { Favorite } from 'src/favorites/entity/favorite.entity';
 import { Cart } from 'src/cart/entity/cart.entity';
 import { SharedModule } from 'src/shared/modules/shared.module';
+import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, Category, SubCategory, Type, Cart, Favorite]), SharedModule],
+  imports: [
+    TypeOrmModule.forFeature([Product, Category, SubCategory, Type, Cart, Favorite]), 
+    SharedModule,
+    AppCacheModule
+  ],
   providers: [ProductsService, ProductsRepository],
   controllers: [ProductsController],
   exports: [ProductsService],

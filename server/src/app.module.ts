@@ -13,6 +13,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { envValidationSchema } from './config/env.validation';
+import { AppCacheModule } from './shared/cache/cache.module';
 
 @Module({
     imports: [
@@ -51,6 +52,7 @@ import { envValidationSchema } from './config/env.validation';
         FavoritesModule,
         CartModule,
         OrdersModule,
+        AppCacheModule,
     ],
     providers: [
         {

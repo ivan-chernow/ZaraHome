@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { ConflictException, ResourceNotFoundException, BadRequestException } from 'src/common/base/base.exceptions';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Promocode } from './entity/promocode.entity';
 import { PromocodesRepository } from './promocodes.repository';
 import { IPromocodeService } from 'src/common/interfaces/service.interface';
+import { CacheService } from '../shared/cache/cache.service';
+import { CACHE_TTL, CACHE_PREFIXES, CACHE_KEYS } from '../shared/cache/cache.constants';
 
 @Injectable()
 export class PromocodesService implements IPromocodeService {
   constructor(
     private readonly promocodesRepository: PromocodesRepository,
+    private readonly cacheService: CacheService,
   ) {}
 
   // Создание промокода (для админа)
@@ -19,11 +21,16 @@ export class PromocodesService implements IPromocodeService {
       throw new ConflictException('Промокод с таким кодом уже существует');
     }
 
-    return this.promocodesRepository.createPromocode({
+    const promocode = await this.promocodesRepository.createPromocode({
       code: code.toUpperCase(),
       discount,
       isActive: true
     });
+    
+    // Инвалидируем кеш промокодов
+    await this.invalidatePromocodesCache();
+    
+    return promocode;
   }
 
   // Проверка и применение промокода
@@ -61,7 +68,14 @@ export class PromocodesService implements IPromocodeService {
 
   // Получение всех активных промокодов
   async getAllActive(): Promise<Promocode[]> {
-    return await this.promocodesRepository.findAllActive();
+    return this.cacheService.getOrSet(
+      CACHE_KEYS.ACTIVE_PROMOCODES,
+      () => this.promocodesRepository.findAllActive(),
+      { 
+        ttl: CACHE_TTL.PROMOCODES, 
+        prefix: CACHE_PREFIXES.PROMOCODES 
+      }
+    );
   }
 
   // Получение всех промокодов (активных и неактивных)
@@ -74,10 +88,20 @@ export class PromocodesService implements IPromocodeService {
     const promocode = await this.promocodesRepository.findByCode(code);
 
     if (!promocode) {
-      throw new ResourceNotFoundException('Промокод', code);
+      throw new NotFoundException(`Промокод с кодом ${code} не найден`);
     }
 
     // Жёсткое удаление записи из БД по запросу "деактивировать"
     await this.promocodesRepository.deleteByCode(code);
+    
+    // Инвалидируем кеш промокодов
+    await this.invalidatePromocodesCache();
+  }
+
+  /**
+   * Инвалидировать кеш промокодов
+   */
+  private async invalidatePromocodesCache(): Promise<void> {
+    await this.cacheService.deleteByPrefix(CACHE_PREFIXES.PROMOCODES);
   }
 } 

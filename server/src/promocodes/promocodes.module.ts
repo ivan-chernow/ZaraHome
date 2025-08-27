@@ -5,9 +5,14 @@ import { PromocodesService } from './promocodes.service';
 import { PromocodesRepository } from './promocodes.repository';
 import { Promocode } from './entity/promocode.entity';
 import { SharedModule } from '../shared/modules/shared.module';
+import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Promocode]), SharedModule],
+  imports: [
+    TypeOrmModule.forFeature([Promocode]), 
+    SharedModule,
+    AppCacheModule
+  ],
   controllers: [PromocodesController],
   providers: [PromocodesService, PromocodesRepository],
   exports: [PromocodesService]

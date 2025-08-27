@@ -14,6 +14,8 @@ import {
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
 import { FileUploadErrorHandlerService } from 'src/shared/services/file-upload-error-handler.service';
+import { CacheService } from '../shared/cache/cache.service';
+import { CACHE_TTL, CACHE_PREFIXES, CACHE_KEYS } from '../shared/cache/cache.constants';
 
 @Injectable()
 export class ProductsService implements IProductService {
@@ -21,6 +23,7 @@ export class ProductsService implements IProductService {
     private readonly productsRepository: ProductsRepository,
     private readonly imageOptimizationService: ImageOptimizationService,
     private readonly errorHandlerService: FileUploadErrorHandlerService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async createProduct(dto: ICreateProductDto, files?: Express.Multer.File[]): Promise<IProduct> {
@@ -88,15 +91,34 @@ export class ProductsService implements IProductService {
       if (type) productData.type = type;
     }
 
-    return this.productsRepository.createProduct(productData);
+    const product = await this.productsRepository.createProduct(productData);
+    
+    // Инвалидируем кеш после создания продукта
+    await this.invalidateProductCache();
+    
+    return product;
   }
 
   async findAll(): Promise<IProduct[]> {
-    return this.productsRepository.findAllProducts();
+    return this.cacheService.getOrSet(
+      CACHE_KEYS.ALL_PRODUCTS,
+      () => this.productsRepository.findAllProducts(),
+      { 
+        ttl: CACHE_TTL.PRODUCTS, 
+        prefix: CACHE_PREFIXES.PRODUCTS 
+      }
+    );
   }
 
   async findOne(id: number): Promise<IProduct | null> {
-    return this.productsRepository.findProductById(id);
+    return this.cacheService.getOrSet(
+      `${CACHE_KEYS.PRODUCT_BY_ID}:${id}`,
+      () => this.productsRepository.findProductById(id),
+      { 
+        ttl: CACHE_TTL.PRODUCTS, 
+        prefix: CACHE_PREFIXES.PRODUCTS 
+      }
+    );
   }
 
   async update(id: number, data: Partial<ICreateProductDto>): Promise<IProduct> {
@@ -109,33 +131,120 @@ export class ProductsService implements IProductService {
     if (!updatedProduct) {
       throw new ConflictException('Не удалось обновить продукт');
     }
+
+    // Инвалидируем кеш после обновления
+    await this.invalidateProductCacheById(id);
+    
     return updatedProduct;
   }
 
   async delete(id: number): Promise<void> {
     await this.productsRepository.removeProduct(id);
+    
+    // Инвалидируем кеш после удаления
+    await this.invalidateProductCacheById(id);
   }
 
   async getCatalog(): Promise<ICategory[]> {
-    const categories = await this.productsRepository.findAllCategories();
-    const newProducts = await this.productsRepository.findNewProducts();
-    const discountedProducts = await this.productsRepository.findDiscountedProducts();
+    return this.cacheService.getOrSet(
+      'catalog:full',
+      async () => {
+        const categories = await this.findAllCategories();
+        const newProducts = await this.findNewProducts();
+        const discountedProducts = await this.findDiscountedProducts();
 
-    // Бизнес-логика: добавление новинок и скидок в соответствующие категории
-    const novinkiCategory = categories.find(c => c.name === 'Новинки');
-    if (novinkiCategory) {
-      novinkiCategory.products = newProducts;
-    }
+        // Бизнес-логика: добавление новинок и скидок в соответствующие категории
+        const novinkiCategory = categories.find(c => c.name === 'Новинки');
+        if (novinkiCategory) {
+          novinkiCategory.products = newProducts;
+        }
 
-    const skidkiCategory = categories.find(c => c.name === 'Скидки');
-    if (skidkiCategory) {
-      skidkiCategory.products = discountedProducts;
-    }
-    
-    return categories;
+        const skidkiCategory = categories.find(c => c.name === 'Скидки');
+        if (skidkiCategory) {
+          skidkiCategory.products = discountedProducts;
+        }
+        
+        return categories;
+      },
+      { 
+        ttl: CACHE_TTL.CATALOG, 
+        prefix: CACHE_PREFIXES.CATALOG 
+      }
+    );
   }
 
   async findByIds(ids: number[]): Promise<IProduct[]> {
     return this.productsRepository.findProductsByIds(ids);
+  }
+
+  /**
+   * Получить все категории с кешированием
+   */
+  async findAllCategories(): Promise<ICategory[]> {
+    return this.cacheService.getOrSet(
+      CACHE_KEYS.ALL_CATEGORIES,
+      () => this.productsRepository.findAllCategories(),
+      { 
+        ttl: CACHE_TTL.CATEGORIES, 
+        prefix: CACHE_PREFIXES.CATEGORIES 
+      }
+    );
+  }
+
+  /**
+   * Получить категорию по ID с кешированием
+   */
+  async findCategoryById(id: number): Promise<ICategory | null> {
+    return this.cacheService.getOrSet(
+      `${CACHE_KEYS.CATEGORY_BY_ID}:${id}`,
+      () => this.productsRepository.findCategoryById(id),
+      { 
+        ttl: CACHE_TTL.CATEGORIES, 
+        prefix: CACHE_PREFIXES.CATEGORIES 
+      }
+    );
+  }
+
+  /**
+   * Получить новые продукты с кешированием
+   */
+  async findNewProducts(): Promise<IProduct[]> {
+    return this.cacheService.getOrSet(
+      CACHE_KEYS.NEW_PRODUCTS,
+      () => this.productsRepository.findNewProducts(),
+      { 
+        ttl: CACHE_TTL.PRODUCTS, 
+        prefix: CACHE_PREFIXES.PRODUCTS 
+      }
+    );
+  }
+
+  /**
+   * Получить продукты со скидками с кешированием
+   */
+  async findDiscountedProducts(): Promise<IProduct[]> {
+    return this.cacheService.getOrSet(
+      CACHE_KEYS.DISCOUNTED_PRODUCTS,
+      () => this.productsRepository.findDiscountedProducts(),
+      { 
+        ttl: CACHE_TTL.PRODUCTS, 
+        prefix: CACHE_PREFIXES.PRODUCTS 
+      }
+    );
+  }
+
+  /**
+   * Инвалидировать кеш продуктов
+   */
+  private async invalidateProductCache(): Promise<void> {
+    await this.cacheService.deleteByPrefix(CACHE_PREFIXES.PRODUCTS);
+    await this.cacheService.deleteByPrefix(CACHE_PREFIXES.CATEGORIES);
+  }
+
+  /**
+   * Инвалидировать кеш конкретного продукта
+   */
+  async invalidateProductCacheById(id: number): Promise<void> {
+    await this.cacheService.delete(`${CACHE_KEYS.PRODUCT_BY_ID}:${id}`, CACHE_PREFIXES.PRODUCTS);
   }
 }
