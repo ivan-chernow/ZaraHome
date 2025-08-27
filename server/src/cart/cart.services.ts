@@ -87,7 +87,7 @@ export class CartService implements ICartService {
     await this.cartRepository.removeByUserAndProduct(userId, productId);
   }
 
-  async getUserCart(userId: number): Promise<ICartItemWithProduct[]> {
+  async getUserCart(userId: number): Promise<ICartItem[]> {
     const cartItems = await this.cartRepository.findByUser(userId);
     
     return cartItems.map(item => ({

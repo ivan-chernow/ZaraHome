@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Promocode } from './entity/promocode.entity';
 import { PromocodesRepository } from './promocodes.repository';
+import { IPromocodeService } from 'src/common/interfaces/service.interface';
 
 @Injectable()
-export class PromocodesService {
+export class PromocodesService implements IPromocodeService {
   constructor(
     private readonly promocodesRepository: PromocodesRepository,
   ) {}

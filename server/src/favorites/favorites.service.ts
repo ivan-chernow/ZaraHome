@@ -2,9 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Favorite } from './entity/favorite.entity';
 import { Product } from '../products/entity/products.entity';
 import { FavoritesRepository } from './favorites.repository';
+import { IFavoritesService } from 'src/common/interfaces/service.interface';
 
 @Injectable()
-export class FavoritesService {
+export class FavoritesService implements IFavoritesService {
   constructor(
     private readonly favoritesRepository: FavoritesRepository,
   ) {}

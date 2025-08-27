@@ -1,21 +1,23 @@
 export interface ApiResponse<T = any> {
   success: boolean;
-  data?: T;
   message: string;
+  data?: T;
   error?: string;
+  timestamp?: string;
 }
 
-export interface PaginatedResponse<T> extends ApiResponse<{
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}> {}
+export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
 
-export interface ErrorResponse {
-  status: number;
-  message: string;
+export interface ErrorResponse extends ApiResponse<never> {
+  success: false;
   error: string;
-  timestamp: string;
+  code?: string;
+  details?: any;
 }

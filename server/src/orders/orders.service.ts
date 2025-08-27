@@ -4,9 +4,11 @@ import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersRepository } from './orders.repository';
+import { IOrderService } from 'src/common/interfaces/service.interface';
+import { OrderItem } from 'src/common/interfaces/order-item.interface';
 
 @Injectable()
-export class OrdersService {
+export class OrdersService implements IOrderService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
   ) {}
@@ -96,7 +98,7 @@ export class OrdersService {
     return await this.ordersRepository.updateOrder(order);
   }
 
-  private haveItemsChanged(currentItems: any[], newItems: any[]): boolean {
+  private haveItemsChanged(currentItems: OrderItem[], newItems: OrderItem[]): boolean {
     // Если количество товаров разное, значит товары изменились
     if (currentItems.length !== newItems.length) {
       return true;

@@ -4,9 +4,10 @@ import { RefreshToken } from './entity/refresh-token.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from '../auth.repository';
+import { IAuthService } from 'src/common/interfaces/service.interface';
 
 @Injectable()
-export class LoginService {
+export class LoginService implements IAuthService {
     constructor(
         private readonly authRepository: AuthRepository,
         private jwtService: JwtService,
