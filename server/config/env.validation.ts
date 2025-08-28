@@ -66,9 +66,12 @@ export const envValidationSchema = Joi.object({
   // JWT AUTHENTICATION
   // ========================================
   JWT_SECRET: Joi.string()
-    .min(32)
-    .required()
-    .description('JWT secret key (min 32 characters)'),
+    .when('NODE_ENV', {
+      is: 'production',
+      then: Joi.string().min(32).required(),
+      otherwise: Joi.string().min(1).default('dev_jwt_secret_please_change_to_secure_32_chars_min'),
+    })
+    .description('JWT secret key'),
 
   JWT_ACCESS_EXPIRES_IN: Joi.string()
     .default('15m')
@@ -207,9 +210,12 @@ export const envValidationSchema = Joi.object({
     .description('BCrypt rounds'),
 
   SESSION_SECRET: Joi.string()
-    .min(32)
-    .default('fallback_session_secret_change_in_production')
-    .description('Session secret (min 32 characters)'),
+    .when('NODE_ENV', {
+      is: 'production',
+      then: Joi.string().min(32).required(),
+      otherwise: Joi.string().min(1).default('dev_session_secret_please_change_to_secure_32_chars'),
+    })
+    .description('Session secret'),
 });
 
 // ========================================

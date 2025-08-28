@@ -9,9 +9,9 @@ export class RefreshToken {
     @Column()
     token: string;
 
-    @ManyToOne(() => User, user => user.refreshTokens)
+    @ManyToOne(() => User, user => user.refreshTokens, { onDelete: 'CASCADE' })
     user: User;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+    @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP + interval '30 days'" })
+    expiresAt: Date;
 }
