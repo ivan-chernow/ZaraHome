@@ -3,37 +3,41 @@ import { ConfigService as NestConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigService {
-  constructor(private readonly configService: NestConfigService) {}
+  private readonly nestConfigService: NestConfigService;
+
+  constructor(nestConfigService: NestConfigService) {
+    this.nestConfigService = nestConfigService;
+  }
 
   // ========================================
   // APPLICATION CONFIG
   // ========================================
   get nodeEnv(): string {
-    return this.configService.get<string>('app.nodeEnv')!;
+    return this.nestConfigService.get<string>('app.nodeEnv')!;
   }
 
   get port(): number {
-    return this.configService.get<number>('app.port')!;
+    return this.nestConfigService.get<number>('app.port')!;
   }
 
   get apiPrefix(): string {
-    return this.configService.get<string>('app.apiPrefix')!;
+    return this.nestConfigService.get<string>('app.apiPrefix')!;
   }
 
   get globalPrefix(): string {
-    return this.configService.get<string>('app.globalPrefix')!;
+    return this.nestConfigService.get<string>('app.globalPrefix')!;
   }
 
   get isDevelopment(): boolean {
-    return this.configService.get<boolean>('app.isDevelopment')!;
+    return this.nestConfigService.get<boolean>('app.isDevelopment')!;
   }
 
   get isProduction(): boolean {
-    return this.configService.get<boolean>('app.isProduction')!;
+    return this.nestConfigService.get<boolean>('app.isProduction')!;
   }
 
   get isTest(): boolean {
-    return this.configService.get<boolean>('app.isTest')!;
+    return this.nestConfigService.get<boolean>('app.isTest')!;
   }
 
   // ========================================
@@ -41,16 +45,16 @@ export class ConfigService {
   // ========================================
   get database() {
     return {
-      host: this.configService.get<string>('database.host')!,
-      port: this.configService.get<number>('database.port')!,
-      username: this.configService.get<string>('database.username')!,
-      password: this.configService.get<string>('database.password')!,
-      database: this.configService.get<string>('database.database')!,
-      synchronize: this.configService.get<boolean>('database.synchronize')!,
-      logging: this.configService.get<boolean>('database.logging')!,
-      migrationsRun: this.configService.get<boolean>('database.migrationsRun')!,
-      entities: this.configService.get<string[]>('database.entities')!,
-      migrations: this.configService.get<string[]>('database.migrations')!,
+      host: this.nestConfigService.get<string>('database.host')!,
+      port: this.nestConfigService.get<number>('database.port')!,
+      username: this.nestConfigService.get<string>('database.username')!,
+      password: this.nestConfigService.get<string>('database.password')!,
+      database: this.nestConfigService.get<string>('database.database')!,
+      synchronize: this.nestConfigService.get<boolean>('database.synchronize')!,
+      logging: this.nestConfigService.get<boolean>('database.logging')!,
+      migrationsRun: this.nestConfigService.get<boolean>('database.migrationsRun')!,
+      entities: this.nestConfigService.get<string[]>('database.entities')!,
+      migrations: this.nestConfigService.get<string[]>('database.migrations')!,
     };
   }
 
@@ -59,9 +63,9 @@ export class ConfigService {
   // ========================================
   get jwt() {
     return {
-      secret: this.configService.get<string>('jwt.secret')!,
-      accessExpiresIn: this.configService.get<string>('jwt.accessExpiresIn')!,
-      refreshExpiresIn: this.configService.get<string>('jwt.refreshExpiresIn')!,
+      secret: this.nestConfigService.get<string>('jwt.secret')!,
+      accessExpiresIn: this.nestConfigService.get<string>('jwt.accessExpiresIn')!,
+      refreshExpiresIn: this.nestConfigService.get<string>('jwt.refreshExpiresIn')!,
     };
   }
 
@@ -70,8 +74,8 @@ export class ConfigService {
   // ========================================
   get admin() {
     return {
-      email: this.configService.get<string>('admin.email')!,
-      password: this.configService.get<string>('admin.password')!,
+      email: this.nestConfigService.get<string>('admin.email')!,
+      password: this.nestConfigService.get<string>('admin.password')!,
     };
   }
 
@@ -80,12 +84,12 @@ export class ConfigService {
   // ========================================
   get email() {
     return {
-      host: this.configService.get<string>('email.host')!,
-      port: this.configService.get<number>('email.port')!,
-      user: this.configService.get<string>('email.user')!,
-      pass: this.configService.get<string>('email.pass')!,
-      from: this.configService.get<string>('email.from')!,
-      secure: this.configService.get<boolean>('email.secure')!,
+      host: this.nestConfigService.get<string>('email.host')!,
+      port: this.nestConfigService.get<number>('email.port')!,
+      user: this.nestConfigService.get<string>('email.user')!,
+      pass: this.nestConfigService.get<string>('email.pass')!,
+      from: this.nestConfigService.get<string>('email.from')!,
+      secure: this.nestConfigService.get<boolean>('email.secure')!,
     };
   }
 
@@ -94,9 +98,9 @@ export class ConfigService {
   // ========================================
   get fileUpload() {
     return {
-      maxFileSize: this.configService.get<number>('fileUpload.maxFileSize')!,
-      allowedFileTypes: this.configService.get<string[]>('fileUpload.allowedFileTypes')!,
-      uploadPath: this.configService.get<string>('fileUpload.uploadPath')!,
+      maxFileSize: this.nestConfigService.get<number>('fileUpload.maxFileSize')!,
+      allowedFileTypes: this.nestConfigService.get<string[]>('fileUpload.allowedFileTypes')!,
+      uploadPath: this.nestConfigService.get<string>('fileUpload.uploadPath')!,
     };
   }
 
@@ -105,8 +109,8 @@ export class ConfigService {
   // ========================================
   get cache() {
     return {
-      ttlDefault: this.configService.get<number>('cache.ttlDefault')!,
-      maxKeys: this.configService.get<number>('cache.maxKeys')!,
+      ttlDefault: this.nestConfigService.get<number>('cache.ttlDefault')!,
+      maxKeys: this.nestConfigService.get<number>('cache.maxKeys')!,
     };
   }
 
@@ -115,8 +119,8 @@ export class ConfigService {
   // ========================================
   get rateLimit() {
     return {
-      ttl: this.configService.get<number>('rateLimit.ttl')!,
-      maxRequests: this.configService.get<number>('rateLimit.maxRequests')!,
+      ttl: this.nestConfigService.get<number>('rateLimit.ttl')!,
+      maxRequests: this.nestConfigService.get<number>('rateLimit.maxRequests')!,
     };
   }
 
@@ -125,8 +129,8 @@ export class ConfigService {
   // ========================================
   get cors() {
     return {
-      origin: this.configService.get<string | string[]>('cors.origin')!,
-      credentials: this.configService.get<boolean>('cors.credentials')!,
+      origin: this.nestConfigService.get<string | string[]>('cors.origin')!,
+      credentials: this.nestConfigService.get<boolean>('cors.credentials')!,
     };
   }
 
@@ -135,10 +139,10 @@ export class ConfigService {
   // ========================================
   get logging() {
     return {
-      level: this.configService.get<string>('logging.level')!,
-      filePath: this.configService.get<string>('logging.filePath')!,
-      maxSize: this.configService.get<string>('logging.maxSize')!,
-      maxFiles: this.configService.get<string>('logging.maxFiles')!,
+      level: this.nestConfigService.get<string>('logging.level')!,
+      filePath: this.nestConfigService.get<string>('logging.filePath')!,
+      maxSize: this.nestConfigService.get<string>('logging.maxSize')!,
+      maxFiles: this.nestConfigService.get<string>('logging.maxFiles')!,
     };
   }
 
@@ -147,8 +151,8 @@ export class ConfigService {
   // ========================================
   get security() {
     return {
-      bcryptRounds: this.configService.get<number>('security.bcryptRounds')!,
-      sessionSecret: this.configService.get<string>('security.sessionSecret')!,
+      bcryptRounds: this.nestConfigService.get<number>('security.bcryptRounds')!,
+      sessionSecret: this.nestConfigService.get<string>('security.sessionSecret')!,
     };
   }
 
@@ -157,11 +161,11 @@ export class ConfigService {
   // ========================================
   get environment() {
     if (this.isDevelopment) {
-      return this.configService.get('development');
+      return this.nestConfigService.get('development');
     } else if (this.isProduction) {
-      return this.configService.get('production');
+      return this.nestConfigService.get('production');
     } else if (this.isTest) {
-      return this.configService.get('test');
+      return this.nestConfigService.get('test');
     }
     return {};
   }
@@ -170,11 +174,11 @@ export class ConfigService {
   // UTILITY METHODS
   // ========================================
   get<T>(key: string): T | undefined {
-    return this.configService.get<T>(key);
+    return this.nestConfigService.get<T>(key);
   }
 
   getOrThrow<T>(key: string): T {
-    const value = this.configService.get<T>(key);
+    const value = this.nestConfigService.get<T>(key);
     if (value === undefined) {
       throw new Error(`Configuration key "${key}" is required but not set`);
     }
@@ -188,7 +192,7 @@ export class ConfigService {
     const missingKeys: string[] = [];
     
     for (const key of keys) {
-      if (!this.configService.get(key)) {
+      if (!this.nestConfigService.get(key)) {
         missingKeys.push(key);
       }
     }
