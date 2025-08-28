@@ -4,7 +4,7 @@ import { ResetPassword } from './entity/reset-password.entity';
 import { ResetPasswordService } from './reset-password.service';
 import { ResetPasswordController } from './reset-password.controller';
 import { EmailModule } from 'src/email/email.module';
-import { User } from 'src/users/user/entity/user.entity';
+import { User } from '../../users/user/entity/user.entity';
 import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({

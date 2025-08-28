@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { EmailService } from '../../email/email.service';
 import { ResetPassword } from './entity/reset-password.entity';
-import { User } from 'src/users/user/entity/user.entity';
+import { User } from '../../users/user/entity/user.entity';
 import { UserRole } from 'src/common/enums/user-role.enum';
 
 @Injectable()

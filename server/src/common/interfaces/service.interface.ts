@@ -18,7 +18,7 @@ export interface IProductService extends IBaseService<unknown> {
   findByIds(_ids: number[]): Promise<unknown[]>;
 }
 
-import { ChangePasswordDto, ProfileDto, ChangeDeliveryAddressDto } from 'src/users/user/dto/user.dto';
+import { ChangePasswordDto, ProfileDto, ChangeDeliveryAddressDto } from '../../users/user/dto/user.dto';
 
 export interface IUserService extends IBaseService<unknown> {
   findOne(_userId: number): Promise<unknown>;

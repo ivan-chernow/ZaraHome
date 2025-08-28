@@ -1,18 +1,20 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { Injectable, Logger } from '@nestjs/common';
 
 export interface CacheOptions {
   ttl?: number; // время жизни в секундах
   prefix?: string; // префикс для ключа
 }
 
+interface CacheItem<T> {
+  value: T;
+  expiresAt: number;
+}
+
 @Injectable()
 export class CacheService {
   private readonly logger = new Logger(CacheService.name);
   private readonly defaultTTL = 3600; // 1 час
-
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  private readonly cache = new Map<string, CacheItem<any>>();
 
   /**
    * Получить значение из кеша
@@ -20,15 +22,22 @@ export class CacheService {
   async get<T>(key: string, prefix?: string): Promise<T | null> {
     try {
       const fullKey = this.buildKey(key, prefix);
-      const value = await this.cacheManager.get<T>(fullKey);
+      const item = this.cache.get(fullKey);
       
-      if (value !== undefined) {
-        this.logger.debug(`Cache HIT: ${fullKey}`);
-        return value;
+      if (!item) {
+        this.logger.debug(`Cache MISS: ${fullKey}`);
+        return null;
       }
-      
-      this.logger.debug(`Cache MISS: ${fullKey}`);
-      return null;
+
+      // Проверяем TTL
+      if (Date.now() > item.expiresAt) {
+        this.cache.delete(fullKey);
+        this.logger.debug(`Cache EXPIRED: ${fullKey}`);
+        return null;
+      }
+
+      this.logger.debug(`Cache HIT: ${fullKey}`);
+      return item.value;
     } catch (error) {
       this.logger.error(`Error getting cache key ${key}:`, error.message);
       return null;
@@ -42,8 +51,9 @@ export class CacheService {
     try {
       const fullKey = this.buildKey(key, options?.prefix);
       const ttl = options?.ttl || this.defaultTTL;
+      const expiresAt = Date.now() + (ttl * 1000);
       
-      await this.cacheManager.set(fullKey, value, ttl);
+      this.cache.set(fullKey, { value, expiresAt });
       this.logger.debug(`Cache SET: ${fullKey} (TTL: ${ttl}s)`);
     } catch (error) {
       this.logger.error(`Error setting cache key ${key}:`, error.message);
@@ -56,7 +66,7 @@ export class CacheService {
   async delete(key: string, prefix?: string): Promise<void> {
     try {
       const fullKey = this.buildKey(key, prefix);
-      await this.cacheManager.del(fullKey);
+      this.cache.delete(fullKey);
       this.logger.debug(`Cache DELETE: ${fullKey}`);
     } catch (error) {
       this.logger.error(`Error deleting cache key ${key}:`, error.message);
@@ -68,10 +78,16 @@ export class CacheService {
    */
   async deleteByPrefix(prefix: string): Promise<void> {
     try {
-      // В Redis можно использовать SCAN для поиска ключей по паттерну
-      // Для простоты используем внутренний метод
-      await this.cacheManager.store.reset();
-      this.logger.debug(`Cache CLEAR by prefix: ${prefix}`);
+      const keysToDelete: string[] = [];
+      
+      for (const key of this.cache.keys()) {
+        if (key.startsWith(`${prefix}:`)) {
+          keysToDelete.push(key);
+        }
+      }
+      
+      keysToDelete.forEach(key => this.cache.delete(key));
+      this.logger.debug(`Cache CLEAR by prefix: ${prefix} (${keysToDelete.length} keys)`);
     } catch (error) {
       this.logger.error(`Error clearing cache by prefix ${prefix}:`, error.message);
     }
@@ -101,9 +117,8 @@ export class CacheService {
    */
   async invalidatePattern(pattern: string): Promise<void> {
     try {
-      // В реальной реализации здесь была бы логика поиска ключей по паттерну
-      // Для простоты очищаем весь кеш
-      await this.cacheManager.reset();
+      // Упрощенная реализация - очищаем весь кеш
+      this.cache.clear();
       this.logger.debug(`Cache INVALIDATE pattern: ${pattern}`);
     } catch (error) {
       this.logger.error(`Error invalidating cache pattern ${pattern}:`, error.message);
@@ -115,14 +130,13 @@ export class CacheService {
    */
   async getStats(): Promise<{ keys: number; memory: string }> {
     try {
-      // В Redis можно получить реальную статистику
-      return {
-        keys: 0, // TODO: реализовать подсчет ключей
-        memory: '0 MB', // TODO: реализовать подсчет памяти
-      };
+      const keys = this.cache.size;
+      const memory = `${Math.round(keys * 0.1)} KB`; // Примерная оценка
+      
+      return { keys, memory };
     } catch (error) {
       this.logger.error('Error getting cache stats:', error.message);
-      return { keys: 0, memory: '0 MB' };
+      return { keys: 0, memory: '0 KB' };
     }
   }
 
@@ -131,7 +145,7 @@ export class CacheService {
    */
   async clear(): Promise<void> {
     try {
-      await this.cacheManager.reset();
+      this.cache.clear();
       this.logger.debug('Cache CLEAR: all');
     } catch (error) {
       this.logger.error('Error clearing cache:', error.message);
@@ -153,11 +167,37 @@ export class CacheService {
    */
   async isHealthy(): Promise<boolean> {
     try {
-      await this.cacheManager.get('health-check');
-      return true;
+      // Простая проверка - пробуем записать и прочитать тестовое значение
+      const testKey = 'health-check';
+      const testValue = { timestamp: Date.now() };
+      
+      await this.set(testKey, testValue, { ttl: 60 });
+      const result = await this.get(testKey);
+      
+      return result !== null;
     } catch (error) {
       this.logger.error('Cache health check failed:', error.message);
       return false;
+    }
+  }
+
+  /**
+   * Очистить истекшие ключи
+   */
+  private cleanupExpiredKeys(): void {
+    const now = Date.now();
+    const keysToDelete: string[] = [];
+    
+    for (const [key, item] of this.cache.entries()) {
+      if (now > item.expiresAt) {
+        keysToDelete.push(key);
+      }
+    }
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+    
+    if (keysToDelete.length > 0) {
+      this.logger.debug(`Cleaned up ${keysToDelete.length} expired cache keys`);
     }
   }
 }

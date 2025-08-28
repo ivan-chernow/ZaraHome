@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { EmailService } from '../../email/email.service';
 import { EmailVerification } from 'src/email/entity/email-verification.entity';
-import { User } from 'src/users/user/entity/user.entity';
+import { User } from '../../users/user/entity/user.entity';
 
 @Injectable()
 export class RegistrationService {

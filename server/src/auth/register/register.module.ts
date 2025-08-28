@@ -4,7 +4,7 @@ import { EmailVerification } from 'src/email/entity/email-verification.entity';
 import { RegistrationService } from './register.service';
 import { EmailModule } from 'src/email/email.module';
 import { RegistrationController } from './register.controller';
-import { User } from 'src/users/user/entity/user.entity';
+import { User } from '../../users/user/entity/user.entity';
 import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({

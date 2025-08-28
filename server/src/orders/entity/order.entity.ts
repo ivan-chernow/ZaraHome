@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { User } from "src/users/user/entity/user.entity";
+import { User } from "../../users/user/entity/user.entity";
 import { OrderItem } from "src/common/interfaces/order-item.interface";
 import { OrderStatus } from "src/common/enums/order-status.enum";
 

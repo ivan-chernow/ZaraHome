@@ -5,17 +5,19 @@ import { UserRepository } from './user/user.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
-import { Product } from 'src/products/entity/products.entity';
-import { ProductsModule } from 'src/products/products.module';
+import { Product } from '../products/entity/products.entity';
+import { ProductsModule } from '../products/products.module';
 import { User } from './user/entity/user.entity';
 import { DeliveryAddress } from './user/entity/delivery-address.entity';
-import { SharedModule } from 'src/shared/modules/shared.module';
+import { SharedModule } from '../shared/modules/shared.module';
+import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User, DeliveryAddress, Product]),
         ProductsModule,
-        SharedModule
+        SharedModule,
+        AppCacheModule
     ],
     controllers: [UserController, AdminController],
     providers: [UserService, UserRepository, AdminService],

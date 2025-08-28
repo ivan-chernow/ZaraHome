@@ -3,11 +3,11 @@ import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { AdminService } from './admin.service';
-import { ResponseService } from 'src/shared/services/response.service';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { ResponseService } from '../../shared/services/response.service';
+import { UserRole } from '../../common/enums/user-role.enum';
 import { UserService } from '../user/user.service';
-import { ImagesUploadInterceptor } from 'src/shared/upload/file-upload.helper';
-import { CreateProductDto } from 'src/products/dto/create-product.dto';
+import { ImagesUploadInterceptor } from '../../shared/upload/file-upload.helper';
+import { CreateProductDto } from '../../products/dto/create-product.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)

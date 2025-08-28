@@ -4,7 +4,7 @@ import { OrdersService } from './orders.service';
 import { OrdersRepository } from './orders.repository';
 import { OrdersController } from './orders.controller';
 import { Order } from './entity/order.entity';
-import { User } from 'src/users/user/entity/user.entity';
+import { User } from '../users/user/entity/user.entity';
 import { SharedModule } from '../shared/modules/shared.module';
 
 @Module({

@@ -3,15 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/entity/user.entity';
-import { UserRole } from 'src/common/enums/user-role.enum';
-import { CreateProductDto } from 'src/products/dto/create-product.dto';
-import { ProductsService } from 'src/products/products.service';
+import { UserRole } from '../../common/enums/user-role.enum';
+import { CreateProductDto } from '../../products/dto/create-product.dto';
+import { ProductsService } from '../../products/products.service';
 import { ConfigService } from '@nestjs/config';
-import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
-import { IAdminService } from 'src/common/interfaces/service.interface';
-import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
-import { FileUploadErrorHandlerService } from 'src/shared/services/file-upload-error-handler.service';
-import { UploadMonitoringService } from 'src/shared/services/upload-monitoring.service';
+import { ImageOptimizationService } from '../../shared/services/image-optimization.service';
+import { IAdminService } from '../../common/interfaces/service.interface';
+import { validateUploadedFiles } from '../../shared/upload/file-upload.helper';
+import { FileUploadErrorHandlerService } from '../../shared/services/file-upload-error-handler.service';
+import { UploadMonitoringService } from '../../shared/services/upload-monitoring.service';
 
 @Injectable()
 export class AdminService implements OnModuleInit, IAdminService {

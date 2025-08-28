@@ -5,7 +5,6 @@ import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { CacheService } from './cache.service';
-import { ResponseService } from '../services/response.service';
 
 @ApiTags('cache')
 @Controller('cache')
@@ -15,7 +14,6 @@ import { ResponseService } from '../services/response.service';
 export class CacheController {
   constructor(
     private readonly cacheService: CacheService,
-    private readonly responseService: ResponseService,
   ) {}
 
   @Get('health')
@@ -23,10 +21,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Статус кеша получен' })
   async getHealth() {
     const isHealthy = await this.cacheService.isHealthy();
-    return this.responseService.success(
-      { isHealthy },
-      isHealthy ? 'Кеш работает нормально' : 'Проблемы с кешем'
-    );
+    return {
+      success: true,
+      data: { isHealthy },
+      message: isHealthy ? 'Кеш работает нормально' : 'Проблемы с кешем'
+    };
   }
 
   @Get('stats')
@@ -34,7 +33,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Статистика кеша получена' })
   async getStats() {
     const stats = await this.cacheService.getStats();
-    return this.responseService.success(stats, 'Статистика кеша получена');
+    return {
+      success: true,
+      data: stats,
+      message: 'Статистика кеша получена'
+    };
   }
 
   @Delete('clear')
@@ -42,7 +45,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Кеш очищен' })
   async clearCache() {
     await this.cacheService.clear();
-    return this.responseService.success(null, 'Весь кеш очищен');
+    return {
+      success: true,
+      data: null,
+      message: 'Весь кеш очищен'
+    };
   }
 
   @Delete('products')
@@ -50,7 +57,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Кеш продуктов очищен' })
   async clearProductsCache() {
     await this.cacheService.deleteByPrefix('products');
-    return this.responseService.success(null, 'Кеш продуктов очищен');
+    return {
+      success: true,
+      data: null,
+      message: 'Кеш продуктов очищен'
+    };
   }
 
   @Delete('categories')
@@ -58,7 +69,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Кеш категорий очищен' })
   async clearCategoriesCache() {
     await this.cacheService.deleteByPrefix('categories');
-    return this.responseService.success(null, 'Кеш категорий очищен');
+    return {
+      success: true,
+      data: null,
+      message: 'Кеш категорий очищен'
+    };
   }
 
   @Delete('cart')
@@ -66,7 +81,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Кеш корзин очищен' })
   async clearCartCache() {
     await this.cacheService.deleteByPrefix('cart');
-    return this.responseService.success(null, 'Кеш корзин очищен');
+    return {
+      success: true,
+      data: null,
+      message: 'Кеш корзин очищен'
+    };
   }
 
   @Delete('favorites')
@@ -74,7 +93,11 @@ export class CacheController {
   @ApiOkResponse({ description: 'Кеш избранного очищен' })
   async clearFavoritesCache() {
     await this.cacheService.deleteByPrefix('favorites');
-    return this.responseService.success(null, 'Кеш избранного очищен');
+    return {
+      success: true,
+      data: null,
+      message: 'Кеш избранного очищен'
+    };
   }
 
   @Delete('promocodes')
@@ -82,6 +105,10 @@ export class CacheController {
   @ApiOkResponse({ description: 'Кеш промокодов очищен' })
   async clearPromocodesCache() {
     await this.cacheService.deleteByPrefix('promocodes');
-    return this.responseService.success(null, 'Кеш промокодов очищен');
+    return {
+      success: true,
+      data: null,
+      message: 'Кеш промокодов очищен'
+    };
   }
 }

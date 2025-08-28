@@ -6,7 +6,7 @@ import { LoginController } from './login.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt/jwt.strategy';
-import { User } from 'src/users/user/entity/user.entity';
+import { User } from '../../users/user/entity/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthRepository } from '../auth.repository';
 import { SharedModule } from 'src/shared/modules/shared.module';
