@@ -79,8 +79,9 @@ async function bootstrap() {
       .build();
     
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
-    
+    // Страница документации будет по /api/docs (один раз префикс)
+    SwaggerModule.setup('docs', app, document);
+
     console.log('📚 Swagger documentation available at /api/docs');
   }
 
