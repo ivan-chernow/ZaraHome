@@ -13,7 +13,29 @@ async function bootstrap() {
 
   // Проверяем обязательные переменные
   try {
-    configService.validateRequired(['JWT_SECRET', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE']);
+    // Проверяем обязательные ключи конфигурации (namespaced ключи из registerAs)
+    configService.validateRequired([
+      'jwt.secret',
+      'database.username',
+      'database.password',
+      'database.database',
+    ]);
+
+    // Дополнительная защита: длина JWT секретного ключа
+    const jwtSecret = configService.jwt.secret;
+    if (!jwtSecret || jwtSecret.length < 32) {
+      throw new Error('JWT secret must be at least 32 characters long');
+    }
+
+    // Защита для production: запрет dev-настроек
+    if (configService.isProduction) {
+      if (configService.database.synchronize) {
+        throw new Error('Database synchronize must be disabled in production');
+      }
+      if (configService.nodeEnv !== 'production') {
+        throw new Error('NODE_ENV must be "production" for production builds');
+      }
+    }
     console.log('✅ Configuration validation passed');
   } catch (error) {
     console.error('❌ Configuration validation failed:', error.message);
