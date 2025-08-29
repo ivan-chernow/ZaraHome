@@ -38,6 +38,7 @@ export class BaseUpdateDto {
 /**
  * Базовый DTO для пагинации
  */
+
 export class PaginationDto {
   // @ApiPropertyOptional({ description: 'Номер страницы', default: 1, minimum: 1 })
   @IsOptional()
