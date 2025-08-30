@@ -1,8 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Index, CreateDateColumn } from 'typeorm';
 import { User } from '../../users/user/entity/user.entity';
 import { Product } from '../../products/entity/products.entity';
 
 @Entity('favorites')
+@Index(['user', 'product'], { unique: true }) // Уникальный индекс для предотвращения дублирования
+@Index(['user']) // Индекс для быстрого поиска по пользователю
+@Index(['product']) // Индекс для быстрого поиска по продукту
 export class Favorite {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,4 +17,7 @@ export class Favorite {
   @ManyToOne(() => Product, product => product.favoritedBy, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_id' })
   product: Product;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }
