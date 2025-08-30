@@ -6,6 +6,7 @@ import * as crypto from 'crypto';
 import { EmailService } from '../../email/email.service';
 import { EmailVerification } from 'src/email/entity/email-verification.entity';
 import { User } from '../../users/user/entity/user.entity';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 @Injectable()
 export class RegistrationService {
@@ -115,7 +116,7 @@ export class RegistrationService {
         email: verification.email,
         password: hashedPassword,
         isEmailVerified: true,
-        role: 'user',
+        role: UserRole.USER,
       });
     } else {
       user.password = hashedPassword;
