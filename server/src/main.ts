@@ -4,9 +4,11 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '../config/config.service';
 import { getCorsConfig } from '../config/cors.config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Получаем сервис конфигурации
   const configService = app.get(ConfigService);
@@ -54,7 +56,10 @@ async function bootstrap() {
   const corsConfig = getCorsConfig(configService);
   app.enableCors(corsConfig);
 
-
+  // Настройка статических файлов для раздачи изображений
+  app.useStaticAssets(join(__dirname, '..', '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   // Глобальная валидация
   app.useGlobalPipes(
