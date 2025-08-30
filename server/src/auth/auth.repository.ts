@@ -4,25 +4,36 @@ import { Repository } from 'typeorm';
 import { User } from '../users/user/entity/user.entity';
 import { RefreshToken } from './login/entity/refresh-token.entity';
 
+/**
+  Репозиторий для работы с аутентификацией
+  Централизует все операции с пользователями и токенами
+ */
 @Injectable()
 export class AuthRepository {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
     @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>,
+    private readonly refreshTokenRepository: Repository<RefreshToken>,
   ) {}
 
+
   async findUserByEmail(email: string): Promise<User | null> {
+    const normalizedEmail = email.toLowerCase().trim();
+    
     return this.userRepository.findOne({
-      where: { email: email.toLowerCase().trim() },
-      select: ['id', 'email', 'password', 'isEmailVerified', 'role']
+      where: { email: normalizedEmail },
+      select: ['id', 'email', 'password', 'isEmailVerified', 'role'],
     });
   }
 
+
   async findUserById(userId: number): Promise<User | null> {
-    return this.userRepository.findOne({ where: { id: userId } });
+    return this.userRepository.findOne({ 
+      where: { id: userId } 
+    });
   }
+
 
   async findRefreshTokenByUser(userId: number): Promise<RefreshToken | null> {
     return this.refreshTokenRepository.findOne({ 
@@ -30,21 +41,47 @@ export class AuthRepository {
     });
   }
 
+
   async findRefreshTokenByToken(token: string, userId: number): Promise<RefreshToken | null> {
     return this.refreshTokenRepository.findOne({ 
       where: { token, user: { id: userId } } 
     });
   }
 
+
   async deleteRefreshTokenByUser(userId: number): Promise<void> {
-    await this.refreshTokenRepository.delete({ user: { id: userId } });
+    await this.refreshTokenRepository.delete({ 
+      user: { id: userId } 
+    });
   }
+
 
   async deleteRefreshTokenByToken(token: string): Promise<void> {
     await this.refreshTokenRepository.delete({ token });
   }
 
-  async saveRefreshToken(token: string, user: User, expiresAt: Date): Promise<RefreshToken> {
-    return this.refreshTokenRepository.save({ token, user, expiresAt });
+ 
+  async saveRefreshToken(
+    token: string, 
+    user: User, 
+    expiresAt: Date
+  ): Promise<RefreshToken> {
+    const refreshToken = this.refreshTokenRepository.create({
+      token,
+      user,
+      expiresAt,
+    });
+    
+    return this.refreshTokenRepository.save(refreshToken);
+  }
+
+
+  async isUserExists(email: string): Promise<boolean> {
+    const normalizedEmail = email.toLowerCase().trim();
+    const count = await this.userRepository.count({
+      where: { email: normalizedEmail }
+    });
+    
+    return count > 0;
   }
 }
