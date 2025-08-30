@@ -1,34 +1,22 @@
-import { IsString, IsNumber, IsOptional, IsDateString, Min, Max, Length } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsBoolean, IsDateString, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { PROMOCODES_CONSTANTS } from '../promocodes.constants';
 
-export class CreatePromocodeDto {
-  @ApiProperty({
-    description: 'Код промокода',
-    example: 'SUMMER15',
-    minLength: 3,
-    maxLength: 20
-  })
-  @IsString({ message: 'Код промокода должен быть строкой' })
-  @Length(
-    PROMOCODES_CONSTANTS.MIN_CODE_LENGTH, 
-    PROMOCODES_CONSTANTS.MAX_CODE_LENGTH, 
-    { message: `Код промокода должен содержать от ${PROMOCODES_CONSTANTS.MIN_CODE_LENGTH} до ${PROMOCODES_CONSTANTS.MAX_CODE_LENGTH} символов` }
-  )
-  code: string;
-
+export class UpdatePromocodeDto {
   @ApiProperty({
     description: 'Размер скидки в процентах',
     example: 15,
+    required: false,
     minimum: 1,
     maximum: 100
   })
+  @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Скидка должна быть числом' })
   @Min(PROMOCODES_CONSTANTS.MIN_DISCOUNT, { message: 'Скидка должна быть не менее 1%' })
   @Max(PROMOCODES_CONSTANTS.MAX_DISCOUNT, { message: 'Скидка не может превышать 100%' })
-  discount: number;
+  discount?: number;
 
   @ApiProperty({
     description: 'Максимальное количество использований',
@@ -72,4 +60,13 @@ export class CreatePromocodeDto {
   @IsOptional()
   @IsString({ message: 'Описание должно быть строкой' })
   description?: string;
+
+  @ApiProperty({
+    description: 'Активен ли промокод',
+    example: true,
+    required: false
+  })
+  @IsOptional()
+  @IsBoolean({ message: 'Статус активности должен быть булевым значением' })
+  isActive?: boolean;
 }
