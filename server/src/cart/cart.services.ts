@@ -2,11 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { UserService } from '../users/user/user.service';
 import { ProductsService } from '../products/products.service';
-import { 
-  ICartService, 
-  ICartItem, 
-  ICartItemWithProduct
-} from '../common/interfaces';
+import { ICartService } from '../common/interfaces/service.interface';
+import { ICartItem, ICartItemWithProduct } from '../common/interfaces/cart-favorites.interface';
 import { CacheService } from '../shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES } from '../shared/cache/cache.constants';
 
