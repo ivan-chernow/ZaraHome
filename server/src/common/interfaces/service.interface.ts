@@ -59,7 +59,7 @@ import { UpdateOrderDto } from 'src/orders/dto/update-order.dto';
 
 export interface IOrderService {
   createOrder(_createOrderDto: CreateOrderDto, _userId: number): Promise<Order>;
-  getUserOrders(_userId: number): Promise<Order[]>;
+  getUserOrders(_userId: number, _page?: number, _limit?: number): Promise<unknown>;
   getActiveOrder(_userId: number): Promise<Order | null>;
   getOrderById(_orderId: number, _userId: number): Promise<Order | null>;
   updateOrderStatus(_orderId: number, _status: OrderStatus, _userId: number): Promise<Order>;

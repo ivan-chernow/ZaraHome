@@ -13,6 +13,8 @@ export const CACHE_TTL = {
   USER_CART: 1800, // 30 минут
   USER_FAVORITES: 3600, // 1 час
   USER_PROFILE: 1800, // 30 минут
+  USER: 1800, // 30 минут
+  ORDERS: 1800, // 30 минут
   
   // Справочники (изменяются редко)
   PROMOCODES: 900, // 15 минут
@@ -36,6 +38,8 @@ export const CACHE_PREFIXES = {
   USER_CART: 'cart',
   USER_FAVORITES: 'favorites',
   USER_PROFILE: 'profile',
+  USER: 'user',
+  ORDERS: 'orders',
   PROMOCODES: 'promocodes',
   DELIVERY: 'delivery',
   SESSION: 'session',
