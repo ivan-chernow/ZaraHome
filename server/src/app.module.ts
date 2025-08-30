@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
@@ -14,6 +13,7 @@ import { ConfigModule } from '../config/config.module';
 import { DatabaseConfigModule } from '../config/database/database-config.module';
 import { JwtConfigModule } from '../config/jwt/jwt-config.module';
 import { RateLimitConfigModule } from '../config/rate-limit/rate-limit-config.module';
+import { ConditionalThrottlerGuard } from './shared/guards/conditional-throttler.guard';
 
 @Module({
     imports: [
@@ -34,7 +34,7 @@ import { RateLimitConfigModule } from '../config/rate-limit/rate-limit-config.mo
     providers: [
         {
             provide: APP_GUARD,
-            useClass: ThrottlerGuard
+            useClass: ConditionalThrottlerGuard
         }
     ],
 })

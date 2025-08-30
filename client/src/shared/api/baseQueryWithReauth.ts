@@ -27,6 +27,14 @@ export const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
+  // Обработка ошибки 429 (Too Many Requests)
+  if (result.error && result.error.status === 429) {
+    console.warn('Rate limit exceeded, retrying after delay...');
+    // Ждем 2 секунды перед повторной попыткой
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    result = await baseQuery(args, api, extraOptions);
+  }
+
   if (result.error && result.error.status === 401) {
     console.log('Unauthorized request, attempting token refresh...');
     const state: any = api.getState?.();

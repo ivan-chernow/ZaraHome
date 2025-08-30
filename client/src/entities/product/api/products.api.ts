@@ -65,13 +65,21 @@ export const productsApi = createApi({
 		endpoints: (builder) => ({
 				getCatalog: builder.query<Category[], void>({
 						query: () => '/products/catalog',
-						providesTags: ['Products']
+						transformResponse: (response: { success: boolean; data: Category[]; message: string }) => {
+							return response.data;
+						},
+						providesTags: ['Products'],
+						keepUnusedDataFor: 300, // Кешируем на 5 минут
+						staleTime: 300000, // Данные считаются свежими 5 минут
 				}),
 				getProductsByIds: builder.query<Product[], number[]>({
 					query: (ids: number[]) => ({
 						url: `/products?ids=${ids.join(',')}`,
 						method: 'GET',
 					}),
+					transformResponse: (response: { success: boolean; data: Product[]; message: string }) => {
+						return response.data;
+					},
 				}),
 				addProduct: builder.mutation<Product, CreateProductDto>({
 						query: (product: CreateProductDto) => ({
@@ -79,6 +87,9 @@ export const productsApi = createApi({
 								method: 'POST',
 								body: product
 						}),
+						transformResponse: (response: { success: boolean; data: Product; message: string }) => {
+							return response.data;
+						},
 						invalidatesTags: ['Products']
 				}),
 		})

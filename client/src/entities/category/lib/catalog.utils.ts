@@ -33,9 +33,18 @@ export function getProductsByType(type?: Type): Product[] {
 }
 
 export function getAllProducts(categories?: Category[]): Product[] {
+  console.log('getAllProducts called with:', categories);
+  
   if (!categories) {
+    console.log('Categories is undefined or null');
     return [];
   }
+  
+  if (!Array.isArray(categories)) {
+    console.log('Categories is not an array:', typeof categories, categories);
+    return [];
+  }
+  
   const allProducts = categories.reduce<Product[]>((acc, category) => {
     return [...acc, ...getProductsByCategory(category)];
   }, []);

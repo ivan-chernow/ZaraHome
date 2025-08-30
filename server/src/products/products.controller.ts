@@ -7,7 +7,8 @@ import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { ImagesUploadInterceptor } from 'src/shared/upload/file-upload.helper';
-import { IProduct, ICategory, ApiResponse } from '../common/interfaces';
+import { IProduct, ICategory } from '../common/interfaces/product.interface';
+import { ApiResponse } from '../common/interfaces/api-response.interface';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ResponseService } from 'src/shared/services/response.service';
 import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
@@ -43,6 +44,14 @@ export class ProductsController {
     async findAll(): Promise<ApiResponse<IProduct[]>> {
         const products = await this.productsService.findAll();
         return this.responseService.success(products, 'Продукты успешно загружены');
+    }
+
+    @Get('catalog')
+    @ApiOperation({ summary: 'Получить весь каталог с категориями' })
+    @ApiOkResponse({ description: 'Каталог успешно загружен' })
+    async getCatalog(): Promise<ApiResponse<ICategory[]>> {
+        const catalog = await this.productsService.getCatalog();
+        return this.responseService.success(catalog, 'Каталог успешно загружен');
     }
 
     @Get(':id')
@@ -85,11 +94,4 @@ export class ProductsController {
         return this.responseService.success(undefined, 'Продукт успешно удален');
     }
 
-    @Get('catalog/all')
-    @ApiOperation({ summary: 'Получить весь каталог с категориями' })
-    @ApiOkResponse({ description: 'Каталог успешно загружен' })
-    async getCatalog(): Promise<ApiResponse<ICategory[]>> {
-        const catalog = await this.productsService.getCatalog();
-        return this.responseService.success(catalog, 'Каталог успешно загружен');
-    }
 }

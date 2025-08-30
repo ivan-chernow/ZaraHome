@@ -2,15 +2,10 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { ResourceNotFoundException, ConflictException } from 'src/common/base/base.exceptions';
 import { ProductsRepository } from './products.repository';
 import { CreateProductDto } from './dto/create-product.dto';
-import { 
-  IProduct, 
-  IProductService, 
-  ICreateProductDto,
-  IProductWithRelations,
-  ICategory,
-  ISubCategory,
-  IType
-} from '../common/interfaces';
+import { IProduct, IProductWithRelations } from '../common/interfaces/product.interface';
+import { ICategory, ISubCategory, IType } from '../common/interfaces/product.interface';
+import { IProductService } from '../common/interfaces/service.interface';
+import { ICreateProductDto } from '../common/interfaces/dto.interface';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
 import { FileUploadErrorHandlerService } from 'src/shared/services/file-upload-error-handler.service';
