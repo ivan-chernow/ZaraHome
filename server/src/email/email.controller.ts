@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/login/jwt/jwt-auth.guard';
-import { EmailService } from './email.service';
+import { EmailService, EmailMetrics } from './email.service';
 import { SendEmailDto } from './dto/send-email.dto';
 import { ResponseService } from '../shared/services/response.service';
 import { ApiDefaultErrors } from '../common/swagger/swagger.decorators';

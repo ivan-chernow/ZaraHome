@@ -11,10 +11,10 @@ export class PromocodeUsage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'promocode_id' })
+  @Column({ name: 'promocode_id', type: 'int' })
   promocodeId: number;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'int' })
   userId: number;
 
   @Column({ name: 'order_amount', type: 'decimal', precision: 10, scale: 2 })

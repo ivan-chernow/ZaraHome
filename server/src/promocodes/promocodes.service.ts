@@ -14,7 +14,7 @@ interface PromocodeUsage {
   usedAt: Date;
 }
 
-interface PromocodeStats {
+export interface PromocodeStats {
   totalPromocodes: number;
   activePromocodes: number;
   totalUsage: number;

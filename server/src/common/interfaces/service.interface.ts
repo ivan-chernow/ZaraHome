@@ -13,7 +13,12 @@ export interface IAuthService {
   logout(_userId: number, _res?: unknown): Promise<unknown>;
 }
 
-export interface IProductService extends IBaseService<unknown> {
+export interface IProductService {
+  create(_data: unknown): Promise<unknown>;
+  findAll(_filters?: unknown, _sort?: unknown, _pagination?: unknown): Promise<unknown>;
+  findOne(_id: number): Promise<unknown | null>;
+  update(_id: number, _data: unknown): Promise<unknown>;
+  delete(_id: number): Promise<void>;
   getCatalog(): Promise<unknown[]>;
   findByIds(_ids: number[]): Promise<unknown[]>;
 }
@@ -63,16 +68,21 @@ export interface IOrderService {
 }
 
 export interface IPromocodeService {
-  create(_code: string, _discount: number): Promise<unknown>;
-  validateAndApply(_code: string, _orderAmount: number): Promise<{ 
+  create(_code: string, _discount: number, _options?: unknown): Promise<unknown>;
+  validateAndApply(_code: string, _orderAmount: number, _userId?: number): Promise<{ 
     isValid: boolean; 
     message?: string; 
     discount?: number;
     finalAmount?: number;
   }>;
-  getAllActive(): Promise<unknown[]>;
-  getAll(): Promise<unknown[]>;
+  getAllActive(_page?: number, _limit?: number): Promise<unknown>;
+  getAll(_page?: number, _limit?: number): Promise<unknown>;
   deactivate(_code: string): Promise<void>;
+  update(_code: string, _data: unknown): Promise<unknown>;
+  deactivateMultiple(_codes: string[]): Promise<unknown>;
+  searchPromocodes(_query: string, _page?: number, _limit?: number): Promise<unknown>;
+  getPromocodeStats(): Promise<unknown>;
+  getPromocodeUsageStats(_promocodeId: number): Promise<unknown>;
 }
 
 export interface IAdminService {

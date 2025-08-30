@@ -151,7 +151,7 @@ export class ProductsService implements IProductService {
 
     const cachedResult = await this.cacheService.get(cacheKey, CACHE_PREFIXES.PRODUCTS);
     if (cachedResult) {
-      return cachedResult;
+      return cachedResult as ProductListResponse;
     }
 
     const result = await this.productsRepository.findProductsWithFilters(
@@ -165,8 +165,10 @@ export class ProductsService implements IProductService {
     await this.cacheService.set(
       cacheKey,
       result,
-      CACHE_TTL.PRODUCTS,
-      CACHE_PREFIXES.PRODUCTS
+      { 
+        ttl: CACHE_TTL.PRODUCTS, 
+        prefix: CACHE_PREFIXES.PRODUCTS 
+      }
     );
 
     return result;

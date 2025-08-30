@@ -10,16 +10,16 @@ export class EmailVerification {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ length: 254 })
+    @Column({ length: 254, nullable: true })
     email: string;
 
-    @Column({ length: 10 })
+    @Column({ length: 10, nullable: true })
     code: string;
 
-    @Column({ length: 255, unique: true })
+    @Column({ length: 255, unique: true, nullable: true })
     token: string;
 
-    @Column()
+    @Column({ nullable: true })
     expiresAt: Date;
 
     @CreateDateColumn()

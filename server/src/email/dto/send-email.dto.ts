@@ -35,7 +35,8 @@ export class SendEmailDto {
   @ApiProperty({
     description: 'Контекст для шаблона',
     example: { code: '123456', name: 'John' },
-    type: 'object'
+    type: 'object',
+    additionalProperties: true
   })
   @IsObject({ message: 'Контекст должен быть объектом' })
   @IsNotEmpty({ message: 'Контекст обязателен' })

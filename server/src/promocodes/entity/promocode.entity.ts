@@ -13,25 +13,25 @@ export class Promocode {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, length: 20 })
+  @Column({ unique: true, length: 20, nullable: true })
   code: string;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   discount: number;
 
-  @Column({ default: true })
+  @Column({ default: true, nullable: true })
   isActive: boolean;
 
-  @Column({ name: 'max_usage', nullable: true })
+  @Column({ name: 'max_usage', type: 'int', nullable: true })
   maxUsage: number | null;
 
-  @Column({ name: 'current_usage', default: 0 })
+  @Column({ name: 'current_usage', type: 'int', default: 0 })
   currentUsage: number;
 
   @Column({ name: 'min_order_amount', type: 'decimal', precision: 10, scale: 2, default: 0 })
   minOrderAmount: number;
 
-  @Column({ name: 'expires_at', nullable: true })
+  @Column({ name: 'expires_at', type: 'timestamp', nullable: true })
   expiresAt: Date | null;
 
   @Column({ type: 'text', nullable: true })

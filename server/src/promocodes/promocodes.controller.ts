@@ -32,7 +32,7 @@ export class PromocodesController {
       {
         maxUsage: createPromocodeDto.maxUsage,
         minOrderAmount: createPromocodeDto.minOrderAmount,
-        expiresAt: createPromocodeDto.expiresAt,
+        expiresAt: createPromocodeDto.expiresAt ? new Date(createPromocodeDto.expiresAt) : undefined,
         description: createPromocodeDto.description
       }
     );
@@ -51,7 +51,11 @@ export class PromocodesController {
     @Param() params: PromocodeCodeDto,
     @Body() updatePromocodeDto: UpdatePromocodeDto
   ) {
-    const promocode = await this.promocodesService.update(params.code, updatePromocodeDto);
+    const updateData = {
+      ...updatePromocodeDto,
+      expiresAt: updatePromocodeDto.expiresAt ? new Date(updatePromocodeDto.expiresAt) : undefined
+    };
+    const promocode = await this.promocodesService.update(params.code, updateData);
     return this.responseService.success(promocode, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_UPDATED);
   }
 

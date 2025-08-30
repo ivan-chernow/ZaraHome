@@ -21,6 +21,10 @@ export const CACHE_TTL = {
   // Временные данные
   SESSION: 1800, // 30 минут
   RATE_LIMIT: 60, // 1 минута
+  
+  // Поиск и статистика
+  SEARCH: 900, // 15 минут
+  STATS: 1800, // 30 минут
 } as const;
 
 export const CACHE_PREFIXES = {
@@ -35,6 +39,8 @@ export const CACHE_PREFIXES = {
   PROMOCODES: 'promocodes',
   DELIVERY: 'delivery',
   SESSION: 'session',
+  SEARCH: 'search',
+  STATS: 'stats',
 } as const;
 
 export const CACHE_KEYS = {

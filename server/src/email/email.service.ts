@@ -12,7 +12,7 @@ interface EmailTemplate {
   requiredFields: string[];
 }
 
-interface EmailMetrics {
+export interface EmailMetrics {
   sent: number;
   failed: number;
   totalAttempts: number;
@@ -160,7 +160,7 @@ export class EmailService {
     const html = template(enrichedContext);
 
     // Отправляем email с retry логикой
-    let lastError: Error;
+    let lastError: Error | undefined;
     
     for (let attempt = 1; attempt <= retryAttempts; attempt++) {
       try {
@@ -195,8 +195,9 @@ export class EmailService {
 
     // Все попытки исчерпаны
     this.metrics.failed++;
-    this.logEmailFailure(to, subject, templateName, lastError);
-    throw new InternalServerErrorException(EMAIL_CONSTANTS.ERRORS.SEND_FAILED + lastError.message);
+    const finalError = lastError || new Error('Unknown error');
+    this.logEmailFailure(to, subject, templateName, finalError);
+    throw new InternalServerErrorException(EMAIL_CONSTANTS.ERRORS.SEND_FAILED + finalError.message);
   }
 
   /**

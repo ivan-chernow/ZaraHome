@@ -12,7 +12,7 @@ interface PromocodeUsageData {
   usedAt: Date;
 }
 
-interface PromocodeListResponse {
+export interface PromocodeListResponse {
   promocodes: Promocode[];
   total: number;
   page: number;

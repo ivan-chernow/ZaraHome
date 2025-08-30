@@ -52,7 +52,7 @@ export class FavoritesService {
     }
 
     // Создаем новую запись в избранном
-    const favorite = await this.favoritesRepository.createFavorite(user, product);
+    const favorite = await this.favoritesRepository.createFavorite(user, product as any);
     
     // Инвалидируем кеш избранного пользователя
     await this.invalidateUserFavoritesCache(userId);
@@ -225,7 +225,7 @@ export class FavoritesService {
 
     // Создаем новые записи в избранном
     const newFavorites = await Promise.all(
-      newProducts.map(product => this.favoritesRepository.createFavorite(user, product!))
+            newProducts.map(product => this.favoritesRepository.createFavorite(user, product! as any)) 
     );
 
     // Инвалидируем кеш избранного пользователя

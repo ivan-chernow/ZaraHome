@@ -10,4 +10,5 @@ export { Cart } from '../cart/entity/cart.entity';
 export { Order } from '../orders/entity/order.entity';
 export { EmailVerification } from '../email/entity/email-verification.entity';
 export { Promocode } from '../promocodes/entity/promocode.entity';
+export { PromocodeUsage } from '../promocodes/entity/promocode-usage.entity';
 export {ResetPassword} from '../auth/reset-password/entity/reset-password.entity'
