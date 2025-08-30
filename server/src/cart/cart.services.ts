@@ -1,14 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { UserService } from '../users/user/user.service';
 import { ProductsService } from '../products/products.service';
-import { ICartService } from '../common/interfaces/service.interface';
 import { ICartItem, ICartItemWithProduct } from '../common/interfaces/cart-favorites.interface';
 import { CacheService } from '../shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES } from '../shared/cache/cache.constants';
+import { CART_CONSTANTS } from './cart.constants';
 
 @Injectable()
-export class CartService implements ICartService {
+export class CartService {
   constructor(
     private readonly cartRepository: CartRepository,
     private readonly userService: UserService,
@@ -16,66 +16,40 @@ export class CartService implements ICartService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async create(data: any): Promise<ICartItem> {
-    const { userId, productId } = data;
-    return this.addToCart(userId, productId);
-  }
-
-  async findAll(): Promise<ICartItem[]> {
-    // Метод не используется. Возвращаем пустой массив, чтобы не выбрасывать Error
-    return [];
-  }
-
-  async findOne(id: number): Promise<ICartItem | null> {
-    const cart = await this.cartRepository.findById(id);
-    if (!cart) return null;
-    
-    return {
-      id: cart.id,
-      userId: cart.user.id,
-      productId: cart.product.id
-    };
-  }
-
-  async update(id: number, data: any): Promise<ICartItem> {
-    const cart = await this.cartRepository.findById(id);
-    if (!cart) {
-      throw new NotFoundException('Cart item not found');
-    }
-    
-    const updatedCart = await this.cartRepository.update(id, data);
-    if (!updatedCart) {
-      throw new NotFoundException('Failed to update cart item');
-    }
-    
-    return {
-      id: updatedCart.id,
-      userId: updatedCart.user.id,
-      productId: updatedCart.product.id
-    };
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.cartRepository.remove(id);
-  }
-
+  /**
+   * Добавить товар в корзину
+   */
   async addToCart(userId: number, productId: number): Promise<ICartItem> {
-    // Проверяем существование пользователя и продукта
-    await this.userService.findOne(userId);
-    await this.productService.findOne(productId);
+    // Валидация входных данных
+    if (!userId || !productId) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
+    }
+
+    // Проверяем существование пользователя и продукта параллельно
+    const [user, product] = await Promise.all([
+      this.userService.findOne(userId),
+      this.productService.findOne(productId)
+    ]);
+
+    if (!user) {
+      throw new NotFoundException(CART_CONSTANTS.ERRORS.USER_NOT_FOUND);
+    }
+
+    if (!product) {
+      throw new NotFoundException(CART_CONSTANTS.ERRORS.PRODUCT_NOT_FOUND);
+    }
 
     // Проверяем, есть ли уже в корзине
     const existingCart = await this.cartRepository.findByUserAndProduct(userId, productId);
-    if (existingCart) return {
-      id: existingCart.id,
-      userId: existingCart.user.id,
-      productId: existingCart.product.id
-    }; // idempotent
+    if (existingCart) {
+      return {
+        id: existingCart.id,
+        userId: existingCart.user.id,
+        productId: existingCart.product.id
+      };
+    }
 
     // Создаем новую запись в корзине
-    const user = await this.userService.findOne(userId);
-    const product = await this.productService.findOne(productId);
-    
     const newCart = await this.cartRepository.create(user, product);
     
     // Инвалидируем кеш корзины пользователя
@@ -88,20 +62,39 @@ export class CartService implements ICartService {
     };
   }
 
+  /**
+   * Удалить товар из корзины
+   */
   async removeFromCart(userId: number, productId: number): Promise<void> {
+    if (!userId || !productId) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
+    }
+
+    const cartItem = await this.cartRepository.findByUserAndProduct(userId, productId);
+    if (!cartItem) {
+      throw new NotFoundException(CART_CONSTANTS.ERRORS.CART_ITEM_NOT_FOUND);
+    }
+
     await this.cartRepository.removeByUserAndProduct(userId, productId);
     
     // Инвалидируем кеш корзины пользователя
     await this.invalidateUserCartCache(userId);
   }
 
-  async getUserCart(userId: number): Promise<ICartItem[]> {
-    const cacheKey = `user:${userId}`;
+  /**
+   * Получить корзину пользователя с кешированием
+   */
+  async getUserCart(userId: number): Promise<ICartItemWithProduct[]> {
+    if (!userId) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
+    }
+
+    const cacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART(userId);
     
     return this.cacheService.getOrSet(
       cacheKey,
       async () => {
-        const cartItems = await this.cartRepository.findByUser(userId);
+        const cartItems = await this.cartRepository.findByUserWithProductDetails(userId);
         
         return cartItems.map(item => ({
           id: item.id,
@@ -129,30 +122,174 @@ export class CartService implements ICartService {
     );
   }
 
+  /**
+   * Очистить корзину пользователя
+   */
   async clearCart(userId: number): Promise<void> {
+    if (!userId) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
+    }
+
+    const cartItems = await this.cartRepository.findByUser(userId);
+    if (cartItems.length === 0) {
+      return; // Корзина уже пуста
+    }
+
     await this.cartRepository.removeByUser(userId);
     
     // Инвалидируем кеш корзины пользователя
     await this.invalidateUserCartCache(userId);
   }
 
+  /**
+   * Получить статус товаров в корзине (batch операция)
+   */
   async getCartStatus(userId: number, productIds: number[]): Promise<Record<number, boolean>> {
-    if (!productIds || productIds.length === 0) return {};
+    if (!userId) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
+    }
+
+    if (!productIds || productIds.length === 0) {
+      return {};
+    }
+
+    // Валидация productIds
+    const validProductIds = productIds.filter(id => Number.isInteger(id) && id > 0);
+    if (validProductIds.length === 0) {
+      return {};
+    }
+
+    // Удаляем дубликаты
+    const uniqueProductIds = [...new Set(validProductIds)];
     
-    const rows = await this.cartRepository.findByUserAndProducts(userId, productIds);
-    const set = new Set(rows.map((r) => r.product.id));
+    const cartItems = await this.cartRepository.findByUserAndProducts(userId, uniqueProductIds);
+    const cartProductIds = new Set(cartItems.map(item => item.product.id));
     
-    return productIds.reduce<Record<number, boolean>>((acc, id) => {
-      acc[id] = set.has(id);
+    return uniqueProductIds.reduce<Record<number, boolean>>((acc, id) => {
+      acc[id] = cartProductIds.has(id);
       return acc;
     }, {});
+  }
+
+  /**
+   * Добавить несколько товаров в корзину (batch операция)
+   */
+  async addMultipleToCart(userId: number, productIds: number[]): Promise<ICartItem[]> {
+    if (!userId || !productIds || productIds.length === 0) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_PRODUCT_IDS);
+    }
+
+    // Валидация и дедупликация
+    const validProductIds = [...new Set(productIds.filter(id => Number.isInteger(id) && id > 0))];
+    
+    if (validProductIds.length === 0) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.NO_VALID_PRODUCTS);
+    }
+
+    // Проверяем существование пользователя
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException(CART_CONSTANTS.ERRORS.USER_NOT_FOUND);
+    }
+
+    // Проверяем существование продуктов
+    const products = await Promise.all(
+      validProductIds.map(id => this.productService.findOne(id))
+    );
+
+    const existingProducts = products.filter(Boolean);
+    if (existingProducts.length === 0) {
+      throw new NotFoundException(CART_CONSTANTS.ERRORS.NO_VALID_PRODUCTS);
+    }
+
+    // Получаем существующие товары в корзине
+    const existingCartItems = await this.cartRepository.findByUserAndProducts(
+      userId, 
+      existingProducts.map(p => p!.id)
+    );
+    const existingProductIds = new Set(existingCartItems.map(item => item.product.id));
+
+    // Добавляем только новые товары
+    const newProducts = existingProducts.filter(product => product && !existingProductIds.has(product.id));
+    
+    if (newProducts.length === 0) {
+      // Все товары уже в корзине
+      return existingCartItems.map(item => ({
+        id: item.id,
+        userId: item.user.id,
+        productId: item.product.id
+      }));
+    }
+
+    // Создаем новые записи в корзине
+    const newCartItems = await Promise.all(
+      newProducts.map(product => this.cartRepository.create(user, product))
+    );
+
+    // Инвалидируем кеш корзины пользователя
+    await this.invalidateUserCartCache(userId);
+
+    // Возвращаем все товары в корзине
+    const allCartItems = [...existingCartItems, ...newCartItems];
+    return allCartItems.map(item => ({
+      id: item.id,
+      userId: item.user.id,
+      productId: item.product.id
+    }));
+  }
+
+  /**
+   * Удалить несколько товаров из корзины (batch операция)
+   */
+  async removeMultipleFromCart(userId: number, productIds: number[]): Promise<void> {
+    if (!userId || !productIds || productIds.length === 0) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_PRODUCT_IDS);
+    }
+
+    const validProductIds = [...new Set(productIds.filter(id => Number.isInteger(id) && id > 0))];
+    
+    if (validProductIds.length === 0) {
+      return; // Нет валидных ID для удаления
+    }
+
+    await this.cartRepository.removeMultipleByUserAndProducts(userId, validProductIds);
+    
+    // Инвалидируем кеш корзины пользователя
+    await this.invalidateUserCartCache(userId);
+  }
+
+  /**
+   * Получить количество товаров в корзине
+   */
+  async getCartItemCount(userId: number): Promise<number> {
+    if (!userId) {
+      throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
+    }
+
+    const cacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART_COUNT(userId);
+    
+    return this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        return this.cartRepository.countByUser(userId);
+      },
+      { 
+        ttl: CACHE_TTL.USER_CART, 
+        prefix: CACHE_PREFIXES.USER_CART 
+      }
+    );
   }
 
   /**
    * Инвалидировать кеш корзины пользователя
    */
   private async invalidateUserCartCache(userId: number): Promise<void> {
-    const cacheKey = `user:${userId}`;
-    await this.cacheService.delete(cacheKey, CACHE_PREFIXES.USER_CART);
+    const cartCacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART(userId);
+    const countCacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART_COUNT(userId);
+    
+    await Promise.all([
+      this.cacheService.delete(cartCacheKey, CACHE_PREFIXES.USER_CART),
+      this.cacheService.delete(countCacheKey, CACHE_PREFIXES.USER_CART)
+    ]);
   }
 }
