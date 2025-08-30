@@ -1,8 +1,6 @@
 import * as Joi from 'joi';
 
-// ========================================
-// SIMPLIFIED VALIDATION FOR STUDENT PROJECT
-// ========================================
+
 export const envValidationSchema = Joi.object({
   // APPLICATION
   NODE_ENV: Joi.string()
@@ -32,7 +30,7 @@ export const envValidationSchema = Joi.object({
     .default('postgres'),
 
   DB_DATABASE: Joi.string()
-    .default('zarahome_ecom'),
+    .default('zarahome'),
 
   DB_SYNCHRONIZE: Joi.boolean()
     .default(true),
@@ -42,7 +40,7 @@ export const envValidationSchema = Joi.object({
 
   // JWT
   JWT_SECRET: Joi.string()
-    .default('dev_secret_key_change_in_production_123'),
+    .default('jasdjasoij123128989fxcvmlkviodfgjjpodfgjopjfdogjdpof'),
 
   JWT_ACCESS_EXPIRES_IN: Joi.string()
     .default('15m'),
@@ -51,8 +49,6 @@ export const envValidationSchema = Joi.object({
     .default('7d'),
 
   // EMAIL
-  EMAIL_HOST: Joi.string()
-    .default('smtp.gmail.com'),
 
   EMAIL_PORT: Joi.number()
     .port()

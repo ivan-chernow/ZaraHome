@@ -23,7 +23,10 @@ import {
   corsConfig,
   cacheConfig,
   fileUploadConfig,
-  emailConfig 
+  emailConfig,
+  getDatabaseConfig,
+  getJwtConfig,
+  getRateLimitConfig
 } from '../config/env.config';
 
 @Module({
@@ -47,43 +50,21 @@ import {
       cache: true,
     }),
 
-    // База данных
+    // База данных - используем функцию-помощник
     TypeOrmModule.forRootAsync({
-      useFactory: (configService) => ({
-        type: 'postgres',
-        host: configService.get('database.host'),
-        port: configService.get('database.port'),
-        username: configService.get('database.username'),
-        password: configService.get('database.password'),
-        database: configService.get('database.database'),
-        synchronize: configService.get('database.synchronize'),
-        logging: configService.get('database.logging'),
-        entities: configService.get('database.entities'),
-      }),
+      useFactory: getDatabaseConfig,
       inject: [ConfigService],
     }),
 
-    // JWT
+    // JWT - используем функцию-помощник
     JwtModule.registerAsync({
-      useFactory: (configService) => ({
-        secret: configService.get('jwt.secret'),
-        signOptions: {
-          expiresIn: configService.get('jwt.accessExpiresIn'),
-        },
-      }),
+      useFactory: getJwtConfig,
       inject: [ConfigService],
     }),
 
-    // Rate Limiting
+    // Rate Limiting - используем функцию-помощник
     ThrottlerModule.forRootAsync({
-      useFactory: (configService) => ({
-        throttlers: [
-          {
-            ttl: configService.get('rateLimit.ttl'),
-            limit: configService.get('rateLimit.maxRequests'),
-          },
-        ],
-      }),
+      useFactory: getRateLimitConfig,
       inject: [ConfigService],
     }),
 
