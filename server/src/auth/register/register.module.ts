@@ -8,9 +8,13 @@ import { User } from '../../users/user/entity/user.entity';
 import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, EmailVerification]), EmailModule, SharedModule],
-    controllers: [RegistrationController],
-    providers: [RegistrationService],
-    exports: [RegistrationService],
+  imports: [
+    TypeOrmModule.forFeature([User, EmailVerification]), 
+    EmailModule, 
+    SharedModule
+  ],
+  controllers: [RegistrationController],
+  providers: [RegistrationService],
+  exports: [RegistrationService],
 })
-export class RegisterModule { }
+export class RegisterModule {}

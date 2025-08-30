@@ -2,36 +2,49 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { RegistrationService } from './register.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { Throttle } from '@nestjs/throttler';
-import { RegistrationInitiateDto, RegistrationVerifyDto, RegistrationCompleteDto } from './dto/registration.dto';
+import { 
+  RegistrationInitiateDto, 
+  RegistrationVerifyDto, 
+  RegistrationCompleteDto 
+} from './dto/registration.dto';
 
 @Controller('auth/registration')
 export class RegistrationController {
-    constructor(
-        private readonly registrationService: RegistrationService,
-        private readonly responseService: ResponseService,
-    ) { }
+  constructor(
+    private readonly registrationService: RegistrationService,
+    private readonly responseService: ResponseService,
+  ) {}
 
-    @Post('initiate')
-    @HttpCode(HttpStatus.OK)
-    @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
-    async initiate(@Body() dto: RegistrationInitiateDto) {
-        await this.registrationService.initiateRegistration(dto.email);
-        return this.responseService.success(undefined, `Код подтверждения отправлен на email ${dto.email}`);
-    }   
+  @Post('initiate')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 3, ttl: 300 } })
+  async initiate(@Body() dto: RegistrationInitiateDto) {
+    await this.registrationService.initiateRegistration(dto.email);
+    return this.responseService.success(
+      undefined, 
+      `Код подтверждения отправлен на email ${dto.email}`
+    );
+  }   
 
-    @Post('verify-code')
-    @HttpCode(HttpStatus.OK)
-    @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
-    async verifyCode(@Body() dto: RegistrationVerifyDto) {
-        const sessionToken = await this.registrationService.verifyByCode(dto.email, dto.code);
-        return this.responseService.success({ sessionToken }, `Код подтверждения подтвержден, токен сессии ${sessionToken}`);
-    }
+  @Post('verify-code')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 3, ttl: 300 } })
+  async verifyCode(@Body() dto: RegistrationVerifyDto) {
+    const sessionToken = await this.registrationService.verifyByCode(dto.email, dto.code);
+    return this.responseService.success(
+      { sessionToken }, 
+      'Код подтверждения подтвержден'
+    );
+  }
 
-    @Post('complete')
-    @HttpCode(HttpStatus.OK)
-    @Throttle({ default: { limit: 3, ttl: 300 } }) // 3 запроса в 5 минут
-    async complete(@Body() dto: RegistrationCompleteDto) {
-        const user = await this.registrationService.completeRegistration(dto.sessionToken, dto.password);
-        return this.responseService.success({ user }, `Регистрация завершена, пользователь ${user.email} создан`);
-    }
+  @Post('complete')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 3, ttl: 300 } })
+  async complete(@Body() dto: RegistrationCompleteDto) {
+    const user = await this.registrationService.completeRegistration(dto.sessionToken, dto.password);
+    return this.responseService.success(
+      { user }, 
+      `Регистрация завершена для пользователя ${user.email}`
+    );
+  }
 }

@@ -1,28 +1,29 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class RegistrationInitiateDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Введите корректный email адрес' })
+  @IsNotEmpty({ message: 'Email обязателен' })
   email: string;
 }
 
 export class RegistrationVerifyDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Введите корректный email адрес' })
+  @IsNotEmpty({ message: 'Email обязателен' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Код подтверждения должен быть строкой' })
+  @IsNotEmpty({ message: 'Код подтверждения обязателен' })
   code: string;
 }
 
 export class RegistrationCompleteDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Токен сессии должен быть строкой' })
+  @IsNotEmpty({ message: 'Токен сессии обязателен' })
   sessionToken: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Пароль должен быть строкой' })
+  @MinLength(8, { message: 'Пароль должен содержать минимум 8 символов' })
+  @IsNotEmpty({ message: 'Пароль обязателен' })
   password: string;
 }
 
