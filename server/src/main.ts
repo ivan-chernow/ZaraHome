@@ -54,8 +54,7 @@ async function bootstrap() {
   const corsConfig = getCorsConfig(configService);
   app.enableCors(corsConfig);
 
-  // Глобальный префикс API
-  app.setGlobalPrefix(configService.globalPrefix);
+
 
   // Глобальная валидация
   app.useGlobalPipes(
@@ -82,13 +81,13 @@ async function bootstrap() {
     // Страница документации будет по /api/docs (один раз префикс)
     SwaggerModule.setup('docs', app, document);
 
-    console.log('📚 Swagger documentation available at /api/docs');
+    console.log('📚 Swagger documentation available at /docs');
   }
 
   // Запуск сервера
   await app.listen(configService.port);
   
-  console.log(`🎉 Server is running on: http://localhost:${configService.port}/${configService.apiPrefix}`);
+  console.log(`🎉 Server is running on: http://localhost:${configService.port}`);
   
   if (configService.isDevelopment) {
     console.log(`🔍 Development mode enabled`);
