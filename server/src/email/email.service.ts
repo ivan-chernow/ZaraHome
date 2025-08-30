@@ -13,9 +13,13 @@ export class EmailService {
 
   constructor(private readonly config: ConfigService) {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
-    this.resend = new Resend(apiKey);
-    this.fromAddress = this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
-    this.logger.log('EmailService initialized with API key: ' + (apiKey ? 'Present' : 'Missing'));
+    if (apiKey) {
+      this.resend = new Resend(apiKey);
+      this.fromAddress = this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
+      this.logger.log('EmailService initialized with API key: Present');
+    } else {
+      this.logger.warn('EmailService initialized without API key - email sending will be disabled');
+    }
   }
 
   async sendTemplateEmail(
@@ -24,6 +28,11 @@ export class EmailService {
     templateName: string,
     context: Record<string, any>,
   ): Promise<void> {
+    if (!this.resend) {
+      this.logger.warn('Email service not configured - skipping email send');
+      return;
+    }
+
     try {
       this.logger.log(`Attempting to send email to: ${to}`);
       this.logger.log(`Using template: ${templateName}`);

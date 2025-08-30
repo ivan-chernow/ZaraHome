@@ -1,5 +1,5 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
-import { ConfigService } from '../../../config/config.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConditionalThrottlerGuard {
@@ -7,7 +7,7 @@ export class ConditionalThrottlerGuard {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // В development режиме отключаем rate limiting полностью
-    if (this.configService.isDevelopment) {
+    if (this.configService.get('app.isDevelopment')) {
       return true;
     }
     

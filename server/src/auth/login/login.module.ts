@@ -8,7 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { User } from '../../users/user/entity/user.entity';
 import { ConfigModule as NestConfigModule, ConfigService as NestConfigService } from '@nestjs/config';
-import { ConfigModule } from '../../../config/config.module';
+import { ConfigModule } from '@nestjs/config';
 import { AuthRepository } from '../auth.repository';
 import { SharedModule } from 'src/shared/modules/shared.module';
 

@@ -1,229 +1,106 @@
 import * as Joi from 'joi';
 
 // ========================================
-// ENVIRONMENT VALIDATION SCHEMA
+// SIMPLIFIED VALIDATION FOR STUDENT PROJECT
 // ========================================
 export const envValidationSchema = Joi.object({
-  // ========================================
   // APPLICATION
-  // ========================================
   NODE_ENV: Joi.string()
     .valid('development', 'production', 'test')
-    .default('development')
-    .description('Node environment'),
+    .default('development'),
 
   PORT: Joi.number()
     .port()
-    .default(3000)
-    .description('Application port'),
-
-  API_PREFIX: Joi.string()
-    .default('api')
-    .description('API prefix'),
+    .default(3001),
 
   GLOBAL_PREFIX: Joi.string()
-    .default('api')
-    .description('Global API prefix'),
+    .allow('')
+    .default('api'),
 
-  // ========================================
   // DATABASE
-  // ========================================
   DB_HOST: Joi.string()
-    .hostname()
-    .default('localhost')
-    .description('Database host'),
+    .default('localhost'),
 
   DB_PORT: Joi.number()
     .port()
-    .default(5432)
-    .description('Database port'),
+    .default(5432),
 
   DB_USERNAME: Joi.string()
-    .required()
-    .description('Database username'),
+    .default('postgres'),
 
   DB_PASSWORD: Joi.string()
-    .required()
-    .description('Database password'),
+    .default('postgres'),
 
   DB_DATABASE: Joi.string()
-    .required()
-    .description('Database name'),
+    .default('zarahome_ecom'),
 
   DB_SYNCHRONIZE: Joi.boolean()
-    .default(false)
-    .description('Database synchronization (only for development)'),
+    .default(true),
 
   DB_LOGGING: Joi.boolean()
-    .default(false)
-    .description('Database logging'),
+    .default(true),
 
-  DB_MIGRATIONS_RUN: Joi.boolean()
-    .default(false)
-    .description('Run database migrations'),
-
-  // ========================================
-  // JWT AUTHENTICATION
-  // ========================================
+  // JWT
   JWT_SECRET: Joi.string()
-    .when('NODE_ENV', {
-      is: 'production',
-      then: Joi.string().min(32).required(),
-      otherwise: Joi.string().min(1).default('dev_jwt_secret_please_change_to_secure_32_chars_min'),
-    })
-    .description('JWT secret key'),
+    .default('dev_secret_key_change_in_production_123'),
 
   JWT_ACCESS_EXPIRES_IN: Joi.string()
-    .default('15m')
-    .description('JWT access token expiration'),
+    .default('15m'),
 
   JWT_REFRESH_EXPIRES_IN: Joi.string()
-    .default('7d')
-    .description('JWT refresh token expiration'),
+    .default('7d'),
 
-  // ========================================
-  // ADMIN USER
-  // ========================================
-  ADMIN_EMAIL: Joi.string()
-    .email()
-    .default('admin@zarahome.com')
-    .description('Admin email'),
-
-  ADMIN_PASSWORD: Joi.string()
-    .min(8)
-    .default('admin123')
-    .description('Admin password (min 8 characters)'),
-
-  // ========================================
-  // EMAIL SERVICE
-  // ========================================
+  // EMAIL
   EMAIL_HOST: Joi.string()
-    .default('smtp.gmail.com')
-    .description('SMTP host'),
+    .default('smtp.gmail.com'),
 
   EMAIL_PORT: Joi.number()
     .port()
-    .default(587)
-    .description('SMTP port'),
+    .default(587),
 
   EMAIL_USER: Joi.string()
-    .email()
     .allow('')
-    .default('')
-    .description('SMTP user email'),
+    .default(''),
 
   EMAIL_PASS: Joi.string()
     .allow('')
-    .default('')
-    .description('SMTP password'),
+    .default(''),
 
   EMAIL_FROM: Joi.string()
-    .email()
-    .default('noreply@zarahome.com')
-    .description('From email address'),
+    .default('noreply@zarahome.com'),
 
-  // ========================================
   // FILE UPLOAD
-  // ========================================
   MAX_FILE_SIZE: Joi.number()
-    .min(1024 * 1024) // 1MB
-    .max(50 * 1024 * 1024) // 50MB
-    .default(10 * 1024 * 1024) // 10MB
-    .description('Maximum file size in bytes'),
-
-  ALLOWED_FILE_TYPES: Joi.string()
-    .default('image/jpeg,image/png,image/webp')
-    .description('Comma-separated allowed file types'),
+    .default(5242880), // 5MB
 
   UPLOAD_PATH: Joi.string()
-    .default('./uploads')
-    .description('File upload path'),
+    .default('uploads'),
 
-  // ========================================
   // CACHE
-  // ========================================
-  CACHE_TTL_DEFAULT: Joi.number()
-    .min(60) // 1 minute
-    .max(86400) // 24 hours
-    .default(3600) // 1 hour
-    .description('Default cache TTL in seconds'),
+  CACHE_TTL: Joi.number()
+    .default(300),
 
   CACHE_MAX_KEYS: Joi.number()
-    .min(100)
-    .max(100000)
-    .default(10000)
-    .description('Maximum cache keys'),
+    .default(1000),
 
-  // ========================================
   // RATE LIMITING
-  // ========================================
   RATE_LIMIT_TTL: Joi.number()
-    .min(1000) // 1 second
-    .max(300000) // 5 minutes
-    .default(60000) // 1 minute
-    .description('Rate limit TTL in milliseconds'),
+    .default(60000),
 
-  RATE_LIMIT_MAX_REQUESTS: Joi.number()
-    .min(10)
-    .max(1000)
-    .default(120)
-    .description('Maximum requests per TTL'),
+  RATE_LIMIT_MAX: Joi.number()
+    .default(100),
 
-  // ========================================
   // CORS
-  // ========================================
   CORS_ORIGIN: Joi.string()
-    .default('http://localhost:3001')
-    .description('CORS allowed origins (comma-separated)'),
+    .default('http://localhost:3000'),
 
   CORS_CREDENTIALS: Joi.boolean()
-    .default(true)
-    .description('CORS credentials'),
-
-  // ========================================
-  // LOGGING
-  // ========================================
-  LOG_LEVEL: Joi.string()
-    .valid('error', 'warn', 'info', 'debug')
-    .default('debug')
-    .description('Log level'),
-
-  LOG_FILE_PATH: Joi.string()
-    .default('./logs')
-    .description('Log file path'),
-
-  LOG_MAX_SIZE: Joi.string()
-    .default('20m')
-    .description('Log file max size'),
-
-  LOG_MAX_FILES: Joi.string()
-    .default('14d')
-    .description('Log file retention'),
-
-  // ========================================
-  // SECURITY
-  // ========================================
-  BCRYPT_ROUNDS: Joi.number()
-    .min(8)
-    .max(16)
-    .default(10)
-    .description('BCrypt rounds'),
-
-  SESSION_SECRET: Joi.string()
-    .when('NODE_ENV', {
-      is: 'production',
-      then: Joi.string().min(32).required(),
-      otherwise: Joi.string().min(1).default('dev_session_secret_please_change_to_secure_32_chars'),
-    })
-    .description('Session secret'),
+    .default(true),
 });
 
-// ========================================
-// VALIDATION OPTIONS
-// ========================================
 export const validationOptions = {
-  allowUnknown: true, // Разрешаем неизвестные переменные
-  abortEarly: false, // Показываем все ошибки сразу
-  stripUnknown: true, // Убираем неизвестные переменные
+  allowUnknown: true,
+  abortEarly: false,
+  stripUnknown: true,
 };
 
