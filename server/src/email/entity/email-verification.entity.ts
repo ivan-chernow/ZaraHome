@@ -1,17 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
-@Entity()
+@Entity('email_verification')
+@Index(['email', 'isVerified']) // Индекс для поиска по email и статусу
+@Index(['token']) // Индекс для поиска по токену
+@Index(['code']) // Индекс для поиска по коду
+@Index(['expiresAt']) // Индекс для поиска по дате истечения
+@Index(['email', 'expiresAt']) // Составной индекс для активных верификаций
 export class EmailVerification {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ length: 254 })
     email: string;
 
-    @Column()
+    @Column({ length: 10 })
     code: string;
 
-    @Column()
+    @Column({ length: 255, unique: true })
     token: string;
 
     @Column()
