@@ -8,8 +8,13 @@ import { User } from '../../users/user/entity/user.entity';
 import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ResetPassword, User]), EmailModule, SharedModule],
+  imports: [
+    TypeOrmModule.forFeature([ResetPassword, User]), 
+    EmailModule, 
+    SharedModule
+  ],
   providers: [ResetPasswordService],
   controllers: [ResetPasswordController],
+  exports: [ResetPasswordService],
 })
 export class ResetPasswordModule {}

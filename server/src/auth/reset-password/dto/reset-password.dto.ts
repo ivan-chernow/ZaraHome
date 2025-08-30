@@ -1,28 +1,29 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class ResetRequestDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Введите корректный email адрес' })
+  @IsNotEmpty({ message: 'Email обязателен' })
   email: string;
 }
 
 export class ResetVerifyDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Введите корректный email адрес' })
+  @IsNotEmpty({ message: 'Email обязателен' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Токен должен быть строкой' })
+  @IsNotEmpty({ message: 'Токен обязателен' })
   token: string;
 }
 
 export class ResetSetDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Токен должен быть строкой' })
+  @IsNotEmpty({ message: 'Токен обязателен' })
   token: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Пароль должен быть строкой' })
+  @MinLength(8, { message: 'Пароль должен содержать минимум 8 символов' })
+  @IsNotEmpty({ message: 'Пароль обязателен' })
   password: string;
 }
 

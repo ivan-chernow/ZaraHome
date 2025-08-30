@@ -1,22 +1,33 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
-@Entity()
+@Entity('reset_passwords')
+@Index(['email'])
+@Index(['token'], { unique: true })
+@Index(['email', 'createdAt'])
 export class ResetPassword {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   email: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 64, unique: true })
   token: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isVerified: boolean;
 
-  @Column()
+  @Column({ type: 'timestamp' })
   expiresAt: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+
+  isExpired(): boolean {
+    return new Date() > this.expiresAt;
+  }
+
+  isVerifiedAndNotExpired(): boolean {
+    return this.isVerified && !this.isExpired();
+  }
 }
