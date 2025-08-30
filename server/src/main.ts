@@ -1,18 +1,15 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
-const logger = new Logger('Bootstrap');
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
-  // Получаем все необходимые конфигурации за один раз
   const config = {
     app: {
       nodeEnv: configService.get('app.nodeEnv'),
@@ -36,21 +33,15 @@ async function bootstrap() {
     },
   };
 
-  // Валидация критических настроек
   validateCriticalConfig(config);
-
-  // Логирование конфигурации
   logServerConfig(config);
 
-  // Настройка CORS
   app.enableCors(config.cors);
 
-  // Настройка статических файлов
   app.useStaticAssets(join(__dirname, '..', '..', 'uploads'), {
     prefix: '/uploads/',
   });
 
-  // Глобальная валидация
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -62,22 +53,19 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger документация (только для development)
   if (config.app.isDevelopment) {
     setupSwagger(app);
   }
 
-  // Запуск сервера
   await app.listen(config.app.port);
   
-  logger.log(`🎉 Server is running on: http://localhost:${config.app.port}`);
+  console.log(`🎉 Server is running on: http://localhost:${config.app.port}`);
   
   if (config.app.isDevelopment) {
     logDevelopmentInfo(config);
   }
 }
 
-// Валидация критических настроек
 function validateCriticalConfig(config: any) {
   const errors: string[] = [];
 
@@ -94,25 +82,23 @@ function validateCriticalConfig(config: any) {
   }
 
   if (errors.length > 0) {
-    logger.error('❌ Configuration validation failed:');
-    errors.forEach(error => logger.error(`   - ${error}`));
-    logger.error('Please check your .env file and required environment variables');
+    console.error('❌ Configuration validation failed:');
+    errors.forEach(error => console.error(`   - ${error}`));
+    console.error('Please check your .env file and required environment variables');
     process.exit(1);
   }
 
-  logger.log('✅ Configuration validation passed');
+  console.log('✅ Configuration validation passed');
 }
 
-// Логирование конфигурации сервера
 function logServerConfig(config: any) {
-  logger.log('🚀 Starting ZaraHome ECOM Server');
-  logger.log(`🌍 Environment: ${config.app.nodeEnv}`);
-  logger.log(`🌐 Port: ${config.app.port}`);
-  logger.log(`🗄️ Database: ${config.database.host}:${config.database.port}/${config.database.database}`);
-  logger.log(`🔐 JWT Expires In: ${config.jwt.accessExpiresIn}`);
+  console.log('🚀 Starting ZaraHome ECOM Server');
+  console.log(`🌍 Environment: ${config.app.nodeEnv}`);
+  console.log(`🌐 Port: ${config.app.port}`);
+  console.log(`🗄️ Database: ${config.database.host}:${config.database.port}/${config.database.database}`);
+  console.log(`🔐 JWT Expires In: ${config.jwt.accessExpiresIn}`);
 }
 
-// Настройка Swagger
 function setupSwagger(app: NestExpressApplication) {
   const config = new DocumentBuilder()
     .setTitle('ZaraHome ECOM API')
@@ -124,17 +110,16 @@ function setupSwagger(app: NestExpressApplication) {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
   
-  logger.log('📚 Swagger documentation available at /docs');
+  console.log('📚 Swagger documentation available at /docs');
 }
 
-// Логирование информации для development
 function logDevelopmentInfo(config: any) {
-  logger.log('🔍 Development mode enabled');
-  logger.log(`📊 Database sync: ${config.database.synchronize ? 'ON' : 'OFF'}`);
-  logger.log(`📝 Database logging: ${config.database.logging ? 'ON' : 'OFF'}`);
+  console.log('🔍 Development mode enabled');
+  console.log(`📊 Database sync: ${config.database.synchronize ? 'ON' : 'OFF'}`);
+  console.log(`📝 Database logging: ${config.database.logging ? 'ON' : 'OFF'}`);
 }
 
 bootstrap().catch((error) => {
-  logger.error('❌ Failed to start server:', error);
+  console.error('❌ Failed to start server:', error);
   process.exit(1);
 });  

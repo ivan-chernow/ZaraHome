@@ -1,17 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Index } from 'typeorm';
 import { User } from '../../../users/user/entity/user.entity';
 
-@Entity()
+@Entity('refresh_tokens')
+@Index(['token'], { unique: true })
+@Index(['user', 'expiresAt'])
 export class RefreshToken {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'text', unique: true })
   token: string;
 
-  @ManyToOne(() => User, user => user.refreshTokens, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.refreshTokens, { 
+    onDelete: 'CASCADE',
+    nullable: false 
+  })
   user: User;
 
-  @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP + interval '30 days'" })
+  @Column({ type: 'timestamp' })
   expiresAt: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  isExpired(): boolean {
+    return new Date() > this.expiresAt;
+  }
 }

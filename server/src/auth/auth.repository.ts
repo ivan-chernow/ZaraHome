@@ -4,10 +4,6 @@ import { Repository } from 'typeorm';
 import { User } from '../users/user/entity/user.entity';
 import { RefreshToken } from './login/entity/refresh-token.entity';
 
-/**
-  Репозиторий для работы с аутентификацией
-  Централизует все операции с пользователями и токенами
- */
 @Injectable()
 export class AuthRepository {
   constructor(
@@ -16,7 +12,6 @@ export class AuthRepository {
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
   ) {}
-
 
   async findUserByEmail(email: string): Promise<User | null> {
     const normalizedEmail = email.toLowerCase().trim();
@@ -27,13 +22,11 @@ export class AuthRepository {
     });
   }
 
-
   async findUserById(userId: number): Promise<User | null> {
     return this.userRepository.findOne({ 
       where: { id: userId } 
     });
   }
-
 
   async findRefreshTokenByUser(userId: number): Promise<RefreshToken | null> {
     return this.refreshTokenRepository.findOne({ 
@@ -41,13 +34,11 @@ export class AuthRepository {
     });
   }
 
-
   async findRefreshTokenByToken(token: string, userId: number): Promise<RefreshToken | null> {
     return this.refreshTokenRepository.findOne({ 
       where: { token, user: { id: userId } } 
     });
   }
-
 
   async deleteRefreshTokenByUser(userId: number): Promise<void> {
     await this.refreshTokenRepository.delete({ 
@@ -55,12 +46,10 @@ export class AuthRepository {
     });
   }
 
-
   async deleteRefreshTokenByToken(token: string): Promise<void> {
     await this.refreshTokenRepository.delete({ token });
   }
 
- 
   async saveRefreshToken(
     token: string, 
     user: User, 
@@ -74,7 +63,6 @@ export class AuthRepository {
     
     return this.refreshTokenRepository.save(refreshToken);
   }
-
 
   async isUserExists(email: string): Promise<boolean> {
     const normalizedEmail = email.toLowerCase().trim();
