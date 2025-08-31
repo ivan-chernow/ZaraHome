@@ -1,6 +1,6 @@
-import { UserRole } from "src/common/enums/user-role.enum";
+import { UserRole } from "src/shared/shared.interfaces";
 import { DeliveryAddress } from "../entity/delivery-address.entity";
-import { ChangePasswordDto, ChangeEmailDto, AddressDto } from "src/common/dto/validation.dto";
+import { ChangePasswordDto, ChangeEmailDto, AddressDto } from "./validation.dto";
 
 export class ChangeDeliveryAddressDto extends AddressDto {}
 

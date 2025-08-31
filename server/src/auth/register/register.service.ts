@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 import { EmailService } from '../../email/email.service';
 import { EmailVerification } from 'src/email/entity/email-verification.entity';
 import { User } from '../../users/user/entity/user.entity';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/shared/shared.interfaces';
 
 @Injectable()
 export class RegistrationService {

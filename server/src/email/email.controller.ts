@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../auth/login/jwt/jwt-auth.guard';
 import { EmailService, EmailMetrics } from './email.service';
 import { SendEmailDto } from './dto/send-email.dto';
 import { ResponseService } from '../shared/services/response.service';
-import { ApiDefaultErrors } from '../common/swagger/swagger.decorators';
+import { ApiDefaultErrors } from '../shared/shared.interfaces';
 import { EMAIL_CONSTANTS } from './email.constants';
 
 @ApiTags('email')

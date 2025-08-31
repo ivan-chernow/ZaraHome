@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Order } from './entity/order.entity';
 import { User } from '../users/user/entity/user.entity';
-import { OrderStatus } from '../common/enums/order-status.enum';
+import { OrderStatus } from '../shared/shared.interfaces';
 import { CacheService } from '../shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES } from '../shared/cache/cache.constants';
 

@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsOptional, MinLength, MaxLength, IsEnum, IsBoolean } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/shared/shared.interfaces';
 import { USERS_CONSTANTS } from '../../users.constants';
 
 export class CreateUserDto {

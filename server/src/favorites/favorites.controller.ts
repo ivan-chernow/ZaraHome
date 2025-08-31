@@ -3,13 +3,13 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { FavoritesService } from './favorites.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { JwtAuthGuard } from '../auth/login/jwt/jwt-auth.guard';
-import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
+import { AuthenticatedRequest } from 'src/shared/shared.interfaces';
 import { FavoriteProductIdDto } from './dto/product-id.dto';
 import { ProductIdsQueryDto } from './dto/product-ids-query.dto';
 import { AddMultipleToFavoritesDto } from './dto/add-multiple-to-favorites.dto';
 import { RemoveMultipleFromFavoritesDto } from './dto/remove-multiple-from-favorites.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiBody } from '@nestjs/swagger';
-import { ApiDefaultErrors } from 'src/common/swagger/swagger.decorators';
+import { ApiDefaultErrors } from 'src/shared/shared.interfaces';
 import { FAVORITES_CONSTANTS } from './favorites.constants';
 
 @ApiTags('favorites')

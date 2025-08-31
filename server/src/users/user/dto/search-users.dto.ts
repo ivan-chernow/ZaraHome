@@ -2,7 +2,7 @@ import { IsOptional, IsString, IsNumber, IsEnum, Min, Max, IsIn } from 'class-va
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { USERS_CONSTANTS } from '../../users.constants';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/shared/shared.interfaces';
 
 export class SearchUsersDto {
   @ApiPropertyOptional({ 

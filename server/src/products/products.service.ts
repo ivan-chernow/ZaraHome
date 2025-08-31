@@ -1,11 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ResourceNotFoundException, ConflictException } from 'src/common/base/base.exceptions';
+import { ResourceNotFoundException, ConflictException } from 'src/shared/shared.interfaces';
 import { ProductsRepository } from './products.repository';
-import { CreateProductDto } from './dto/create-product.dto';
-import { IProduct, IProductWithRelations } from '../common/interfaces/product.interface';
-import { ICategory, ISubCategory, IType } from '../common/interfaces/product.interface';
-import { IProductService } from '../common/interfaces/service.interface';
-import { ICreateProductDto } from '../common/interfaces/dto.interface';
+import { Product, Category, IProductService, CreateProductDto } from '../shared/shared.interfaces';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
 import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
 import { FileUploadErrorHandlerService } from 'src/shared/services/file-upload-error-handler.service';
@@ -36,7 +32,7 @@ interface PaginationOptions {
 }
 
 interface ProductListResponse {
-  products: IProduct[];
+  products: Product[];
   total: number;
   page: number;
   limit: number;
@@ -54,7 +50,7 @@ export class ProductsService implements IProductService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async createProduct(dto: ICreateProductDto, files?: Express.Multer.File[]): Promise<IProduct> {
+  async createProduct(dto: CreateProductDto, files?: Express.Multer.File[]): Promise<Product> {
     if (files && files.length > 0) {
       // Валидируем загруженные файлы с graceful fallback
       const validationResults = await Promise.all(
@@ -99,7 +95,7 @@ export class ProductsService implements IProductService {
     return this.create(dto);
   }
 
-  async create(data: ICreateProductDto): Promise<IProduct> {
+  async create(data: CreateProductDto): Promise<Product> {
     const { categoryId, subCategoryId, typeId, ...rest } = data;
     
     // Валидация входных данных
@@ -174,7 +170,7 @@ export class ProductsService implements IProductService {
     return result;
   }
 
-  async findOne(id: number): Promise<IProduct | null> {
+  async findOne(id: number): Promise<Product | null> {
     return this.cacheService.getOrSet(
       `${CACHE_KEYS.PRODUCT_BY_ID}:${id}`,
       () => this.productsRepository.findProductById(id),
@@ -185,7 +181,7 @@ export class ProductsService implements IProductService {
     );
   }
 
-  async update(id: number, data: Partial<ICreateProductDto>): Promise<IProduct> {
+  async update(id: number, data: Partial<CreateProductDto>): Promise<Product> {
     const product = await this.productsRepository.findProductById(id);
     if (!product) {
       throw new ResourceNotFoundException('Продукт', id);
@@ -239,7 +235,7 @@ export class ProductsService implements IProductService {
     return { deleted, failed };
   }
 
-  async getCatalog(): Promise<ICategory[]> {
+  async getCatalog(): Promise<Category[]> {
     return this.cacheService.getOrSet(
       'catalog:full',
       async () => {
@@ -269,7 +265,7 @@ export class ProductsService implements IProductService {
     );
   }
 
-  async findByIds(ids: number[]): Promise<IProduct[]> {
+  async findByIds(ids: number[]): Promise<Product[]> {
     if (!ids.length) return [];
     
     if (ids.length > PRODUCTS_CONSTANTS.MAX_BATCH_SIZE) {
@@ -279,7 +275,7 @@ export class ProductsService implements IProductService {
     return this.productsRepository.findProductsByIds(ids);
   }
 
-  async searchProducts(query: string, limit: number = 10): Promise<IProduct[]> {
+  async searchProducts(query: string, limit: number = 10): Promise<Product[]> {
     if (!query || query.trim().length < PRODUCTS_CONSTANTS.MIN_SEARCH_LENGTH) {
       throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.SEARCH_TOO_SHORT);
     }
@@ -315,7 +311,7 @@ export class ProductsService implements IProductService {
   /**
    * Получить все категории с кешированием
    */
-  async findAllCategories(): Promise<ICategory[]> {
+  async findAllCategories(): Promise<Category[]> {
     return this.cacheService.getOrSet(
       CACHE_KEYS.ALL_CATEGORIES,
       () => this.productsRepository.findAllCategories(),
@@ -329,7 +325,7 @@ export class ProductsService implements IProductService {
   /**
    * Получить категорию по ID с кешированием
    */
-  async findCategoryById(id: number): Promise<ICategory | null> {
+  async findCategoryById(id: number): Promise<Category | null> {
     return this.cacheService.getOrSet(
       `${CACHE_KEYS.CATEGORY_BY_ID}:${id}`,
       () => this.productsRepository.findCategoryById(id),
@@ -343,7 +339,7 @@ export class ProductsService implements IProductService {
   /**
    * Получить новые продукты с кешированием
    */
-  async findNewProducts(): Promise<IProduct[]> {
+  async findNewProducts(): Promise<Product[]> {
     return this.cacheService.getOrSet(
       CACHE_KEYS.NEW_PRODUCTS,
       () => this.productsRepository.findNewProducts(),
@@ -357,7 +353,7 @@ export class ProductsService implements IProductService {
   /**
    * Получить продукты со скидками с кешированием
    */
-  async findDiscountedProducts(): Promise<IProduct[]> {
+  async findDiscountedProducts(): Promise<Product[]> {
     return this.cacheService.getOrSet(
       CACHE_KEYS.DISCOUNTED_PRODUCTS,
       () => this.productsRepository.findDiscountedProducts(),

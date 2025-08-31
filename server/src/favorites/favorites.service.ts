@@ -4,7 +4,7 @@ import { Product } from '../products/entity/products.entity';
 import { FavoritesRepository } from './favorites.repository';
 import { UserService } from '../users/user/user.service';
 import { ProductsService } from '../products/products.service';
-import { IFavoriteItem, IFavoriteItemWithProduct } from '../common/interfaces/cart-favorites.interface';
+import { FavoriteItem, FavoriteItemWithProduct } from '../shared/shared.interfaces';
 import { CacheService } from '../shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES } from '../shared/cache/cache.constants';
 import { FAVORITES_CONSTANTS } from './favorites.constants';
@@ -21,7 +21,7 @@ export class FavoritesService {
   /**
    * Добавить товар в избранное
    */
-  async add(userId: number, productId: number): Promise<IFavoriteItem> {
+  async add(userId: number, productId: number): Promise<FavoriteItem> {
     // Валидация входных данных
     if (!userId || !productId) {
       throw new BadRequestException(FAVORITES_CONSTANTS.ERRORS.INVALID_USER_ID);
@@ -86,7 +86,7 @@ export class FavoritesService {
   /**
    * Получить избранное пользователя с кешированием
    */
-  async findAll(userId: number): Promise<IFavoriteItemWithProduct[]> {
+  async findAll(userId: number): Promise<FavoriteItemWithProduct[]> {
     if (!userId) {
       throw new BadRequestException(FAVORITES_CONSTANTS.ERRORS.INVALID_USER_ID);
     }
@@ -176,7 +176,7 @@ export class FavoritesService {
   /**
    * Добавить несколько товаров в избранное (batch операция)
    */
-  async addMultiple(userId: number, productIds: number[]): Promise<IFavoriteItem[]> {
+  async addMultiple(userId: number, productIds: number[]): Promise<FavoriteItem[]> {
     if (!userId || !productIds || productIds.length === 0) {
       throw new BadRequestException(FAVORITES_CONSTANTS.ERRORS.INVALID_PRODUCT_IDS);
     }

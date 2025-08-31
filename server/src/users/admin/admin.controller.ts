@@ -4,7 +4,7 @@ import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { AdminService } from './admin.service';
 import { ResponseService } from '../../shared/services/response.service';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { UserRole } from '../../shared/shared.interfaces';
 import { UserService } from '../user/user.service';
 import { ImagesUploadInterceptor } from '../../shared/upload/file-upload.helper';
 import { CreateProductDto } from '../../products/dto/create-product.dto';

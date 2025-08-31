@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { CartRepository } from './cart.repository';
 import { UserService } from '../users/user/user.service';
 import { ProductsService } from '../products/products.service';
-import { ICartItem, ICartItemWithProduct } from '../common/interfaces/cart-favorites.interface';
+import { CartItem, CartItemWithProduct } from '../shared/shared.interfaces';
 import { CacheService } from '../shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES } from '../shared/cache/cache.constants';
 import { CART_CONSTANTS } from './cart.constants';
@@ -19,7 +19,7 @@ export class CartService {
   /**
    * Добавить товар в корзину
    */
-  async addToCart(userId: number, productId: number): Promise<ICartItem> {
+  async addToCart(userId: number, productId: number): Promise<CartItem> {
     // Валидация входных данных
     if (!userId || !productId) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
@@ -84,7 +84,7 @@ export class CartService {
   /**
    * Получить корзину пользователя с кешированием
    */
-  async getUserCart(userId: number): Promise<ICartItemWithProduct[]> {
+  async getUserCart(userId: number): Promise<CartItemWithProduct[]> {
     if (!userId) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
     }
@@ -174,7 +174,7 @@ export class CartService {
   /**
    * Добавить несколько товаров в корзину (batch операция)
    */
-  async addMultipleToCart(userId: number, productIds: number[]): Promise<ICartItem[]> {
+  async addMultipleToCart(userId: number, productIds: number[]): Promise<CartItem[]> {
     if (!userId || !productIds || productIds.length === 0) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_PRODUCT_IDS);
     }

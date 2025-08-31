@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
 import { User } from "../../users/user/entity/user.entity";
-import { OrderItem } from "src/common/interfaces/order-item.interface";
-import { OrderStatus } from "src/common/enums/order-status.enum";
+import { OrderItem } from "src/shared/shared.interfaces";
+import { OrderStatus } from "src/shared/shared.interfaces";
 
 @Entity('order')
 @Index(['user', 'status']) // Индекс для поиска заказов пользователя по статусу

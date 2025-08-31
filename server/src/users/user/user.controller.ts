@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { UserService } from './user.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { ChangeDeliveryAddressDto, ChangeEmailDto, ChangePasswordDto } from './dto/user.dto';
-import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
+import { AuthenticatedRequest } from 'src/shared/shared.interfaces';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)

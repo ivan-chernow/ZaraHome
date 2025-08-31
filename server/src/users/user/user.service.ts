@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
 import { ChangePasswordDto, ProfileDto } from './dto/user.dto';
 import { ChangeDeliveryAddressDto } from './dto/user.dto';
-import { IUserService } from 'src/common/interfaces/service.interface';
+import { IUserService } from 'src/shared/shared.interfaces';
 import { User } from './entity/user.entity';
 
 @Injectable()

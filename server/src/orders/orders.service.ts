@@ -1,12 +1,11 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
+import { ResourceNotFoundException } from 'src/shared/shared.interfaces';
 import { Order } from './entity/order.entity';
-import { OrderStatus } from 'src/common/enums/order-status.enum';
+import { OrderStatus } from 'src/shared/shared.interfaces';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersRepository, OrderListResponse } from './orders.repository';
-import { IOrderService } from 'src/common/interfaces/service.interface';
-import { OrderItem } from 'src/common/interfaces/order-item.interface';
+import { IOrderService, OrderItem } from 'src/shared/shared.interfaces';
 import { PromocodesService } from '../promocodes/promocodes.service';
 import { ORDERS_CONSTANTS } from './orders.constants';
 

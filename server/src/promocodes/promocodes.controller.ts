@@ -4,7 +4,7 @@ import { ResponseService } from 'src/shared/services/response.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/shared/shared.interfaces';
 import { CreatePromocodeDto, ValidatePromocodeDto, UpdatePromocodeDto } from './dto';
 import { PromocodeCodeDto } from './dto/promocode-code.dto';
 import { ApiTags, ApiOperation, ApiOkResponse, ApiQuery, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';

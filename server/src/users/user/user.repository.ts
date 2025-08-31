@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InternalServerException } from 'src/common/base/base.exceptions';
+import { InternalServerException } from 'src/shared/shared.interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entity/user.entity';

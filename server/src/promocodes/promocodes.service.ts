@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Promocode } from './entity/promocode.entity';
 import { PromocodesRepository } from './promocodes.repository';
-import { IPromocodeService } from 'src/common/interfaces/service.interface';
+import { IPromocodeService } from 'src/shared/shared.interfaces';
 import { CacheService } from '../shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES, CACHE_KEYS } from '../shared/cache/cache.constants';
 import { PROMOCODES_CONSTANTS } from './promocodes.constants';

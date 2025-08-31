@@ -5,14 +5,14 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderIdDto } from './dto/order-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { ResponseService } from 'src/shared/services/response.service';
-import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
+import { AuthenticatedRequest } from 'src/shared/shared.interfaces';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
-import { ApiDefaultErrors } from 'src/common/swagger/swagger.decorators';
-import { OrderStatus } from 'src/common/enums/order-status.enum';
+import { ApiDefaultErrors } from 'src/shared/shared.interfaces';
+import { OrderStatus } from 'src/shared/shared.interfaces';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/shared/shared.interfaces';
 
 @ApiTags('orders')
 @Controller('orders')

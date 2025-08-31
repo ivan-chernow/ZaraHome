@@ -5,13 +5,13 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductIdDto } from './dto/product-id.dto';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRole } from 'src/shared/shared.interfaces';
 import { ImagesUploadInterceptor } from 'src/shared/upload/file-upload.helper';
-import { IProduct, ICategory } from '../common/interfaces/product.interface';
-import { ApiResponse } from '../common/interfaces/api-response.interface';
+import { Product, Category } from '../shared/shared.interfaces';
+import { ApiResponse } from '../shared/shared.interfaces';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { ResponseService } from 'src/shared/services/response.service';
-import { ResourceNotFoundException } from 'src/common/base/base.exceptions';
+import { ResourceNotFoundException } from 'src/shared/shared.interfaces';
 import { PRODUCTS_CONSTANTS } from './products.constants';
 
 @ApiTags('products')
@@ -34,7 +34,7 @@ export class ProductsController {
     async createProduct(
         @Body() dto: CreateProductDto,
         @UploadedFiles() files: Array<Express.Multer.File>
-    ): Promise<ApiResponse<IProduct>> {
+    ): Promise<ApiResponse<Product>> {
         const product = await this.productsService.createProduct(dto, files);
         return this.responseService.success(product, PRODUCTS_CONSTANTS.SUCCESS.PRODUCT_CREATED);
     }
@@ -97,7 +97,7 @@ export class ProductsController {
     async searchProducts(
         @Query('q') query: string,
         @Query('limit') limit?: number
-    ): Promise<ApiResponse<IProduct[]>> {
+    ): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService.searchProducts(query, limit);
         return this.responseService.success(products, PRODUCTS_CONSTANTS.SUCCESS.SEARCH_COMPLETED);
     }
@@ -113,7 +113,7 @@ export class ProductsController {
     @Get('catalog')
     @ApiOperation({ summary: 'Получить весь каталог с категориями' })
     @ApiOkResponse({ description: 'Каталог успешно загружен' })
-    async getCatalog(): Promise<ApiResponse<ICategory[]>> {
+    async getCatalog(): Promise<ApiResponse<Category[]>> {
         const catalog = await this.productsService.getCatalog();
         return this.responseService.success(catalog, PRODUCTS_CONSTANTS.SUCCESS.CATALOG_LOADED);
     }
@@ -121,7 +121,7 @@ export class ProductsController {
     @Get('new')
     @ApiOperation({ summary: 'Получить новые продукты' })
     @ApiOkResponse({ description: 'Новые продукты загружены' })
-    async getNewProducts(): Promise<ApiResponse<IProduct[]>> {
+    async getNewProducts(): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService.findNewProducts();
         return this.responseService.success(products, 'Новые продукты загружены');
     }
@@ -129,7 +129,7 @@ export class ProductsController {
     @Get('discounted')
     @ApiOperation({ summary: 'Получить продукты со скидками' })
     @ApiOkResponse({ description: 'Продукты со скидками загружены' })
-    async getDiscountedProducts(): Promise<ApiResponse<IProduct[]>> {
+    async getDiscountedProducts(): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService.findDiscountedProducts();
         return this.responseService.success(products, 'Продукты со скидками загружены');
     }
@@ -142,7 +142,7 @@ export class ProductsController {
     async getProductsByCategory(
         @Param('categoryId') categoryId: number,
         @Query('limit') limit?: number
-    ): Promise<ApiResponse<IProduct[]>> {
+    ): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService['productsRepository'].getProductsByCategory(categoryId, limit);
         return this.responseService.success(products, 'Продукты категории загружены');
     }
@@ -155,7 +155,7 @@ export class ProductsController {
     async getProductsBySubCategory(
         @Param('subCategoryId') subCategoryId: number,
         @Query('limit') limit?: number
-    ): Promise<ApiResponse<IProduct[]>> {
+    ): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService['productsRepository'].getProductsBySubCategory(subCategoryId, limit);
         return this.responseService.success(products, 'Продукты подкатегории загружены');
     }
@@ -168,7 +168,7 @@ export class ProductsController {
     async getProductsByType(
         @Param('typeId') typeId: number,
         @Query('limit') limit?: number
-    ): Promise<ApiResponse<IProduct[]>> {
+    ): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService['productsRepository'].getProductsByType(typeId, limit);
         return this.responseService.success(products, 'Продукты типа загружены');
     }
@@ -178,10 +178,10 @@ export class ProductsController {
     @ApiOkResponse({ description: 'Продукт найден' })
     @ApiNotFoundResponse({ description: 'Продукт не найден' })
     @ApiParam({ name: 'id', type: Number, description: 'ID продукта' })
-    async findOne(@Param() params: ProductIdDto): Promise<ApiResponse<IProduct>> {
+    async findOne(@Param() params: ProductIdDto): Promise<ApiResponse<Product>> {
         const product = await this.productsService.findOne(params.id);
         if (!product) {
-            throw new ResourceNotFoundException('Продукт', params.id);
+            throw new ResourceNotFoundException('Продукт не найден');
         }
         return this.responseService.success(product, 'Продукт найден');
     }
@@ -196,7 +196,7 @@ export class ProductsController {
     async updateProduct(
         @Param() params: ProductIdDto,
         @Body() dto: UpdateProductDto
-    ): Promise<ApiResponse<IProduct>> {
+    ): Promise<ApiResponse<Product>> {
         const product = await this.productsService.update(params.id, dto);
         return this.responseService.success(product, PRODUCTS_CONSTANTS.SUCCESS.PRODUCT_UPDATED);
     }
@@ -254,7 +254,7 @@ export class ProductsController {
             }
         }
     })
-    async getProductsByIds(@Body() body: { ids: number[] }): Promise<ApiResponse<IProduct[]>> {
+    async getProductsByIds(@Body() body: { ids: number[] }): Promise<ApiResponse<Product[]>> {
         const products = await this.productsService.findByIds(body.ids);
         return this.responseService.success(products, 'Продукты получены');
     }

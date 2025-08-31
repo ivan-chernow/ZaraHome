@@ -3,14 +3,14 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { CartService } from './cart.services';
 import { ResponseService } from 'src/shared/services/response.service';
-import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
+import { AuthenticatedRequest } from 'src/shared/shared.interfaces';
 //
 import { ProductIdDto } from './dto/product-id.dto';
 import { ProductIdsQueryDto } from './dto/product-ids-query.dto';
 import { AddMultipleToCartDto } from './dto/add-multiple-to-cart.dto';
 import { RemoveMultipleFromCartDto } from './dto/remove-multiple-from-cart.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiBody } from '@nestjs/swagger';
-import { ApiDefaultErrors } from 'src/common/swagger/swagger.decorators';
+import { ApiDefaultErrors } from 'src/shared/shared.interfaces';
 import { CART_CONSTANTS } from './cart.constants';
 
 @ApiTags('cart')

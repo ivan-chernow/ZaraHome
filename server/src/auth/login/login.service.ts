@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../../users/user/entity/user.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
 import { AuthRepository } from '../auth.repository';
-import { IAuthService } from 'src/common/interfaces/service.interface';
+import { IAuthService } from 'src/shared/shared.interfaces';
 
 @Injectable()
 export class LoginService implements IAuthService {

@@ -5,7 +5,7 @@ import { Favorite } from "src/favorites/entity/favorite.entity";
 import { DeliveryAddress } from "./delivery-address.entity";
 import { Cart } from "src/cart/entity/cart.entity";
 import { Order } from "src/orders/entity/order.entity";
-import { UserRole } from "src/common/enums/user-role.enum";
+import { UserRole } from "src/shared/shared.interfaces";
 
 @Entity('users')
 @Index(['email'], { unique: true })

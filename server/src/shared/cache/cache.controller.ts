@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse } from '@nestjs/swa
 import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { UserRole } from '../shared.interfaces';
 import { CacheService } from './cache.service';
 
 @ApiTags('cache')
