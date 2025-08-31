@@ -146,7 +146,7 @@ export class FileUploadErrorHandlerService {
 
     const cleanupPromises = filePaths.map(async (filePath) => {
       try {
-        await this.imageOptimizationService.deleteFile(filePath);
+        await this.imageOptimizationService.deleteImage(filePath);
         this.logger.log(`Удален неполный файл: ${filePath}`);
       } catch (error) {
         this.logger.warn(`Не удалось удалить файл ${filePath}:`, error.message);

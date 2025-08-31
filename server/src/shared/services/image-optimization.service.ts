@@ -4,18 +4,11 @@ import * as fs from 'fs/promises';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-
-export interface ImageProcessingOptions {
-  quality?: number;
-  maxWidth?: number;
-  maxHeight?: number;
-  format?: 'webp' | 'jpeg' | 'png';
-  generateThumbnail?: boolean;
-  thumbnailSize?: number;
-}
+import { SHARED_CONSTANTS } from '../shared.constants';
+import { IImageOptimizationService, ImageProcessingOptions } from '../shared.interfaces';
 
 @Injectable()
-export class ImageOptimizationService {
+export class ImageOptimizationService implements IImageOptimizationService {
   private readonly logger = new Logger(ImageOptimizationService.name);
   private readonly outputDir = join(__dirname, '..', '..', '..', 'uploads', 'products');
   private readonly thumbnailsDir = join(this.outputDir, 'thumbnails');
@@ -25,7 +18,8 @@ export class ImageOptimizationService {
       await fs.mkdir(this.outputDir, { recursive: true });
       await fs.mkdir(this.thumbnailsDir, { recursive: true });
     } catch (error) {
-      throw new InternalServerErrorException('Не удалось создать директории для загрузки');
+      this.logger.error('Ошибка создания директорий для загрузки', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.DIRECTORY_CREATION_FAILED);
     }
   }
 
@@ -39,28 +33,32 @@ export class ImageOptimizationService {
   }
 
   // Валидация изображения
-  private async validateImage(buffer: Buffer): Promise<void> {
+  async validateImage(buffer: Buffer): Promise<void> {
     try {
       const metadata = await sharp(buffer).metadata();
       
       if (!metadata.width || !metadata.height) {
-        throw new BadRequestException('Некорректное изображение');
+        throw new BadRequestException(SHARED_CONSTANTS.ERRORS.GENERAL.INVALID_IMAGE);
       }
 
       // Проверяем минимальные размеры
-      if (metadata.width < 50 || metadata.height < 50) {
-        throw new BadRequestException('Изображение слишком маленькое. Минимальный размер: 50x50 пикселей');
+      if (metadata.width < SHARED_CONSTANTS.IMAGES.MIN_DIMENSIONS || metadata.height < SHARED_CONSTANTS.IMAGES.MIN_DIMENSIONS) {
+        throw new BadRequestException(
+          `Изображение слишком маленькое. Минимальный размер: ${SHARED_CONSTANTS.IMAGES.MIN_DIMENSIONS}x${SHARED_CONSTANTS.IMAGES.MIN_DIMENSIONS} пикселей`
+        );
       }
 
       // Проверяем максимальные размеры
-      if (metadata.width > 8000 || metadata.height > 8000) {
-        throw new BadRequestException('Изображение слишком большое. Максимальный размер: 8000x8000 пикселей');
+      if (metadata.width > SHARED_CONSTANTS.IMAGES.MAX_DIMENSIONS || metadata.height > SHARED_CONSTANTS.IMAGES.MAX_DIMENSIONS) {
+        throw new BadRequestException(
+          `Изображение слишком большое. Максимальный размер: ${SHARED_CONSTANTS.IMAGES.MAX_DIMENSIONS}x${SHARED_CONSTANTS.IMAGES.MAX_DIMENSIONS} пикселей`
+        );
       }
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new BadRequestException('Некорректный формат изображения');
+              throw new BadRequestException(SHARED_CONSTANTS.ERRORS.GENERAL.INVALID_IMAGE_FORMAT);
     }
   }
 
@@ -76,12 +74,12 @@ export class ImageOptimizationService {
       await this.validateImage(buffer);
 
       const {
-        quality = 78,
-        maxWidth = 1600,
-        maxHeight = 1600,
+        quality = SHARED_CONSTANTS.IMAGES.DEFAULT_QUALITY,
+        maxWidth = SHARED_CONSTANTS.IMAGES.DEFAULT_MAX_WIDTH,
+        maxHeight = SHARED_CONSTANTS.IMAGES.DEFAULT_MAX_HEIGHT,
         format = 'webp',
         generateThumbnail = false,
-        thumbnailSize = 300
+        thumbnailSize = SHARED_CONSTANTS.IMAGES.DEFAULT_THUMBNAIL_SIZE
       } = options;
 
       // Генерируем уникальное имя файла
@@ -103,159 +101,226 @@ export class ImageOptimizationService {
         }
       }
 
-      // Создаем pipeline для основного изображения
-      let pipeline = image
-        .rotate() // Автоматический поворот по EXIF
-        .resize({ 
-          width: width || maxWidth, 
-          height: height || maxHeight, 
-          withoutEnlargement: true,
-          fit: 'inside'
+      // Применяем изменения
+      const processedImage = image
+        .resize(width, height, { 
+          fit: 'inside', 
+          withoutEnlargement: true 
+        })
+        .webp({ 
+          quality: Math.min(quality, SHARED_CONSTANTS.IMAGES.MAX_QUALITY),
+          effort: SHARED_CONSTANTS.IMAGES.COMPRESSION_EFFORT
         });
 
-      // Применяем формат и качество
-      switch (format) {
-        case 'webp':
-          pipeline = pipeline.webp({ quality, effort: 4 });
-          break;
-        case 'jpeg':
-          pipeline = pipeline.jpeg({ quality });
-          break;
-        case 'png':
-          pipeline = pipeline.png({ quality });
-          break;
-        default:
-          pipeline = pipeline.webp({ quality, effort: 4 });
-      }
-
-      await pipeline.toFile(outputPath);
+      // Сохраняем основное изображение
+      await processedImage.toFile(outputPath);
 
       let thumbnailPath: string | undefined;
 
-      // Создаем миниатюру если требуется
+      // Генерируем миниатюру если требуется
       if (generateThumbnail) {
         const thumbnailFileName = `thumb-${fileName}`;
         const thumbnailOutputPath = join(this.thumbnailsDir, thumbnailFileName);
-
-        await sharp(buffer)
-          .rotate()
-          .resize(thumbnailSize, thumbnailSize, {
-            fit: 'cover',
-            position: 'center'
+        
+        const thumbnail = sharp(buffer)
+          .resize(thumbnailSize, thumbnailSize, { 
+            fit: 'cover', 
+            position: 'center' 
           })
-          .webp({ quality: 70, effort: 4 })
-          .toFile(thumbnailOutputPath);
+          .webp({ 
+            quality: Math.min(quality, SHARED_CONSTANTS.IMAGES.MAX_QUALITY),
+            effort: SHARED_CONSTANTS.IMAGES.COMPRESSION_EFFORT
+          });
 
-        thumbnailPath = `/uploads/products/thumbnails/${thumbnailFileName}`;
+        await thumbnail.toFile(thumbnailOutputPath);
+        thumbnailPath = thumbnailOutputPath;
       }
 
+      this.logger.log(`Изображение успешно обработано: ${fileName}`);
+      
       return {
-        mainPath: `/uploads/products/${fileName}`,
+        mainPath: outputPath,
         thumbnailPath
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Ошибка обработки изображения: ' + error.message);
+      this.logger.error('Ошибка обработки изображения', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.IMAGE_PROCESSING_FAILED);
     }
   }
 
-  async processMany(
-    files: Express.Multer.File[], 
-    options: ImageProcessingOptions = {}
-  ): Promise<string[]> {
-    const results: string[] = [];
-    const processedFiles: string[] = [];
-
-    for (const file of files) {
-      try {
-        const result = await this.processAndSave(file.buffer, file.originalname, options);
-        results.push(result.mainPath);
-        processedFiles.push(result.mainPath);
-        
-        // Если создана миниатюра, добавляем её в список для возможной очистки
-        if (result.thumbnailPath) {
-          processedFiles.push(result.thumbnailPath);
-        }
-      } catch (error) {
-        this.logger.error(`Ошибка обработки файла ${file.originalname}:`, error.message);
-        
-        // Удаляем уже обработанные файлы при ошибке
-        if (processedFiles.length > 0) {
-          await this.deleteFiles(processedFiles);
-        }
-        
-        throw new InternalServerErrorException(
-          `Ошибка обработки изображения ${file.originalname}: ${error.message}`
-        );
-      }
-    }
-
-    return results;
-  }
-
-  async processManyWithFallback(
-    files: Express.Multer.File[], 
-    options: ImageProcessingOptions = {}
-  ): Promise<{ success: boolean; paths: string[]; errors: string[] }> {
-    const paths: string[] = [];
-    const errors: string[] = [];
-    const processedFiles: string[] = [];
-
-    for (const file of files) {
-      try {
-        const result = await this.processAndSave(file.buffer, file.originalname, options);
-        paths.push(result.mainPath);
-        processedFiles.push(result.mainPath);
-        
-        if (result.thumbnailPath) {
-          processedFiles.push(result.thumbnailPath);
-        }
-      } catch (error) {
-        this.logger.error(`Ошибка обработки файла ${file.originalname}:`, error.message);
-        errors.push(`${file.originalname}: ${error.message}`);
-        
-        // Удаляем файлы, обработанные в этой итерации
-        if (processedFiles.length > 0) {
-          await this.deleteFiles(processedFiles);
-          processedFiles.length = 0; // Очищаем массив
-        }
-      }
-    }
-
-    return {
-      success: errors.length === 0,
-      paths,
-      errors,
-    };
-  }
-
-  // Удаление файлов
-  async deleteFile(filePath: string): Promise<void> {
+  async generateThumbnail(
+    imagePath: string, 
+    size: number = SHARED_CONSTANTS.IMAGES.DEFAULT_THUMBNAIL_SIZE
+  ): Promise<string> {
     try {
-      const fullPath = join(__dirname, '..', '..', '..', filePath.replace(/^\//, ''));
-      await fs.unlink(fullPath);
+      const fileName = `thumb-${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
+      const outputPath = join(this.thumbnailsDir, fileName);
+
+      await sharp(imagePath)
+        .resize(size, size, { fit: 'cover', position: 'center' })
+        .webp({ 
+          quality: SHARED_CONSTANTS.IMAGES.DEFAULT_QUALITY,
+          effort: SHARED_CONSTANTS.IMAGES.COMPRESSION_EFFORT
+        })
+        .toFile(outputPath);
+
+      this.logger.log(`Миниатюра создана: ${fileName}`);
+      return outputPath;
     } catch (error) {
-      // Игнорируем ошибки если файл не существует
-      console.warn(`Не удалось удалить файл ${filePath}:`, error.message);
+      this.logger.error('Ошибка создания миниатюры', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
     }
   }
 
-  // Удаление нескольких файлов
-  async deleteFiles(filePaths: string[]): Promise<void> {
-    const deletePromises = filePaths.map(path => this.deleteFile(path));
-    await Promise.allSettled(deletePromises);
+  async compressImage(
+    imagePath: string, 
+    quality: number = SHARED_CONSTANTS.IMAGES.DEFAULT_QUALITY
+  ): Promise<string> {
+    try {
+      const fileName = `compressed-${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
+      const outputPath = join(this.outputDir, fileName);
+
+      await sharp(imagePath)
+        .webp({ 
+          quality: Math.min(quality, SHARED_CONSTANTS.IMAGES.MAX_QUALITY),
+          effort: SHARED_CONSTANTS.IMAGES.COMPRESSION_EFFORT
+        })
+        .toFile(outputPath);
+
+      this.logger.log(`Изображение сжато: ${fileName}`);
+      return outputPath;
+    } catch (error) {
+      this.logger.error('Ошибка сжатия изображения', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
+    }
   }
 
-  // Получение информации о файле
-  async getFileInfo(filePath: string): Promise<{ size: number; exists: boolean }> {
+  async resizeImage(
+    imagePath: string, 
+    width: number, 
+    height: number
+  ): Promise<string> {
     try {
-      const fullPath = join(__dirname, '..', '..', '..', filePath.replace(/^\//, ''));
-      const stats = await fs.stat(fullPath);
-      return { size: stats.size, exists: true };
+      const fileName = `resized-${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
+      const outputPath = join(this.outputDir, fileName);
+
+      await sharp(imagePath)
+        .resize(width, height, { fit: 'inside', withoutEnlargement: true })
+        .webp({ 
+          quality: SHARED_CONSTANTS.IMAGES.DEFAULT_QUALITY,
+          effort: SHARED_CONSTANTS.IMAGES.COMPRESSION_EFFORT
+        })
+        .toFile(outputPath);
+
+      this.logger.log(`Изображение изменено: ${fileName}`);
+      return outputPath;
     } catch (error) {
-      return { size: 0, exists: false };
+      this.logger.error('Ошибка изменения размера изображения', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
+    }
+  }
+
+  async convertFormat(
+    imagePath: string, 
+    format: 'webp' | 'jpeg' | 'png' = 'webp'
+  ): Promise<string> {
+    try {
+      const fileName = `converted-${Date.now()}-${Math.random().toString(36).substring(7)}.${format}`;
+      const outputPath = join(this.outputDir, fileName);
+
+      let processedImage = sharp(imagePath);
+
+      switch (format) {
+        case 'webp':
+          processedImage = processedImage.webp({ 
+            quality: SHARED_CONSTANTS.IMAGES.DEFAULT_QUALITY,
+            effort: SHARED_CONSTANTS.IMAGES.COMPRESSION_EFFORT
+          });
+          break;
+        case 'jpeg':
+          processedImage = processedImage.jpeg({ 
+            quality: SHARED_CONSTANTS.IMAGES.DEFAULT_QUALITY,
+            progressive: true
+          });
+          break;
+        case 'png':
+          processedImage = processedImage.png({ 
+            compressionLevel: SHARED_CONSTANTS.IMAGES.PNG_COMPRESSION_LEVEL,
+            progressive: true
+          });
+          break;
+      }
+
+      await processedImage.toFile(outputPath);
+
+      this.logger.log(`Формат изменен на ${format}: ${fileName}`);
+      return outputPath;
+    } catch (error) {
+      this.logger.error('Ошибка изменения формата изображения', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
+    }
+  }
+
+  async getImageMetadata(imagePath: string): Promise<{
+    width: number;
+    height: number;
+    format: string;
+    size: number;
+    channels: number;
+    space: string;
+  }> {
+    try {
+      const metadata = await sharp(imagePath).metadata();
+      const stats = await fs.stat(imagePath);
+
+      return {
+        width: metadata.width || 0,
+        height: metadata.height || 0,
+        format: metadata.format || 'unknown',
+        size: stats.size,
+        channels: metadata.channels || 0,
+        space: metadata.space || 'unknown'
+      };
+    } catch (error) {
+      this.logger.error('Ошибка получения метаданных изображения', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
+    }
+  }
+
+  async deleteImage(imagePath: string): Promise<void> {
+    try {
+      await fs.unlink(imagePath);
+      this.logger.log(`Изображение удалено: ${imagePath}`);
+    } catch (error) {
+      this.logger.error('Ошибка удаления изображения', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
+    }
+  }
+
+  async cleanupOldImages(maxAge: number = SHARED_CONSTANTS.IMAGES.DEFAULT_CLEANUP_AGE): Promise<number> {
+    try {
+      const files = await fs.readdir(this.outputDir);
+      const now = Date.now();
+      let deletedCount = 0;
+
+      for (const file of files) {
+        if (file === 'thumbnails') continue; // Пропускаем папку с миниатюрами
+        
+        const filePath = join(this.outputDir, file);
+        const stats = await fs.stat(filePath);
+        const fileAge = now - stats.mtime.getTime();
+
+        if (fileAge > maxAge) {
+          await fs.unlink(filePath);
+          deletedCount++;
+        }
+      }
+
+      this.logger.log(`Удалено ${deletedCount} старых изображений`);
+      return deletedCount;
+    } catch (error) {
+      this.logger.error('Ошибка очистки старых изображений', error);
+      throw new InternalServerErrorException(SHARED_CONSTANTS.ERRORS.GENERAL.OPERATION_FAILED);
     }
   }
 }
