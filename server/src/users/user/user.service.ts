@@ -4,6 +4,7 @@ import { UserRepository } from './user.repository';
 import { ChangePasswordDto, ProfileDto } from './dto/user.dto';
 import { ChangeDeliveryAddressDto } from './dto/user.dto';
 import { IUserService } from 'src/common/interfaces/service.interface';
+import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -15,7 +16,7 @@ export class UserService implements IUserService {
     return this.userRepository.findUserByIdBasic(userId);
   }
 
-  async getProfile(userId: number): Promise<ProfileDto> {
+  async getProfile(userId: number): Promise<User> {
     const user = await this.userRepository.findUserById(userId);
 
     if (!user) {

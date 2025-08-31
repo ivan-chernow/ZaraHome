@@ -27,7 +27,7 @@ import { ChangePasswordDto, ProfileDto, ChangeDeliveryAddressDto } from '../../u
 
 export interface IUserService extends IBaseService<unknown> {
   findOne(_userId: number): Promise<unknown>;
-  getProfile(_userId: number): Promise<ProfileDto>;
+  getProfile(_userId: number): Promise<unknown>;
   changePassword(_userId: number, _dto: ChangePasswordDto): Promise<{ message: string }>;
   changeEmail(_userId: number, _currentEmail: string, _newEmail: string): Promise<{ message: string }>;
   changeDeliveryAddress(_userId: number, _addressData: ChangeDeliveryAddressDto): Promise<{ message: string }>;

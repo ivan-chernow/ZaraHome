@@ -14,6 +14,7 @@ export const CACHE_TTL = {
   USER_FAVORITES: 3600, // 1 час
   USER_PROFILE: 1800, // 30 минут
   USER: 1800, // 30 минут
+  USER_ADDRESSES: 600, // 10 минут
   ORDERS: 1800, // 30 минут
   
   // Справочники (изменяются редко)
@@ -26,7 +27,9 @@ export const CACHE_TTL = {
   
   // Поиск и статистика
   SEARCH: 900, // 15 минут
+  SEARCH_RESULTS: 300, // 5 минут
   STATS: 1800, // 30 минут
+  USER_STATS: 1800, // 30 минут
 } as const;
 
 export const CACHE_PREFIXES = {
