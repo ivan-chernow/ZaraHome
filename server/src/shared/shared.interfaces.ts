@@ -628,7 +628,6 @@ export interface IPromocodeService {
   searchPromocodes(query: string, page?: number, limit?: number): Promise<any>;
   deactivateMultiple(codes: string[]): Promise<any>;
   getPromocodeStats(): Promise<any>;
-  getPromocodeUsageStats(promocodeId: number): Promise<any>;
   update(code: string, updates: any): Promise<any>;
 }
 

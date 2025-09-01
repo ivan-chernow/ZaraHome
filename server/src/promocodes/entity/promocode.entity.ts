@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from "typeorm";
-import { PromocodeUsage } from "./promocode-usage.entity";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
 
 @Entity('promocodes')
 @Index(['code'], { unique: true })
@@ -42,7 +41,4 @@ export class Promocode {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @OneToMany(() => PromocodeUsage, usage => usage.promocode)
-  usageHistory: PromocodeUsage[];
 }

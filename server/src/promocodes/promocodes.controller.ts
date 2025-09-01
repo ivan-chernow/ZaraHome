@@ -183,19 +183,6 @@ export class PromocodesController {
     return this.responseService.success(stats, 'Статистика промокодов получена');
   }
 
-  // Получение статистики использования конкретного промокода (только для админа)
-  @Get(':promocodeId/usage-stats')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Получить статистику использования промокода' })
-  @ApiOkResponse({ description: 'Статистика использования получена' })
-  @ApiParam({ name: 'promocodeId', type: Number, description: 'ID промокода' })
-  async getPromocodeUsageStats(@Param('promocodeId') promocodeId: number) {
-    const stats = await this.promocodesService.getPromocodeUsageStats(promocodeId);
-    return this.responseService.success(stats, 'Статистика использования получена');
-  }
-
   // Получение промокода по коду
   @Get(':code')
   @ApiOperation({ summary: 'Получить промокод по коду' })

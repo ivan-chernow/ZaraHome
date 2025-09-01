@@ -23,25 +23,25 @@ export class Product {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: false, length: 255 })
+    @Column({ nullable: true, length: 255 })
     name_eng: string;
 
-    @Column({ length: 255 })
+    @Column({ nullable: true, length: 255 })
     name_ru: string;
 
-    @Column('simple-array')
+    @Column('simple-array', { nullable: true })
     img: string[];
 
-    @Column('jsonb')
+    @Column('jsonb', { nullable: true })
     colors: string[];
 
-    @Column('jsonb')
+    @Column('jsonb', { nullable: true })
     size: { size: string; price: number }[];
 
-    @Column({ length: 100 })
+    @Column({ length: 100, nullable: true })
     deliveryDate: string;
 
-    @Column('text')
+    @Column('text', { nullable: true })
     description: string;
 
     @Column({ default: false })

@@ -120,11 +120,6 @@ export class PromocodesService implements IPromocodeService {
     const discount = (orderAmount * promocode.discount) / 100;
     const finalAmount = orderAmount - discount;
 
-    // Увеличиваем счетчик использования
-    if (userId) {
-      await this.recordPromocodeUsage(promocode.id, userId, orderAmount, discount);
-    }
-
     return { 
       isValid: true, 
       discount,
@@ -241,16 +236,6 @@ export class PromocodesService implements IPromocodeService {
     );
   }
 
-  // Получение статистики использования конкретного промокода
-  async getPromocodeUsageStats(promocodeId: number): Promise<{
-    totalUsage: number;
-    totalDiscountApplied: number;
-    averageOrderAmount: number;
-    usageByDate: Array<{ date: string; usage: number; discount: number }>;
-  }> {
-    return this.promocodesRepository.getPromocodeUsageStats(promocodeId);
-  }
-
   // Обновление промокода
   async update(
     code: string, 
@@ -284,25 +269,6 @@ export class PromocodesService implements IPromocodeService {
     await this.invalidatePromocodesCache();
     
     return updatedPromocode;
-  }
-
-  // Запись использования промокода
-  private async recordPromocodeUsage(
-    promocodeId: number, 
-    userId: number, 
-    orderAmount: number, 
-    discountApplied: number
-  ): Promise<void> {
-    await this.promocodesRepository.recordUsage({
-      promocodeId,
-      userId,
-      orderAmount,
-      discountApplied,
-      usedAt: new Date()
-    });
-
-    // Увеличиваем счетчик использования
-    await this.promocodesRepository.incrementUsage(promocodeId);
   }
 
   // Валидация данных промокода

@@ -4,12 +4,11 @@ import { PromocodesController } from './promocodes.controller';
 import { PromocodesService } from './promocodes.service';
 import { PromocodesRepository } from './promocodes.repository';
 import { Promocode } from './entity/promocode.entity';
-import { PromocodeUsage } from './entity/promocode-usage.entity';
 import { SharedModule } from '../shared/modules/shared.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Promocode, PromocodeUsage]),
+    TypeOrmModule.forFeature([Promocode]),
     SharedModule
   ],
   controllers: [PromocodesController],
