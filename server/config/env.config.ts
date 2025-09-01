@@ -14,7 +14,7 @@ export const databaseConfig = registerAs('database', () => ({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  synchronize: false, // Временно отключаем синхронизацию для исправления проблем с БД
+  synchronize: true,
   logging: process.env.DB_LOGGING === 'true',
   entities: ['dist/**/*.entity{.ts,.js}'],
 }));

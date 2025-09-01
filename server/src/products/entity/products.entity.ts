@@ -56,7 +56,7 @@ export class Product {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => User, user => user.products)
+    @ManyToOne(() => User, user => user.products, { nullable: true })
     user: User;
 
     @Column({ default: true })
