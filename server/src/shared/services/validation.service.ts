@@ -341,8 +341,13 @@ export class ValidationService implements IValidationService {
           total,
           valid,
           invalid,
-          errors
-        }
+          criticalErrors: 0,
+          warnings: 0,
+          suggestions: 0
+        },
+        total,
+        valid,
+        invalid
       };
     } catch (error) {
       this.logger.error(`Error in bulk validation: ${error.message}`);

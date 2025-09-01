@@ -72,11 +72,9 @@ export class ProductsService implements IProductService {
             file.originalname,
             {
               quality: 80,
-              maxWidth: 1600,
-              maxHeight: 1600,
-              format: 'webp',
-              generateThumbnail: true,
-              thumbnailSize: 300
+              width: 1600,
+              height: 1600,
+              format: 'webp'
             }
           );
           return result.mainPath;
@@ -96,34 +94,11 @@ export class ProductsService implements IProductService {
   }
 
   async create(data: CreateProductDto): Promise<Product> {
-    const { categoryId, subCategoryId, typeId, ...rest } = data;
-    
     // Валидация входных данных
     this.validateProductData(data);
     
     // Создаем объект для передачи в репозиторий
-    const productData: any = { ...rest };
-    
-    // Найти объекты по id через репозиторий с параллельными запросами
-    const [category, subCategory, type] = await Promise.all([
-      categoryId ? this.productsRepository.findCategoryById(categoryId) : null,
-      subCategoryId ? this.productsRepository.findSubCategoryById(subCategoryId) : null,
-      typeId ? this.productsRepository.findTypeById(typeId) : null
-    ]);
-
-    if (categoryId && !category) {
-      throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.CATEGORY_NOT_FOUND);
-    }
-    if (subCategoryId && !subCategory) {
-      throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.SUB_CATEGORY_NOT_FOUND);
-    }
-    if (typeId && !type) {
-      throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.TYPE_NOT_FOUND);
-    }
-
-    if (category) productData.category = category;
-    if (subCategory) productData.subCategory = subCategory;
-    if (type) productData.type = type;
+    const productData: any = { ...data };
 
     const product = await this.productsRepository.createProduct(productData);
     
@@ -184,7 +159,7 @@ export class ProductsService implements IProductService {
   async update(id: number, data: Partial<CreateProductDto>): Promise<Product> {
     const product = await this.productsRepository.findProductById(id);
     if (!product) {
-      throw new ResourceNotFoundException('Продукт', id);
+      throw new ResourceNotFoundException('Продукт не найден');
     }
     
     // Валидация обновляемых данных
@@ -204,7 +179,7 @@ export class ProductsService implements IProductService {
   async delete(id: number): Promise<void> {
     const product = await this.productsRepository.findProductById(id);
     if (!product) {
-      throw new ResourceNotFoundException('Продукт', id);
+      throw new ResourceNotFoundException('Продукт не найден');
     }
 
     await this.productsRepository.removeProduct(id);
@@ -367,7 +342,7 @@ export class ProductsService implements IProductService {
   /**
    * Валидация данных продукта
    */
-  private validateProductData(data: Partial<ICreateProductDto>, isUpdate: boolean = false): void {
+  private validateProductData(data: Partial<CreateProductDto>, isUpdate: boolean = false): void {
     if (!isUpdate || data.name_eng !== undefined) {
       if (!data.name_eng || data.name_eng.trim().length < PRODUCTS_CONSTANTS.MIN_NAME_LENGTH) {
         throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.INVALID_NAME_ENG);

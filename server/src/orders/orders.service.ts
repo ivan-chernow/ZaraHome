@@ -32,7 +32,7 @@ export class OrdersService implements IOrderService {
     // Получаем пользователя через репозиторий
     const user = await this.ordersRepository.findUserById(userId);
     if (!user) {
-      throw new ResourceNotFoundException('Пользователь', userId);
+      throw new ResourceNotFoundException('Пользователь не найден');
     }
 
     // Проверяем, есть ли уже активный заказ у пользователя
@@ -44,7 +44,7 @@ export class OrdersService implements IOrderService {
       const newItems = createOrderDto.items;
       
       // Проверяем, одинаковые ли товары и количества
-      const itemsChanged = this.haveItemsChanged(currentItems, newItems);
+      const itemsChanged = this.haveItemsChanged(currentItems as any, newItems as any);
       
       // Если товары не изменились, возвращаем существующий заказ
       if (!itemsChanged) {
@@ -57,7 +57,7 @@ export class OrdersService implements IOrderService {
     }
 
     // Рассчитываем общую стоимость и количество
-    const { totalPrice, totalCount } = this.calculateOrderTotals(createOrderDto.items);
+    const { totalPrice, totalCount } = this.calculateOrderTotals(createOrderDto.items as any);
 
     // Применяем промокод, если указан
     let finalPrice = totalPrice;
@@ -87,7 +87,7 @@ export class OrdersService implements IOrderService {
       totalCount,
       discount,
       promocode,
-    });
+    } as any);
 
     return order;
   }
@@ -111,7 +111,7 @@ export class OrdersService implements IOrderService {
   async updateOrderStatus(orderId: number, status: OrderStatus, userId: number): Promise<Order> {
     const order = await this.getOrderById(orderId, userId);
     if (!order) {
-      throw new ResourceNotFoundException('Заказ', orderId);
+      throw new ResourceNotFoundException('Заказ не найден');
     }
 
     // Проверяем, можно ли изменить статус
@@ -129,7 +129,7 @@ export class OrdersService implements IOrderService {
   async updateOrder(orderId: number, updateOrderDto: UpdateOrderDto, userId: number): Promise<Order> {
     const order = await this.getOrderById(orderId, userId);
     if (!order) {
-      throw new ResourceNotFoundException('Заказ', orderId);
+      throw new ResourceNotFoundException('Заказ не найден');
     }
 
     // Проверяем, можно ли редактировать заказ

@@ -121,11 +121,11 @@ export class ImageOptimizationService implements IImageOptimizationService {
       if (generateThumbnail) {
         const thumbnailFileName = `thumb-${fileName}`;
         const thumbnailOutputPath = join(this.thumbnailsDir, thumbnailFileName);
-        
+
         const thumbnail = sharp(buffer)
-          .resize(thumbnailSize, thumbnailSize, { 
-            fit: 'cover', 
-            position: 'center' 
+          .resize(thumbnailSize, thumbnailSize, {
+            fit: 'cover',
+            position: 'center'
           })
           .webp({ 
             quality: Math.min(quality, SHARED_CONSTANTS.IMAGES.MAX_QUALITY),
@@ -137,7 +137,7 @@ export class ImageOptimizationService implements IImageOptimizationService {
       }
 
       this.logger.log(`Изображение успешно обработано: ${fileName}`);
-      
+
       return {
         mainPath: outputPath,
         thumbnailPath

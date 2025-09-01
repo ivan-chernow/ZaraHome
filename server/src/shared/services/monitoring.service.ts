@@ -108,6 +108,7 @@ export class MonitoringService implements IMonitoringService {
         counters: Object.fromEntries(this.counters),
         gauges: Object.fromEntries(this.gauges),
         histograms: Object.fromEntries(this.histograms),
+        timestamps: {},
         timings: Object.fromEntries(this.timings)
       };
     } catch (error) {
@@ -146,7 +147,7 @@ export class MonitoringService implements IMonitoringService {
       
       return {
         status,
-        checks,
+        checks: Object.fromEntries(checks.map(check => [check.name, { status: check.status, responseTime: check.responseTime }])),
         timestamp: new Date(),
         uptime: Date.now() - this.startTime
       };

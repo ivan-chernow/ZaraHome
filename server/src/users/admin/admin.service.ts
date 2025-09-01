@@ -107,8 +107,8 @@ export class AdminService implements OnModuleInit, IAdminService {
                                     fileToProcess.originalname,
                                     {
                                         quality: 80,
-                                        maxWidth: 1600,
-                                        maxHeight: 1600,
+                                        width: 1600,
+                                        height: 1600,
                                         format: 'webp',
                                         generateThumbnail: true,
                                         thumbnailSize: 300

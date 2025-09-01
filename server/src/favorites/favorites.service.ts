@@ -47,7 +47,8 @@ export class FavoritesService {
       return {
         id: existingFavorite.id,
         userId: existingFavorite.user.id,
-        productId: existingFavorite.product.id
+        productId: existingFavorite.product.id,
+        createdAt: existingFavorite.createdAt
       };
     }
 
@@ -60,7 +61,8 @@ export class FavoritesService {
     return {
       id: favorite.id,
       userId: favorite.user.id,
-      productId: favorite.product.id
+      productId: favorite.product.id,
+      createdAt: favorite.createdAt
     };
   }
 
@@ -102,6 +104,7 @@ export class FavoritesService {
           id: fav.id,
           userId: fav.user.id,
           productId: fav.product.id,
+          createdAt: fav.createdAt,
           product: {
             id: fav.product.id,
             name_eng: fav.product.name_eng,
@@ -113,7 +116,9 @@ export class FavoritesService {
             description: fav.product.description,
             isNew: fav.product.isNew,
             discount: fav.product.discount,
-            isAvailable: fav.product.isAvailable
+            isAvailable: fav.product.isAvailable,
+            createdAt: fav.product.createdAt,
+            updatedAt: fav.product.updatedAt
           }
         }));
       },
@@ -219,7 +224,8 @@ export class FavoritesService {
       return existingFavorites.map(fav => ({
         id: fav.id,
         userId: fav.user.id,
-        productId: fav.product.id
+        productId: fav.product.id,
+        createdAt: fav.createdAt
       }));
     }
 
@@ -236,7 +242,8 @@ export class FavoritesService {
     return allFavorites.map(fav => ({
       id: fav.id,
       userId: fav.user.id,
-      productId: fav.product.id
+      productId: fav.product.id,
+      createdAt: fav.createdAt
     }));
   }
 

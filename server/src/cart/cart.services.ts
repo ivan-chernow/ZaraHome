@@ -45,7 +45,8 @@ export class CartService {
       return {
         id: existingCart.id,
         userId: existingCart.user.id,
-        productId: existingCart.product.id
+        productId: existingCart.product.id,
+        createdAt: existingCart.createdAt
       };
     }
 
@@ -58,7 +59,8 @@ export class CartService {
     return {
       id: newCart.id,
       userId: newCart.user.id,
-      productId: newCart.product.id
+      productId: newCart.product.id,
+      createdAt: newCart.createdAt
     };
   }
 
@@ -100,6 +102,7 @@ export class CartService {
           id: item.id,
           userId: item.user.id,
           productId: item.product.id,
+          createdAt: item.createdAt,
           product: {
             id: item.product.id,
             name_eng: item.product.name_eng,
@@ -111,7 +114,9 @@ export class CartService {
             description: item.product.description,
             isNew: item.product.isNew,
             discount: item.product.discount,
-            isAvailable: item.product.isAvailable
+            isAvailable: item.product.isAvailable,
+            createdAt: item.product.createdAt,
+            updatedAt: item.product.updatedAt
           }
         }));
       },
@@ -217,7 +222,8 @@ export class CartService {
       return existingCartItems.map(item => ({
         id: item.id,
         userId: item.user.id,
-        productId: item.product.id
+        productId: item.product.id,
+        createdAt: item.createdAt
       }));
     }
 
@@ -234,7 +240,8 @@ export class CartService {
     return allCartItems.map(item => ({
       id: item.id,
       userId: item.user.id,
-      productId: item.product.id
+      productId: item.product.id,
+      createdAt: item.createdAt
     }));
   }
 

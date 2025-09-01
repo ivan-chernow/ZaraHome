@@ -53,7 +53,7 @@ export class UserRepository {
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.userRepository.findOne({
-        where: { id: userId }
+      where: { id: userId }
       }),
       { ttl: CACHE_TTL.USER_PROFILE, prefix: CACHE_PREFIXES.USER }
     );
@@ -336,8 +336,8 @@ export class UserRepository {
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.addressRepository.findOne({
-        where: { id: addressId },
-        relations: ['user']
+      where: { id: addressId },
+      relations: ['user']
       }),
       { ttl: CACHE_TTL.USER_ADDRESSES, prefix: CACHE_PREFIXES.USER }
     );
