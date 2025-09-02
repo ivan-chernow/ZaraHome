@@ -100,6 +100,14 @@ export const envValidationSchema = Joi.object({
   ADMIN_PASSWORD: Joi.string()
     .min(8)
     .optional(),
+
+  // EMAIL / RESEND (для отправки писем через Resend)
+  RESEND_API_KEY: Joi.string()
+    .allow('')
+    .optional(),
+  MAIL_FROM: Joi.string()
+    .email()
+    .optional(),
 });
 
 export const validationOptions = {
