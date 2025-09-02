@@ -36,6 +36,10 @@ export const authApi = createApi({
                 method: 'POST',
                 body: credentials,
             }),
+            transformResponse: (response: any) => {
+                // Backend оборачивает ответ: { success, data, message }
+                return response?.data as LoginResponse;
+            },
             invalidatesTags: ['Auth'],
         }),
 
@@ -54,6 +58,9 @@ export const authApi = createApi({
                 method: 'POST',
                 credentials: 'include',
             }),
+            transformResponse: (response: any) => {
+                return response?.data as RefreshResponse;
+            },
         }),
 
         changePassword: builder.mutation<{ success: boolean; message: string }, ChangePasswordRequest>({

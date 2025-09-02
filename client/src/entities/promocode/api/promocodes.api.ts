@@ -69,6 +69,15 @@ export const promocodesApi = createApi({
                 url: '/promocodes',
                 method: 'GET',
             }),
+            transformResponse: (response: any) => {
+                const data = response?.data ?? response;
+                // Сервер возвращает объект пагинации: { promocodes, total, page, ... }
+                if (data && Array.isArray(data.promocodes)) {
+                    return data.promocodes as Promocode[];
+                }
+                // На всякий случай поддержим прямой массив
+                return Array.isArray(data) ? (data as Promocode[]) : [];
+            },
             providesTags: (result) =>
                 result
                     ? [

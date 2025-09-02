@@ -50,6 +50,10 @@ export const profileApi = createApi({
                 url: '/user/delivery-addresses',
                 method: 'GET',
             }),
+            transformResponse: (response: any) => {
+                // Backend: { success, data, message }
+                return (response?.data ?? response) as DeliveryAddressDto[];
+            },
             providesTags: (result) =>
                 result
                     ? [

@@ -92,6 +92,14 @@ export const envValidationSchema = Joi.object({
 
   CORS_CREDENTIALS: Joi.boolean()
     .default(true),
+
+  // ADMIN
+  ADMIN_EMAIL: Joi.string()
+    .email()
+    .optional(),
+  ADMIN_PASSWORD: Joi.string()
+    .min(8)
+    .optional(),
 });
 
 export const validationOptions = {

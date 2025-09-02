@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import {
@@ -39,6 +40,7 @@ interface ApiError {
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const viewPassword = useSelector(
     (state: RootState) => state.auth.viewPassword
   );
@@ -78,8 +80,8 @@ const LoginForm = () => {
           ? "/profile"
           : "/";
 
-      // Переходим в личный кабинет немедленно
-      window.location.href = path;
+      // Переходим в личный кабинет через Next.js router
+      router.push(path);
 
       setTimeout(() => {
         dispatch(setAuthenticating(false));
