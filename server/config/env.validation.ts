@@ -108,6 +108,9 @@ export const envValidationSchema = Joi.object({
   MAIL_FROM: Joi.string()
     .email()
     .optional(),
+  EMAIL_REDIRECT_TO: Joi.string()
+    .email()
+    .optional(),
 });
 
 export const validationOptions = {

@@ -37,6 +37,7 @@ const RegisterForm = () => {
 
   const [verifyCode, {
     isSuccess: isVerifySuccess,
+    data: verifyData,
     error: verifyError,
     reset: resetVerifyCode,
   }] = useVerifyCodeMutation();
@@ -95,7 +96,11 @@ const RegisterForm = () => {
   const handleSetPassword = async () => {
     try {
       const password = getValues('password');
-      const res = await completeRegistration({ password }).unwrap();
+      const sessionToken = (verifyData as any)?.sessionToken;
+      if (!sessionToken) {
+        throw new Error('Session token отсутствует. Сначала подтвердите код.');
+      }
+      const res = await completeRegistration({ sessionToken, password }).unwrap();
       if (res.success) {
         setTimeout(() => {
           dispatch(closeModalAuth());

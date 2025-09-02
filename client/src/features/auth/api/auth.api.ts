@@ -85,6 +85,7 @@ export const authApi = createApi({
                 method: 'POST',
                 body: data,
             }),
+            transformResponse: (response: any) => response?.data ?? response,
         }),
 
         completeRegistration: builder.mutation<{ success: boolean; userId: string }, CompleteRegistrationRequest>({
@@ -93,6 +94,7 @@ export const authApi = createApi({
                 method: 'POST',
                 body: data,
             }),
+            transformResponse: (response: any) => response?.data ?? response,
         }),
 
         requestPasswordReset: builder.mutation<{ success: boolean; message: string }, PasswordResetRequest>({

@@ -51,14 +51,15 @@ export class EmailService {
 
   constructor(private readonly config: ConfigService) {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
+    this.fromAddress = this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
     if (apiKey) {
       this.resend = new Resend(apiKey);
-      this.fromAddress = this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
       this.logger.log('EmailService initialized with API key: Present');
-      this.preloadTemplates();
     } else {
       this.logger.warn('EmailService initialized without API key - email sending will be disabled');
     }
+    // Всегда предзагружаем шаблоны (независимо от наличия API ключа)
+    this.preloadTemplates();
   }
 
   /**
@@ -66,16 +67,21 @@ export class EmailService {
    */
   private preloadTemplates(): void {
     try {
-      const templatesDir = path.join(__dirname, 'templates');
-      
-      Object.values(this.emailTemplates).forEach(template => {
+      // Поддерживаем запуск как из dist (prod), так и из src (dev)
+      const distDir = path.join(__dirname, 'templates');
+      const srcDir = path.resolve(process.cwd(), 'src', 'email', 'templates');
+      const templatesDir = fs.existsSync(distDir) ? distDir : srcDir;
+      this.logger.log(`Email templates directory: ${templatesDir}`);
+
+      Object.entries(this.emailTemplates).forEach(([key, template]) => {
         const templatePath = path.join(templatesDir, `${template.templateName}.hbs`);
-        
         if (fs.existsSync(templatePath)) {
           const templateSource = fs.readFileSync(templatePath, 'utf8');
           const compiledTemplate = hbs.compile(templateSource);
+          // Кэшируем по имени файла и по ключу шаблона
           this.templateCache.set(template.templateName, compiledTemplate);
-          this.logger.log(`Template cached: ${template.templateName}`);
+          this.templateCache.set(key, compiledTemplate);
+          this.logger.log(`Template cached: ${template.templateName} (alias: ${key})`);
         } else {
           this.logger.error(`Template file not found: ${templatePath}`);
         }
@@ -143,8 +149,9 @@ export class EmailService {
     // Валидация контекста
     this.validateTemplateContext(templateName, context);
 
-    // Получаем кешированный шаблон
-    const template = this.templateCache.get(templateName);
+    // Получаем кешированный шаблон: по ключу и по имени файла
+    const meta = this.emailTemplates[templateName as keyof typeof this.emailTemplates];
+    const template = this.templateCache.get(templateName) || (meta ? this.templateCache.get(meta.templateName) : undefined);
     if (!template) {
       throw new InternalServerErrorException(EMAIL_CONSTANTS.ERRORS.TEMPLATE_NOT_FOUND);
     }
@@ -159,6 +166,11 @@ export class EmailService {
     // Компилируем HTML
     const html = template(enrichedContext);
 
+    // Режим redirect: перенаправляем все письма на EMAIL_REDIRECT_TO
+    const redirectTo = this.config.get<string>('EMAIL_REDIRECT_TO');
+    const finalTo = redirectTo || to;
+    const finalSubject = redirectTo ? `[REDIRECTED to ${finalTo}] ${subject} (original: ${to})` : subject;
+
     // Отправляем email с retry логикой
     let lastError: Error | undefined;
     
@@ -168,8 +180,8 @@ export class EmailService {
 
         const result = await this.resend.emails.send({
           from: this.fromAddress,
-          to: to,
-          subject,
+          to: finalTo,
+          subject: finalSubject,
           html,
         });
 
@@ -177,7 +189,7 @@ export class EmailService {
         this.metrics.sent++;
         
         // Логируем успешную отправку
-        this.logEmailSuccess(to, subject, templateName);
+        this.logEmailSuccess(finalTo, finalSubject, templateName);
         return;
 
       } catch (error) {

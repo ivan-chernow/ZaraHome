@@ -25,6 +25,7 @@ export interface VerifyCodeRequest {
 }
 
 export interface CompleteRegistrationRequest {
+    sessionToken: string;
     password: string;
 }
 
