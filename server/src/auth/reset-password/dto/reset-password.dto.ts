@@ -7,10 +7,6 @@ export class ResetRequestDto {
 }
 
 export class ResetVerifyDto {
-  @IsEmail({}, { message: 'Введите корректный email адрес' })
-  @IsNotEmpty({ message: 'Email обязателен' })
-  email: string;
-
   @IsString({ message: 'Токен должен быть строкой' })
   @IsNotEmpty({ message: 'Токен обязателен' })
   token: string;

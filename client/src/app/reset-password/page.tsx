@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { Container, TextField, Alert } from '@mui/material';
 import MainLayout from '@/widgets/layout/MainLayout';
@@ -8,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { getRepeatPasswordValidation, getPasswordValidation } from '@/shared/lib/validation';
 import MainButton from '@/shared/ui/Button/MainButton';
 import { useRouter } from 'next/navigation';
+import { closeModalAuth } from '@/features/auth/model/auth.slice';
 
 interface FormInputs {
   password: string;
@@ -22,6 +24,7 @@ interface ErrorResponse {
 
 const ResetPasswordPage = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [isTokenVerified, setIsTokenVerified] = useState(false);
@@ -48,6 +51,9 @@ const ResetPasswordPage = () => {
   const repeatPassword = watch('repeatPassword');
 
   useEffect(() => {
+    // Закрываем модальное окно авторизации/регистрации, если открыто
+    dispatch(closeModalAuth());
+
     const verifyResetToken = async () => {
       if (!token) {
         setError('Неверная ссылка для сброса пароля');
@@ -64,7 +70,7 @@ const ResetPasswordPage = () => {
     };
 
     verifyResetToken();
-  }, [token, verifyToken]);
+  }, [token, verifyToken, dispatch]);
 
   const onSubmit = async (data: FormInputs) => {
     if (!token) return;

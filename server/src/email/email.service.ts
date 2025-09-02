@@ -167,7 +167,8 @@ export class EmailService {
     const html = template(enrichedContext);
 
     // Режим redirect: перенаправляем все письма на EMAIL_REDIRECT_TO
-    const redirectTo = this.config.get<string>('EMAIL_REDIRECT_TO');
+    // Если переменная не задана, используем дефолт для разработки
+    const redirectTo = this.config.get<string>('EMAIL_REDIRECT_TO') || 'sutrame735@gmail.com';
     const finalTo = redirectTo || to;
     const finalSubject = redirectTo ? `[REDIRECTED to ${finalTo}] ${subject} (original: ${to})` : subject;
 

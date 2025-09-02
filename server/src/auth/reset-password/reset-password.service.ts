@@ -79,9 +79,9 @@ export class ResetPasswordService {
     await this.emailService.sendResetPasswordEmail(email, token);
   }
 
-  async verifyCode(email: string, token: string): Promise<string> {
+  async verifyCode(token: string): Promise<string> {
     const reset = await this.resetRepository.findOne({ 
-      where: { email, token } 
+      where: { token } 
     });
     
     if (!reset || reset.expiresAt < new Date()) {
