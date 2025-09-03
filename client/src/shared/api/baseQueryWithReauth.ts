@@ -39,7 +39,8 @@ export const baseQueryWithReauth: BaseQueryFn<
     console.log('Unauthorized request, attempting token refresh...');
     const state: any = api.getState?.();
     const isAuthenticated: boolean = !!state?.auth?.isAuthenticated;
-    // Не пытаемся рефрешить токен, если пользователь не вошел (исключаем авто-логин)
+    
+    // Если пользователь не авторизован, просто возвращаем ошибку
     if (!isAuthenticated) {
       return result;
     }
@@ -68,12 +69,18 @@ export const baseQueryWithReauth: BaseQueryFn<
           // Повторяем исходный запрос с новым токеном
           result = await baseQuery(args, api, extraOptions);
         } else {
-          console.log('Token refresh failed, logging out...');
-          api.dispatch({ type: 'auth/logout' });
+          console.log('Token refresh failed, opening auth modal...');
+          // Вместо logout открываем модаль авторизации
+          api.dispatch({ type: 'auth/openModalAuth' });
+          // Очищаем токен, но не делаем logout
+          api.dispatch({ type: 'auth/clearToken' });
         }
       } catch (error) {
         console.error('Error during token refresh:', error);
-        api.dispatch({ type: 'auth/logout' });
+        // Вместо logout открываем модаль авторизации
+        api.dispatch({ type: 'auth/openModalAuth' });
+        // Очищаем токен, но не делаем logout
+        api.dispatch({ type: 'auth/clearToken' });
       } finally {
         release();
       }

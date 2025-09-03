@@ -105,6 +105,22 @@ export const authSlice = createSlice({
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
     },
+    clearToken: (state) => {
+      // Очищаем только токен, но сохраняем пользователя и состояние
+      state.accessToken = null;
+      state.isAuthenticated = false;
+      
+      // Очищаем только токены из localStorage
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
+      // Сохраняем обновленное состояние без токенов
+      localStorage.setItem('authState', JSON.stringify({
+        user: state.user,
+        accessToken: null,
+        isAuthenticated: false,
+      }));
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -249,6 +265,7 @@ export const {
   setAuthenticating,
   setCredentials,
   logout,
+  clearToken,
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

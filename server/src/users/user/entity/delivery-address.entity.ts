@@ -3,9 +3,7 @@ import { User } from "./user.entity";
 
 @Entity('delivery_addresses')
 @Index(['userId'])
-@Index(['isDefault'])
 @Index(['createdAt'])
-@Index(['userId', 'isDefault'])
 export class DeliveryAddress {
     @PrimaryGeneratedColumn()
     id: number;
@@ -31,13 +29,6 @@ export class DeliveryAddress {
         comment: 'Отчество получателя'
     })
     patronymic: string | null;
-
-    @Column({ 
-        type: 'varchar', 
-        length: 10,
-        comment: 'Код страны'
-    })
-    phoneCode: string;
 
     @Column({ 
         type: 'varchar', 
@@ -70,9 +61,10 @@ export class DeliveryAddress {
     @Column({ 
         type: 'varchar', 
         length: 50,
+        nullable: true,
         comment: 'Строение/корпус'
     })
-    building: string;
+    building: string | null;
 
     @Column({ 
         type: 'varchar', 
@@ -84,16 +76,10 @@ export class DeliveryAddress {
     @Column({ 
         type: 'varchar', 
         length: 50,
+        nullable: true,
         comment: 'Квартира'
     })
-    apartment: string;
-
-    @Column({ 
-        type: 'varchar', 
-        length: 10,
-        comment: 'Почтовый индекс'
-    })
-    postalCode: string;
+    apartment: string | null;
 
     @Column({ 
         type: 'text',
@@ -102,25 +88,11 @@ export class DeliveryAddress {
     })
     additionalInfo: string | null;
 
-    @Column({ 
-        type: 'boolean',
-        default: false,
-        comment: 'Адрес по умолчанию'
-    })
-    isDefault: boolean;
-
-    @Column({ 
-        type: 'varchar',
-        length: 100,
-        comment: 'Название адреса (например: "Дом", "Работа")'
-    })
-    addressName: string;
-
     @ManyToOne(() => User, user => user.deliveryAddresses, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-        @Column({ name: 'user_id' })
+    @Column({ name: 'user_id' })
     userId: number;
 
     @CreateDateColumn({ name: 'created_at' })

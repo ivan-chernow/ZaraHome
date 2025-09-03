@@ -11,8 +11,7 @@ export interface DeliveryAddressDto {
     firstName: string;
     lastName: string;
     patronymic: string;
-    phoneCode: string;
-    phone: string; // E.164, напр. +79991234567
+    phone: string;
     region: string;
     city: string;
     street: string;
@@ -20,15 +19,13 @@ export interface DeliveryAddressDto {
     house: string;
     apartment?: string;
     additionalInfo?: string;
-    isDefault: boolean;
 }
 
 export interface ChangeDeliveryAddressDto {
     firstName: string;
     lastName: string;
     patronymic: string;
-    phoneCode: string;
-    phone: string; // E.164, напр. +79991234567
+    phone: string;
     region: string;
     city: string;
     street: string;
@@ -36,7 +33,6 @@ export interface ChangeDeliveryAddressDto {
     house: string;
     apartment?: string;
     additionalInfo?: string;
-    isDefault: boolean;
 }
 
 export interface ChangePasswordDto {

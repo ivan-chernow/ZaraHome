@@ -42,8 +42,8 @@ export class LoginService implements IAuthService {
 
   async login(user: User, res?: Response) {
     const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '24h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
 
     await this.authRepository.deleteRefreshTokenByUser(user.id);
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -80,7 +80,7 @@ export class LoginService implements IAuthService {
       await this.authRepository.deleteRefreshTokenByToken(refreshToken);
       const newRefreshToken = this.jwtService.sign(
         { sub: user.id, email: user.email, role: user.role }, 
-        { expiresIn: '7d' }
+        { expiresIn: '30d' }
       );
       
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -93,7 +93,7 @@ export class LoginService implements IAuthService {
       return {
         accessToken: this.jwtService.sign(
           { sub: user.id, email: user.email, role: user.role }, 
-          { expiresIn: '15m' }
+          { expiresIn: '24h' }
         ),
         user: {
           id: user.id,

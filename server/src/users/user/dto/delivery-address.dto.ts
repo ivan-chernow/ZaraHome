@@ -1,6 +1,5 @@
-import { IsString, IsOptional, MaxLength, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { USERS_CONSTANTS } from '../../users.constants';
 
 export class CreateDeliveryAddressDto {
   @ApiProperty({ 
@@ -32,17 +31,8 @@ export class CreateDeliveryAddressDto {
   patronymic?: string;
 
   @ApiProperty({ 
-    description: 'Код страны',
-    example: '+7',
-    maxLength: 10
-  })
-  @IsString()
-  @MaxLength(10)
-  phoneCode: string;
-
-  @ApiProperty({ 
     description: 'Номер телефона',
-    example: '999 123-45-67',
+    example: '+7 (999) 123-45-67',
     maxLength: 20
   })
   @IsString()
@@ -105,15 +95,6 @@ export class CreateDeliveryAddressDto {
   @MaxLength(50)
   apartment?: string;
 
-  @ApiProperty({ 
-    description: 'Почтовый индекс',
-    example: '123456',
-    maxLength: 10
-  })
-  @IsString()
-  @MaxLength(10)
-  postalCode: string;
-
   @ApiPropertyOptional({ 
     description: 'Дополнительная информация',
     example: 'Код домофона: 1234'
@@ -121,23 +102,6 @@ export class CreateDeliveryAddressDto {
   @IsOptional()
   @IsString()
   additionalInfo?: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Адрес по умолчанию',
-    default: false
-  })
-  @IsOptional()
-  @IsBoolean()
-  isDefault?: boolean;
-
-  @ApiProperty({ 
-    description: 'Название адреса',
-    example: 'Дом',
-    maxLength: 100
-  })
-  @IsString()
-  @MaxLength(100)
-  addressName: string;
 }
 
 export class UpdateDeliveryAddressDto {
@@ -164,14 +128,6 @@ export class UpdateDeliveryAddressDto {
   @IsString()
   @MaxLength(100)
   patronymic?: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Код страны'
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  phoneCode?: string;
 
   @ApiPropertyOptional({ 
     description: 'Номер телефона'
@@ -230,33 +186,10 @@ export class UpdateDeliveryAddressDto {
   apartment?: string;
 
   @ApiPropertyOptional({ 
-    description: 'Почтовый индекс'
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  postalCode?: string;
-
-  @ApiPropertyOptional({ 
     description: 'Дополнительная информация'
   })
   @IsOptional()
   @IsString()
   additionalInfo?: string;
-
-  @ApiPropertyOptional({ 
-    description: 'Адрес по умолчанию'
-  })
-  @IsOptional()
-  @IsBoolean()
-  isDefault?: boolean;
-
-  @ApiPropertyOptional({ 
-    description: 'Название адреса'
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  addressName?: string;
 }
 

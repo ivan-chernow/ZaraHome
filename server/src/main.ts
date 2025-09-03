@@ -25,7 +25,7 @@ async function bootstrap() {
     },
     jwt: {
       secret: configService.get('jwt.secret'),
-      accessExpiresIn: configService.get('jwt.accessExpiresIn'),
+      accessExpiresIn: configService.get('jwt.accessExpiresIn') || '24h',
     },
     cors: {
       origin: configService.get('cors.origin'),

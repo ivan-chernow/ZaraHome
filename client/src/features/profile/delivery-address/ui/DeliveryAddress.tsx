@@ -39,7 +39,6 @@ const emptyAddress: ChangeDeliveryAddressDto = {
   firstName: "",
   lastName: "",
   patronymic: "",
-  phoneCode: "+7",
   phone: "",
   region: "",
   city: "",
@@ -48,7 +47,6 @@ const emptyAddress: ChangeDeliveryAddressDto = {
   house: "",
   apartment: "",
   additionalInfo: "",
-  isDefault: false,
 };
 
 const MAX_ADDRESSES = 3;
@@ -562,67 +560,25 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                       <label className="pl-[20px] mb-[5px] text-[14px] font-medium text-[#00000099]">
                         Номер телефона
                       </label>
-                      <div className="flex items-center">
-                        <TextField
-                          sx={{
-                            width: "72px",
-                            marginRight: "6px",
-                            height: "48px",
-                          }}
-                          type="text"
-                          placeholder="+7"
-                          inputProps={{ 
-                            maxLength: 2,
-                            onKeyDown: (e) => {
-                              // Запрещаем удаление +
-                              if (e.key === 'Backspace' && e.currentTarget.value === '+') {
-                                e.preventDefault();
-                              }
-                            }
-                          }}
-                          {...register("phoneCode", {
-                            required: "Код",
-                            pattern: {
-                              value: /^\+\d$/,
-                              message: "Формат: +7",
-                            },
-                          })}
-                          error={!!errors.phoneCode}
-                          helperText={
-                            typeof errors.phoneCode?.message === "string"
-                              ? errors.phoneCode.message
-                              : " "
-                          }
-                        />
-                        <TextField
-                          sx={{ width: "100%", height: "48px" }}
-                          type="tel"
-                          placeholder="(XXX) XXX XX XX"
-                          inputProps={{ maxLength: 10 }}
-                          onKeyPress={(e) => {
-                            if (!/\d/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }}
-                          {...register("phone", {
-                            required: "Это поле обязательное",
-                            minLength: {
-                              value: 10,
-                              message: "Введите корректный номер телефона",
-                            },
-                            maxLength: {
-                              value: 10,
-                              message: "Введите корректный номер телефона",
-                            },
-                          })}
-                          error={!!errors.phone}
-                          helperText={
-                            typeof errors.phone?.message === "string"
-                              ? errors.phone.message
-                              : " "
-                          }
-                        />
-                      </div>
+                      <TextField
+                        sx={{ width: "100%", height: "48px" }}
+                        type="tel"
+                        placeholder="+7XXXXXXXXXX"
+                        inputProps={{ maxLength: 20 }}
+                        {...register("phone", {
+                          required: "Это поле обязательное",
+                          pattern: {
+                            value: /^\+7\d{10}$/,
+                            message: "Формат: +7XXXXXXXXXX (10 цифр после +7)",
+                          },
+                        })}
+                        error={!!errors.phone}
+                        helperText={
+                          typeof errors.phone?.message === "string"
+                            ? errors.phone.message
+                            : " "
+                        }
+                      />
                     </div>
                   </div>
                 </div>
@@ -782,6 +738,9 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                     </div>
                   </div>
                 </div>
+
+
+
                 <div className="flex mt-8 justify-center gap-4">
                   <MainButton
                     text={

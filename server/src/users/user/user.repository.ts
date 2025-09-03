@@ -350,7 +350,7 @@ export class UserRepository {
       cacheKey,
       () => this.addressRepository.find({
         where: { userId },
-        order: { isDefault: 'DESC', createdAt: 'ASC' }
+        order: { createdAt: 'ASC' }
       }),
       { ttl: CACHE_TTL.USER_ADDRESSES, prefix: CACHE_PREFIXES.USER }
     );
@@ -362,7 +362,7 @@ export class UserRepository {
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.addressRepository.findOne({
-        where: { userId, isDefault: true }
+        where: { userId }
       }),
       { ttl: CACHE_TTL.USER_ADDRESSES, prefix: CACHE_PREFIXES.USER }
     );

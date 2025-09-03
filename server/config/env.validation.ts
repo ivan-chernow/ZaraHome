@@ -43,10 +43,10 @@ export const envValidationSchema = Joi.object({
     .default('jasdjasoij123128989fxcvmlkviodfgjjpodfgjopjfdogjdpof'),
 
   JWT_ACCESS_EXPIRES_IN: Joi.string()
-    .default('15m'),
+    .default('24h'),
 
   JWT_REFRESH_EXPIRES_IN: Joi.string()
-    .default('7d'),
+    .default('30d'),
 
   // EMAIL
 

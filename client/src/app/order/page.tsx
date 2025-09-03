@@ -346,7 +346,7 @@ const Page = () => {
                           await updateOrder({
                             id: currentOrderId,
                             address: fullAddress,
-                            phone: `${selectedAddress.phoneCode}${selectedAddress.phone}`,
+                            phone: selectedAddress.phone,
                             comment: '',
                           }).unwrap();
                           
