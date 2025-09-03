@@ -1,20 +1,17 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Order } from '../model/order.slice';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
 
 export interface CreateOrderRequest {
   items: Array<{
     productId: number;
-    productName: string;
     quantity: number;
-    price: number;
     size?: string;
     color?: string;
   }>;
-  totalPrice: number;
-  totalCount: number;
   address?: string;
   phone?: string;
   comment?: string;
+  promocode?: string;
 }
 
 export interface UpdateOrderRequest {
@@ -28,14 +25,10 @@ export interface CreateOrderResponse {
   id: number;
   items: Array<{
     productId: number;
-    productName: string;
     quantity: number;
-    price: number;
     size?: string;
     color?: string;
   }>;
-  totalPrice: number;
-  totalCount: number;
   status: string;
   address?: string;
   phone?: string;
@@ -46,16 +39,7 @@ export interface CreateOrderResponse {
 
 export const ordersApi = createApi({
   reducerPath: 'ordersApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['Orders'],
   endpoints: (builder) => ({
     createOrder: builder.mutation<CreateOrderResponse, CreateOrderRequest>({
@@ -64,21 +48,25 @@ export const ordersApi = createApi({
         method: 'POST',
         body: orderData,
       }),
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse; message: string }) => response.data,
       invalidatesTags: ['Orders'],
     }),
     
     getUserOrders: builder.query<CreateOrderResponse[], void>({
       query: () => '/orders/my',
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse[]; message: string }) => response.data,
       providesTags: ['Orders'],
     }),
     
     getActiveOrder: builder.query<CreateOrderResponse | null, void>({
       query: () => '/orders/active',
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse | null; message: string }) => response.data,
       providesTags: ['Orders'],
     }),
     
     getOrderById: builder.query<CreateOrderResponse, number>({
       query: (id) => `/orders/${id}`,
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse; message: string }) => response.data,
       providesTags: ['Orders'],
     }),
     
@@ -88,6 +76,7 @@ export const ordersApi = createApi({
         method: 'PUT',
         body: { status },
       }),
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse; message: string }) => response.data,
       invalidatesTags: ['Orders'],
     }),
     
@@ -96,6 +85,7 @@ export const ordersApi = createApi({
         url: `/orders/${id}/cancel`,
         method: 'PUT',
       }),
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse; message: string }) => response.data,
       invalidatesTags: ['Orders'],
     }),
     
@@ -105,6 +95,7 @@ export const ordersApi = createApi({
         method: 'PUT',
         body: updateData,
       }),
+      transformResponse: (response: { success: boolean; data: CreateOrderResponse; message: string }) => response.data,
       invalidatesTags: ['Orders'],
     }),
   }),

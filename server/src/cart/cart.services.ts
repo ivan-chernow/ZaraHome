@@ -97,10 +97,14 @@ export class CartService {
       cacheKey,
       async () => {
         const cartItems = await this.cartRepository.findByUserWithProductDetails(userId);
-        
-        return cartItems.map(item => ({
+        // Фильтруем битые элементы без продукта или пользователя (могли быть удалены)
+        const safeItems = (cartItems ?? []).filter(
+          (item) => item && item.product && item.product.id && item.user && item.user.id,
+        );
+
+        return safeItems.map(item => ({
           id: item.id,
-          userId: item.user.id,
+          userId: item.user?.id ?? userId,
           productId: item.product.id,
           createdAt: item.createdAt,
           product: {
