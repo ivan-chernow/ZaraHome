@@ -47,6 +47,8 @@ const emptyAddress: ChangeDeliveryAddressDto = {
   building: "",
   house: "",
   apartment: "",
+  additionalInfo: "",
+  isDefault: false,
 };
 
 const MAX_ADDRESSES = 3;
@@ -478,7 +480,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Только русские буквы",
+                            message: "Поле заполнено некорректно",
                           },
                         })}
                         error={!!errors.firstName}
@@ -505,7 +507,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Только русские буквы",
+                            message: "Поле заполнено некорректно",
                           },
                         })}
                         onKeyPress={(e) => {
@@ -540,7 +542,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Только русские буквы",
+                            message: "Поле заполнено некорректно",
                           },
                         })}
                         onKeyPress={(e) => {
@@ -568,12 +570,20 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                             height: "48px",
                           }}
                           type="text"
-                          value="+7"
-                          disabled
+                          placeholder="+7"
+                          inputProps={{ 
+                            maxLength: 2,
+                            onKeyDown: (e) => {
+                              // Запрещаем удаление +
+                              if (e.key === 'Backspace' && e.currentTarget.value === '+') {
+                                e.preventDefault();
+                              }
+                            }
+                          }}
                           {...register("phoneCode", {
                             required: "Код",
                             pattern: {
-                              value: /^\+\d{1,3}$/,
+                              value: /^\+\d$/,
                               message: "Формат: +7",
                             },
                           })}
@@ -639,7 +649,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Только русские буквы",
+                            message: "Поле заполнено некорректно",
                           },
                         })}
                         error={!!errors.region}
@@ -671,7 +681,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Только русские буквы",
+                            message: "Поле заполнено некорректно",
                           },
                         })}
                         error={!!errors.street}
@@ -705,7 +715,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Только русские буквы",
+                            message: "Поле заполнено некорректно",
                           },
                         })}
                         error={!!errors.city}
@@ -723,13 +733,10 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         </label>
                         <TextField
                           sx={{ width: "100%", height: "48px" }}
-                          type="number"
-                          inputProps={{ min: 1, max: 9999 }}
+                          type="text"
+                          inputProps={{ maxLength: 10 }}
                           {...register("building", {
-                            pattern: {
-                              value: /^\d*$/,
-                              message: "Только цифры",
-                            },
+                            maxLength: { value: 10, message: "Максимум 10 символов" },
                           })}
                         />
                       </div>
@@ -739,14 +746,11 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         </label>
                         <TextField
                           sx={{ width: "100%", height: "48px" }}
-                          type="number"
-                          inputProps={{ min: 1, max: 9999 }}
+                          type="text"
+                          inputProps={{ maxLength: 10 }}
                           {...register("house", {
                             required: "Дом обязателен",
-                            pattern: {
-                              value: /^\d+$/,
-                              message: "Только цифры",
-                            },
+                            maxLength: { value: 10, message: "Максимум 10 символов" },
                           })}
                           error={!!errors.house}
                           helperText={
@@ -762,13 +766,10 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         </label>
                         <TextField
                           sx={{ width: "100%", height: "48px" }}
-                          type="number"
-                          inputProps={{ min: 1, max: 99999 }}
+                          type="text"
+                          inputProps={{ maxLength: 10 }}
                           {...register("apartment", {
-                            pattern: {
-                              value: /^\d+$/,
-                              message: "Только цифры",
-                            },
+                            maxLength: { value: 10, message: "Максимум 10 символов" },
                           })}
                           error={!!errors.apartment}
                           helperText={

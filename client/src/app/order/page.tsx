@@ -341,7 +341,7 @@ const Page = () => {
                           }
 
                           // Обновляем существующий заказ с адресом доставки
-                          const fullAddress = `${selectedAddress.region}, ${selectedAddress.city}, ${selectedAddress.street}, ${selectedAddress.building}, ${selectedAddress.house}${selectedAddress.apartment ? `, кв. ${selectedAddress.apartment}` : ''}`;
+                          const fullAddress = `${selectedAddress.region}, ${selectedAddress.city}, ${selectedAddress.street}${selectedAddress.building ? `, корп. ${selectedAddress.building}` : ''}, д. ${selectedAddress.house}${selectedAddress.apartment ? `, кв. ${selectedAddress.apartment}` : ''}`;
                           
                           await updateOrder({
                             id: currentOrderId,
