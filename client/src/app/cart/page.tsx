@@ -216,13 +216,15 @@ const Page = () => {
                       const orderData = {
                         items: cartItems.map(item => ({
                           productId: item.id,
+                          productName: idToProduct[item.id]?.name_ru || idToProduct[item.id]?.name_eng || `Товар #${item.id}`,
                           quantity: item.quantity,
+                          price: idToProduct[item.id]?.size ? (Object.values(idToProduct[item.id].size)[0]?.price ?? item.price) : item.price,
                           // size и color при необходимости можно подставлять из UI выбора
                         })),
                         // address/phone/comment будут заполнены на странице оформления при необходимости
                       } as const;
 
-                      const createdOrder = await createOrder(orderData as any).unwrap();
+                      const createdOrder = await createOrder(orderData).unwrap();
                       
                       // Сохраняем ID созданного заказа в Redux store
                       dispatch(setCurrentOrderId(createdOrder.id));

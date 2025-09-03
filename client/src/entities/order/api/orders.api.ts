@@ -4,7 +4,9 @@ import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
 export interface CreateOrderRequest {
   items: Array<{
     productId: number;
+    productName: string;
     quantity: number;
+    price: number;
     size?: string;
     color?: string;
   }>;
