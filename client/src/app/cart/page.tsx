@@ -84,8 +84,8 @@ const Page = () => {
   const { data: productsByIds } = useGetProductsByIdsQuery(ids, {
     skip: !mounted || ids.length === 0,
   });
-
-  const idToProduct: Record<number, Product> = (productsByIds || []).reduce(
+  const safeProducts: Product[] = Array.isArray(productsByIds) ? productsByIds : [];
+  const idToProduct: Record<number, Product> = safeProducts.reduce(
     (acc, p) => {
       acc[p.id] = p;
       return acc;
