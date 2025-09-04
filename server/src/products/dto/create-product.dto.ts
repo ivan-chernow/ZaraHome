@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsBoolean, IsArray, IsOptional, IsPositive, IsDateString } from 'class-validator';
+import { IsString, IsNumber, IsBoolean, IsArray, IsOptional, IsPositive, IsDateString, Min, Max } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -11,10 +11,11 @@ export class CreateProductDto {
   @IsString()
   name_ru: string;
 
-  @ApiProperty({ type: [String], example: ['url1.jpg', 'url2.jpg'], description: 'Ссылки на изображения' })
+  @ApiProperty({ type: [String], required: false, example: ['url1.jpg', 'url2.jpg'], description: 'Ссылки на изображения (может отсутствовать при загрузке файлов)' })
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  img: string[];
+  img?: string[];
 
   @ApiProperty({ type: [String], example: ['black', 'white'], description: 'Цвета товара' })
   @IsArray()
@@ -63,10 +64,12 @@ export class CreateProductDto {
   })
   isNew: boolean;
 
-  @ApiProperty({ example: 10, description: 'Скидка в %' })
+  @ApiProperty({ example: 10, required: false, description: 'Скидка в % (0-100)' })
+  @IsOptional()
   @IsNumber()
-  @IsPositive()
-  discount: number;
+  @Min(0)
+  @Max(100)
+  discount?: number;
 
   @ApiProperty({ example: true, description: 'Доступен к покупке' })
   @IsBoolean()

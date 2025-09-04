@@ -65,7 +65,13 @@ const CartButton = ({
       } else {
         dispatch(removeCartItem({ id: productId, size: selectedSize, color: selectedColor }));
       }
-      console.error("Ошибка при работе с корзиной:", error);
+      const anyErr: any = error as any;
+      console.error("Ошибка при работе с корзиной:", {
+        raw: anyErr,
+        status: anyErr?.status,
+        data: anyErr?.data,
+        message: anyErr?.error || anyErr?.message,
+      });
     }
   }, [isInCart, productId, price, img, selectedSize, selectedColor, addToCart, removeFromCart, dispatch]);
 

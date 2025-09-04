@@ -364,8 +364,13 @@ const AdminAddProduct = () => {
       });
       setImages([]);
       setImagePreviews([]);
-    } catch (error) {
-      console.error("Ошибка при добавлении товара:", error);
+    } catch (error: any) {
+      console.error("Ошибка при добавлении товара:", {
+        raw: error,
+        status: error?.status,
+        data: error?.data,
+        message: error?.error || error?.message,
+      });
       setSnackbar({
         open: true,
         message:
