@@ -39,29 +39,40 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
   );
   const product = findProductById(categories, item.id);
   const [removeFromCart] = useRemoveFromCartMutation();
+  const cartItems = useSelector((state: RootState) => state.cartItems.items);
 
   const handleDelete = useCallback(async () => {
-    // Оптимистично убираем из локального стора
-    dispatch(deleteCartItem(item.id));
+    // Оптимистично удаляем конкретную вариацию из Redux
+    dispatch(deleteCartItem({ id: item.id, size: item.size, color: item.color }));
+
+    // Проверяем, остались ли другие вариации этого товара
+    const otherVariantsExist = cartItems.some(
+      (ci) => ci.id === item.id && (ci.size !== item.size || ci.color !== item.color)
+    );
 
     if (isAuthenticated) {
       try {
-        await removeFromCart(item.id).unwrap();
+        // Если это была последняя вариация — синхронизируем с сервером
+        if (!otherVariantsExist) {
+          await removeFromCart(item.id).unwrap();
+        }
       } catch (e) {
-        // В случае ошибки можно откатить при необходимости
         console.error("Ошибка удаления из корзины на сервере", e);
       }
       return;
     }
 
-    // Гость: синхронизируем localStorage
+    // Гость: обновляем localStorage точечно по вариации
     const cart = getLocalStorage("cart", [] as any[]);
     const updated = Array.isArray(cart)
-      ? cart.filter((ci: any) => ci && ci.id !== item.id)
+      ? cart.filter(
+          (ci: any) =>
+            !(ci && ci.id === item.id && (ci.size ?? undefined) === (item.size ?? undefined) && (ci.color ?? undefined) === (item.color ?? undefined))
+        )
       : [];
     setLocalStorage("cart", updated);
     dispatch(setCartItems(updated));
-  }, [dispatch, isAuthenticated, item.id, removeFromCart]);
+  }, [dispatch, isAuthenticated, item.id, item.size, item.color, removeFromCart, cartItems]);
 
   return (
     <li className="flex items-start py-4 w-full">

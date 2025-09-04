@@ -162,7 +162,7 @@ const Page = () => {
                   return groupKeys.map((productIdStr, groupIdx) => {
                     const productId = Number(productIdStr);
                     const variants = groups[productId];
-                    const product = idToProduct[productId];
+                    const product = idToProduct[productId] || findProductById(categories, productId);
                     const totalForProduct = variants.reduce((sum, it) => sum + it.price * it.quantity, 0);
                     const totalQty = variants.reduce((sum, it) => sum + it.quantity, 0);
 
@@ -180,8 +180,8 @@ const Page = () => {
                                 className="mr-4 rounded object-cover"
                               />
                               <div className="flex flex-col min-w-0">
-                                <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{product?.name_eng ?? ''}</h4>
-                                <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{product?.name_ru ?? ''}</p>
+                                <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{product?.name_eng || `Товар #${productId}`}</h4>
+                                <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{product?.name_ru || ''}</p>
                                 <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
                               </div>
                             </div>
@@ -190,16 +190,25 @@ const Page = () => {
                             </span>
                           </div>
 
-                          <div className="mt-3 ml-[95px] flex flex-col gap-2">
+                          <div className="mt-3 ml-[95px] flex flex-col gap-3">
                             {variants.map((v) => (
-                              <div key={`${v.id}-${v.size ?? ''}-${v.color ?? ''}`} className="flex items-center justify-between">
-                                <div className="text-[12px] text-[#00000099] flex items-center gap-3">
-                                  {v.size && <span>Размер: {product?.size?.[v.size!]?.size ?? v.size}</span>}
-                                  {v.color && (
-                                    <span className="flex items-center gap-1">
-                                      Цвет: <span className="inline-block w-3 h-3 rounded-full border" style={{ backgroundColor: product?.colors?.[v.color!] }} />
-                                    </span>
-                                  )}
+                              <div key={`${v.id}-${v.size ?? ''}-${v.color ?? ''}`} className="flex items-center justify-between py-1">
+                                <div className="text-[12px] text-[#00000099] flex items-center gap-4">
+                                  <span>
+                                    {(() => {
+                                      const firstSizeKey = product?.size ? Object.keys(product.size)[0] : undefined;
+                                      const resolvedKey = (v.size && v.size !== '') ? v.size! : (firstSizeKey ?? '');
+                                      const resolvedLabel = resolvedKey ? (product?.size?.[resolvedKey]?.size ?? resolvedKey) : '-';
+                                      return <>Размер: {resolvedLabel}</>;
+                                    })()}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    Цвет:
+                                    <span
+                                      className="inline-block w-3 h-3 rounded-full border"
+                                      style={{ backgroundColor: (product?.colors?.[v.color ?? ''] ?? v.color ?? 'transparent') as string }}
+                                    />
+                                  </span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <button

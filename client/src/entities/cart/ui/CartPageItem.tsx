@@ -108,11 +108,26 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
                     Размер: {product?.size?.[item.size]?.size ?? item.size}
                   </span>
                 )}
-                {item.color && (
-                  <span className="flex items-center gap-1">
-                    Цвет: <span className="inline-block w-3 h-3 rounded-full border" style={{ backgroundColor: product?.colors?.[item.color] }} />
-                  </span>
-                )}
+                {(() => {
+                  const colorKeyRaw = (item.color ?? '').toString();
+                  const colorKey = colorKeyRaw.trim();
+                  const colorValue = product?.colors?.[colorKey] ?? colorKeyRaw;
+                  if (!colorKey && !colorValue) return null;
+                  const isWhite = typeof colorValue === 'string' && /^(#fff(f{0,3})?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))$/i.test(colorValue);
+                  const isBlack = typeof colorValue === 'string' && /^(#000(0{0,3})?|black|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))$/i.test(colorValue);
+                  const colorLabel = colorKey || (isWhite ? 'белый' : isBlack ? 'черный' : (colorValue || '').toString());
+                  return (
+                    <span className="flex items-center gap-1">
+                      Цвет:
+                      <span
+                        className={`inline-block ${isWhite ? 'w-4 h-4' : 'w-3 h-3'} rounded-full border ${isWhite ? 'border-gray-400 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.2)]' : ''}`}
+                        style={{ backgroundColor: (colorValue as string) || undefined }}
+                        aria-label={`Цвет ${colorLabel}`}
+                      />
+                      <span className="ml-1">{colorLabel}</span>
+                    </span>
+                  );
+                })()}
               </div>
             </>
           ) : (
