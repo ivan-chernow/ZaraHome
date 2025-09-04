@@ -85,7 +85,18 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
             <p className="font-medium text-[#00000080] text-[15px] leading-4 truncate">
               {product.name_ru}
             </p>
-            
+            <div className="mt-1 text-[13px] text-[#00000099] flex gap-3 items-center">
+              {item.size && (
+                <span>
+                  Размер: {product?.size?.[item.size]?.size ?? item.size}
+                </span>
+              )}
+              {item.color && (
+                <span className="flex items-center gap-1">
+                  Цвет: <span className="inline-block w-3 h-3 rounded-full border" style={{ backgroundColor: product?.colors?.[item.color] }} />
+                </span>
+              )}
+            </div>
           </>
         ) : (
           <>

@@ -55,11 +55,11 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
     setInputValue(String(item.quantity));
   }, [item.quantity]);
 
-  const handleDecrease = () => dispatch(removeCartItem(item.id));
+  const handleDecrease = () => dispatch(removeCartItem({ id: item.id, size: item.size, color: item.color }));
   const handleIncrease = () =>
-    dispatch(addCartItem({ id: item.id, price: item.price, img: item.img }));
+    dispatch(addCartItem({ id: item.id, price: item.price, img: item.img, size: item.size, color: item.color }));
   const handleDelete = async () => {
-    dispatch(deleteCartItem(item.id));
+    dispatch(deleteCartItem({ id: item.id, size: item.size, color: item.color }));
     try {
       await removeFromCart(item.id).unwrap();
     } catch (error) {
@@ -74,7 +74,7 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
       setInputValue(String(item.quantity));
       return;
     }
-    dispatch(setCartItemQuantity({ id: item.id, quantity: numeric }));
+    dispatch(setCartItemQuantity({ id: item.id, quantity: numeric, size: item.size, color: item.color }));
     setInputValue(String(numeric));
   }, [dispatch, inputValue, item.id, item.quantity]);
 
@@ -102,7 +102,18 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
               <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
                 {product.name_ru}
               </p>
-              
+              <div className="mt-1 text-[12px] text-[#00000099] flex gap-3 items-center">
+                {item.size && (
+                  <span>
+                    Размер: {product?.size?.[item.size]?.size ?? item.size}
+                  </span>
+                )}
+                {item.color && (
+                  <span className="flex items-center gap-1">
+                    Цвет: <span className="inline-block w-3 h-3 rounded-full border" style={{ backgroundColor: product?.colors?.[item.color] }} />
+                  </span>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -132,7 +143,7 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
             setInputValue(raw);
             const numeric = parseInt(raw, 10);
             if (Number.isFinite(numeric) && numeric > 0) {
-              dispatch(setCartItemQuantity({ id: item.id, quantity: numeric }));
+              dispatch(setCartItemQuantity({ id: item.id, quantity: numeric, size: item.size, color: item.color }));
             }
           }}
           onBlur={commitInput}

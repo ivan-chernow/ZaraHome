@@ -12,8 +12,12 @@ import {
   selectCartTotalCount,
   selectCartTotalPrice,
 } from "@/entities/cart/model/cartItems.slice";
-import CartPageItem from "@/entities/cart/ui/CartPageItem";
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import CloseIcon from "@mui/icons-material/Close";
+import { addCartItem, removeCartItem, deleteCartItem, setCartItemQuantity, type CartItem as CartItemType } from "@/entities/cart/model/cartItems.slice";
 import { useGetProductsByIdsQuery, type Product } from "@/entities/product/api/products.api";
+import { findProductById } from "@/entities/category/lib/catalog.utils";
 import { useCreateOrderMutation, useGetActiveOrderQuery } from "@/entities/order/api/orders.api";
 import { useDispatch } from "react-redux";
 import { setCurrentOrderId } from "@/entities/order/model/order.slice";
@@ -46,13 +50,13 @@ const Page = () => {
 
     // Заполняем мапы текущими товарами
     currentItems.forEach(item => {
-      const key = `${item.productId}-${item.quantity}`;
+      const key = `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
       currentItemsMap.set(key, (currentItemsMap.get(key) || 0) + 1);
     });
 
     // Заполняем мапы новыми товарами
     newItems.forEach(item => {
-      const key = `${item.productId}-${item.quantity}`;
+      const key = `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
       newItemsMap.set(key, (newItemsMap.get(key) || 0) + 1);
     });
 
@@ -76,6 +80,7 @@ const Page = () => {
 
   const cartItems = useSelector(selectCartItems);
   const { isAuthenticated } = useSelector((s: RootState) => s.auth);
+  const categories = useSelector((s: RootState) => s.catalog.categories);
   const totalCount = useSelector(selectCartTotalCount);
   const totalPrice = useSelector(selectCartTotalPrice);
 
@@ -92,6 +97,17 @@ const Page = () => {
     },
     {} as Record<number, Product>
   );
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const getFullImageUrl = (path?: string): string | undefined => {
+    if (!path) return undefined;
+    try {
+      const cleanPath = path.replace(/^\/+/, "");
+      return `${API_URL}/${cleanPath}`;
+    } catch {
+      return path;
+    }
+  };
 
   return (
     <MainLayout>
@@ -131,15 +147,105 @@ const Page = () => {
               ) : cartItems.length === 0 ? (
                 <li className="text-[#00000080] py-10">Ваша корзина пуста</li>
               ) : (
-                cartItems.map((item, idx) => (
-                  <React.Fragment key={item.id}>
-                    <HorizontalLine width="720px" />
-                    <CartPageItem item={item} product={idToProduct[item.id]} />
-                    {idx === cartItems.length - 1 && (
-                      <HorizontalLine width="720px" />
-                    )}
-                  </React.Fragment>
-                ))
+                (() => {
+                  const groups = cartItems.reduce((acc: Record<number, CartItemType[]>, item) => {
+                    acc[item.id] = acc[item.id] ? [...acc[item.id], item] : [item];
+                    return acc;
+                  }, {} as Record<number, CartItemType[]>);
+
+                  const handleDec = (item: CartItemType) => dispatch(removeCartItem({ id: item.id, size: item.size, color: item.color }));
+                  const handleInc = (item: CartItemType) => dispatch(addCartItem({ id: item.id, price: item.price, img: item.img, size: item.size, color: item.color }));
+                  const handleDel = (item: CartItemType) => dispatch(deleteCartItem({ id: item.id, size: item.size, color: item.color }));
+                  const handleSetQty = (item: CartItemType, qty: number) => dispatch(setCartItemQuantity({ id: item.id, size: item.size, color: item.color, quantity: qty }));
+
+                  const groupKeys = Object.keys(groups);
+                  return groupKeys.map((productIdStr, groupIdx) => {
+                    const productId = Number(productIdStr);
+                    const variants = groups[productId];
+                    const product = idToProduct[productId];
+                    const totalForProduct = variants.reduce((sum, it) => sum + it.price * it.quantity, 0);
+                    const totalQty = variants.reduce((sum, it) => sum + it.quantity, 0);
+
+                    return (
+                      <React.Fragment key={`group-${productId}`}>
+                        <HorizontalLine width="720px" />
+                        <li className="flex flex-col py-4">
+                          <div className="flex items-start min-w-0 justify-between">
+                            <div className="flex items-center min-w-0">
+                              <img
+                                alt={(product?.name_ru || `Товар #${productId}`)}
+                                src={getFullImageUrl(product?.img?.[0]) || getFullImageUrl(variants[0]?.img) || "/assets/img/Catalog/product2.png"}
+                                width={79}
+                                height={79}
+                                className="mr-4 rounded object-cover"
+                              />
+                              <div className="flex flex-col min-w-0">
+                                <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{product?.name_eng || `Товар #${productId}`}</h4>
+                                <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{product?.name_ru || ''}</p>
+                                <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                              </div>
+                            </div>
+                            <span className="font-medium text-[16px] font-roboto whitespace-nowrap">
+                              {totalForProduct.toLocaleString("ru-RU")} <span className="font-bold font-ysabeau text-[14px]">₽</span>
+                            </span>
+                          </div>
+
+                          <div className="mt-3 ml-[95px] flex flex-col gap-2">
+                            {variants.map((v) => (
+                              <div key={`${v.id}-${v.size ?? ''}-${v.color ?? ''}`} className="flex items-center justify-between">
+                                <div className="text-[12px] text-[#00000099] flex items-center gap-3">
+                                  {v.size && <span>Размер: {product?.size?.[v.size!]?.size ?? v.size}</span>}
+                                  {v.color && (
+                                    <span className="flex items-center gap-1">
+                                      Цвет: <span className="inline-block w-3 h-3 rounded-full border" style={{ backgroundColor: product?.colors?.[v.color!] }} />
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <button
+                                    aria-label="Уменьшить количество"
+                                    onClick={() => handleDec(v)}
+                                    className="w-7 h-7 flex items-center justify-center rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition transform hover:scale-105 active:scale-95 cursor-pointer leading-none"
+                                  >
+                                    <RemoveRoundedIcon fontSize="small" />
+                                  </button>
+                                  <input
+                                    className="w-[56px] h-[30px] border border-[#E5E5E5] text-center text-[14px] rounded outline-none focus:border-gray-400"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    value={String(v.quantity)}
+                                    onChange={(e) => {
+                                      const raw = e.target.value.replace(/\D+/g, "");
+                                      const numeric = parseInt(raw, 10);
+                                      if (Number.isFinite(numeric) && numeric > 0) {
+                                        handleSetQty(v, numeric);
+                                      }
+                                    }}
+                                  />
+                                  <button
+                                    aria-label="Увеличить количество"
+                                    onClick={() => handleInc(v)}
+                                    className="w-7 h-7 flex items-center justify-center rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition transform hover:scale-105 active:scale-95 cursor-pointer leading-none"
+                                  >
+                                    <AddRoundedIcon fontSize="small" />
+                                  </button>
+                                  <button
+                                    aria-label="Удалить вариант"
+                                    onClick={() => handleDel(v)}
+                                    className="ml-1 p-1 rounded-full bg-[#F2F2F2] text-[#6B7280] hover:bg-[#E5E7EB] transition-colors duration-150 transform hover:scale-105 active:scale-95 cursor-pointer"
+                                  >
+                                    <CloseIcon fontSize="small" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </li>
+                        {groupIdx === groupKeys.length - 1 && <HorizontalLine width="720px" />}
+                      </React.Fragment>
+                    );
+                  });
+                })()
               )}
             </ul>
 
@@ -197,6 +303,8 @@ const Page = () => {
                         const newItems = cartItems.map(item => ({
                           productId: item.id,
                           quantity: item.quantity,
+                          size: item.size,
+                          color: item.color,
                         }));
                         
                         // Проверяем, одинаковые ли товары и количества
@@ -214,14 +322,24 @@ const Page = () => {
 
                       // Создаем новый заказ со статусом "ожидает оплаты"
                       const orderData = {
-                        items: cartItems.map(item => ({
-                          productId: item.id,
-                          productName: idToProduct[item.id]?.name_ru || idToProduct[item.id]?.name_eng || `Товар #${item.id}`,
-                          quantity: item.quantity,
-                          price: idToProduct[item.id]?.size ? (Object.values(idToProduct[item.id].size)[0]?.price ?? item.price) : item.price,
-                          // size и color при необходимости можно подставлять из UI выбора
-                        })),
-                        // address/phone/comment будут заполнены на странице оформления при необходимости
+                        items: cartItems.map(item => {
+                          const product = idToProduct[item.id] || findProductById(categories, item.id);
+                          const productName = (product?.name_ru || product?.name_eng || `Товар #${item.id}`).toString();
+                          let price = Number(item.price);
+                          if (!Number.isFinite(price) || price <= 0) {
+                            const sizeKey = item.size && product?.size ? item.size : (product?.size ? Object.keys(product.size)[0] : undefined);
+                            const fallback = sizeKey && product?.size ? product.size[sizeKey]?.price : undefined;
+                            price = Number(fallback) > 0 ? Number(fallback) : 1;
+                          }
+                          return {
+                            productId: item.id,
+                            productName,
+                            quantity: Math.max(1, Math.floor(item.quantity || 1)),
+                            price,
+                            size: item.size,
+                            color: item.color,
+                          };
+                        }),
                       } as const;
 
                       const createdOrder = await createOrder(orderData).unwrap();
@@ -231,9 +349,9 @@ const Page = () => {
                       
                       // После успешного создания заказа переходим к оформлению
                       router.push("/order");
-                    } catch (error) {
-                      console.error('Ошибка при создании заказа:', error);
-                      // Здесь можно добавить уведомление об ошибке
+                    } catch (error: any) {
+                      const payload = error?.data || error;
+                      console.error('Ошибка при создании заказа:', payload);
                     }
                   }}
                       width="358px"

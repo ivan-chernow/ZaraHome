@@ -7,6 +7,8 @@ export interface CartItem {
   quantity: number;
   price: number; // Добавляем цену для подсчёта суммы
   img?: string; // Добавляем ссылку на картинку
+  size?: string; // Выбранный размер
+  color?: string; // Выбранный цвет
 }
 
 interface CartItemsState {
@@ -22,6 +24,8 @@ const loadInitialCartItems = (): CartItem[] => {
       id: i.id,
       price: i.price,
       img: typeof i.img === 'string' ? i.img : undefined,
+      size: typeof i.size === 'string' ? i.size : undefined,
+      color: typeof i.color === 'string' ? i.color : undefined,
       quantity:
         typeof i.quantity === 'number' && Number.isFinite(i.quantity) && i.quantity > 0
           ? Math.floor(i.quantity)
@@ -40,35 +44,37 @@ const cartItemsSlice = createSlice({
     setCartItems: (state, action: PayloadAction<CartItem[]>) => {
       state.items = action.payload;
     },
-    addCartItem: (state, action: PayloadAction<{ id: number; price: number; img?: string }>) => {
-      const { id, price, img } = action.payload;
-      const existingItem = state.items.find((item) => item.id === id);
+    addCartItem: (state, action: PayloadAction<{ id: number; price: number; img?: string; size?: string; color?: string }>) => {
+      const { id, price, img, size, color } = action.payload;
+      const existingItem = state.items.find((item) => item.id === id && item.size === size && item.color === color);
       if (existingItem) {
         existingItem.quantity += 1;
       } else {
-        state.items.push({ id, quantity: 1, price, img });
+        state.items.push({ id, quantity: 1, price, img, size, color });
       }
     },
-    removeCartItem: (state, action: PayloadAction<number>) => {
-      const existingItem = state.items.find((item) => item.id === action.payload);
+    removeCartItem: (state, action: PayloadAction<number | { id: number; size?: string; color?: string }>) => {
+      const key = typeof action.payload === 'number' ? { id: action.payload } : action.payload;
+      const existingItem = state.items.find((item) => item.id === key.id && (key.size === undefined || item.size === key.size) && (key.color === undefined || item.color === key.color));
       if (existingItem) {
         if (existingItem.quantity > 1) {
           existingItem.quantity -= 1;
         } else {
-          state.items = state.items.filter((item) => item.id !== action.payload);
+          state.items = state.items.filter((item) => !(item.id === key.id && (key.size === undefined || item.size === key.size) && (key.color === undefined || item.color === key.color)));
         }
       }
     },
-    deleteCartItem: (state, action: PayloadAction<number>) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
+    deleteCartItem: (state, action: PayloadAction<number | { id: number; size?: string; color?: string }>) => {
+      const key = typeof action.payload === 'number' ? { id: action.payload } : action.payload;
+      state.items = state.items.filter((item) => !(item.id === key.id && (key.size === undefined || item.size === key.size) && (key.color === undefined || item.color === key.color)));
     },
     clearCart: (state) => {
       state.items = [];
     },
-    setCartItemQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
-      const { id, quantity } = action.payload;
+    setCartItemQuantity: (state, action: PayloadAction<{ id: number; quantity: number; size?: string; color?: string }>) => {
+      const { id, quantity, size, color } = action.payload;
       const nextQty = Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1;
-      const existingItem = state.items.find((item) => item.id === id);
+      const existingItem = state.items.find((item) => item.id === id && (size === undefined || item.size === size) && (color === undefined || item.color === color));
       if (existingItem) {
         existingItem.quantity = nextQty;
       }

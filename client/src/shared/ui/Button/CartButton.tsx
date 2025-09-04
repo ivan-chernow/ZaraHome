@@ -20,6 +20,8 @@ interface CartButtonProps {
   productId: number;
   price: number;
   img?: string;
+  selectedSize?: string;
+  selectedColor?: string;
   size?: "default" | "small";
 }
 
@@ -27,6 +29,8 @@ const CartButton = ({
   productId,
   price,
   img,
+  selectedSize,
+  selectedColor,
   size = "default",
 }: CartButtonProps) => {
   const dispatch = useDispatch();
@@ -38,8 +42,8 @@ const CartButton = ({
   const cartItems = useSelector((state: RootState) => state.cartItems.items);
 
   const isInCart = useMemo(
-    () => cartItems.some((item) => item.id === productId),
-    [cartItems, productId]
+    () => cartItems.some((item) => item.id === productId && item.size === selectedSize && item.color === selectedColor),
+    [cartItems, productId, selectedSize, selectedColor]
   );
 
   const [addToCart] = useAddToCartMutation();
@@ -48,22 +52,22 @@ const CartButton = ({
   const handleAuthenticatedToggle = useCallback(async () => {
     try {
       if (isInCart) {
-        dispatch(removeCartItem(productId));
+        dispatch(removeCartItem({ id: productId, size: selectedSize, color: selectedColor }));
         await removeFromCart(productId).unwrap();
       } else {
-        dispatch(addCartItem({ id: productId, price, img }));
+        dispatch(addCartItem({ id: productId, price, img, size: selectedSize, color: selectedColor }));
         await addToCart(productId).unwrap();
       }
     } catch (error) {
       // Rollback optimistic update
       if (isInCart) {
-        dispatch(addCartItem({ id: productId, price, img }));
+        dispatch(addCartItem({ id: productId, price, img, size: selectedSize, color: selectedColor }));
       } else {
-        dispatch(removeCartItem(productId));
+        dispatch(removeCartItem({ id: productId, size: selectedSize, color: selectedColor }));
       }
       console.error("Ошибка при работе с корзиной:", error);
     }
-  }, [isInCart, productId, price, img, addToCart, removeFromCart, dispatch]);
+  }, [isInCart, productId, price, img, selectedSize, selectedColor, addToCart, removeFromCart, dispatch]);
 
   const handleGuestToggle = useCallback(() => {
     const cart = getLocalStorage("cart", []);
@@ -73,7 +77,7 @@ const CartButton = ({
 
     setLocalStorage("cart", updatedCart);
     dispatch(setCartItems(updatedCart));
-  }, [isInCart, productId, price, img, dispatch]);
+  }, [isInCart, productId, price, img, selectedSize, selectedColor, dispatch]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {

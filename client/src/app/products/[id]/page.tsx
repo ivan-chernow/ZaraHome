@@ -86,8 +86,8 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const activeColor = activeColors[product.id];
 
   const isInCart = useMemo(
-    () => cartItems.some((item: any) => item.id === product.id),
-    [cartItems, product.id]
+    () => cartItems.some((item: any) => item.id === product.id && item.size === selectedSize && item.color === activeColor),
+    [cartItems, product.id, selectedSize, activeColor]
   );
 
   const [addToCart] = useAddToCartMutation();
@@ -116,17 +116,17 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleAuthenticatedToggle = useCallback(async () => {
     try {
       if (isInCart) {
-        dispatch(removeCartItem(product.id));
+        dispatch(removeCartItem({ id: product.id, size: selectedSize, color: activeColor }));
         await removeFromCart(product.id).unwrap();
       } else {
-        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0] }));
+        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor }));
         await addToCart(product.id).unwrap();
       }
     } catch (error) {
       if (isInCart) {
-        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0] }));
+        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor }));
       } else {
-        dispatch(removeCartItem(product.id));
+        dispatch(removeCartItem({ id: product.id, size: selectedSize, color: activeColor }));
       }
       console.error("Ошибка при работе с корзиной:", error);
     }
@@ -135,11 +135,11 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleGuestToggle = useCallback(() => {
     const cart = getLocalStorage("cart", []);
     const updatedCart = isInCart
-      ? cart.filter((item: any) => item.id !== product.id)
-      : [...cart, { id: product.id, price: currentPrice, quantity: 1, img: product.img?.[0] }];
+      ? cart.filter((item: any) => !(item.id === product.id && item.size === selectedSize && item.color === activeColor))
+      : [...cart, { id: product.id, price: currentPrice, quantity: 1, img: product.img?.[0], size: selectedSize, color: activeColor }];
     setLocalStorage("cart", updatedCart);
     dispatch(setCartItems(updatedCart));
-  }, [isInCart, product?.id, currentPrice, product?.img, dispatch]);
+  }, [isInCart, product?.id, currentPrice, product?.img, selectedSize, activeColor, dispatch]);
 
   const handleCartClick = useCallback(() => {
     if (isAuthenticated) {

@@ -68,7 +68,7 @@ const CartDetails = ({ cartButtonRef }: CartDetailsProps) => {
           <>
             <ul className="w-full flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
               {cartItems.map((item, idx) => (
-                <React.Fragment key={item.id}>
+                <React.Fragment key={`${item.id}-${item.size ?? 'nosize'}-${item.color ?? 'nocolor'}-${idx}`}>
                   <CartItem item={item} />
                   {idx !== cartItems.length - 1 && (
                     <HorizontalLine width="100%" />
