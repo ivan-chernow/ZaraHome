@@ -314,6 +314,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
               type="button"
               height="56px"
               width="400px"
+              active={isInCart}
             />
           </div>
           <div className="flex items-center mb-[30px] mt-[23px]">

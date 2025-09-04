@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@mui/material";
 
-const MainButton = ({ text, disabled, onClick, type, height, width }: { text: string, disabled: boolean, onClick?: () => void, type: 'button' | 'submit', height?: string, width?: string }) => {
+const MainButton = ({ text, disabled, onClick, type, height, width, active = false }: { text: string, disabled: boolean, onClick?: () => void, type: 'button' | 'submit', height?: string, width?: string, active?: boolean }) => {
 	return (
 		<Button
 			variant="outlined"
@@ -10,8 +10,8 @@ const MainButton = ({ text, disabled, onClick, type, height, width }: { text: st
 			type={type}
 			fullWidth
 			sx={{
-				color: 'white',
-				backgroundColor: 'black',
+				color: active ? 'black' : 'white',
+				backgroundColor: active ? 'white' : 'black',
 				borderColor: 'black',
 				px: { width },
 				py: { height },
@@ -23,8 +23,8 @@ const MainButton = ({ text, disabled, onClick, type, height, width }: { text: st
 				borderRadius: '0',
 				transition: 'all 0.3s ease-in-out',
 				'&:hover': {
-					backgroundColor: 'transparent',
-					color: 'black',
+					backgroundColor: active ? 'black' : 'transparent',
+					color: active ? 'white' : 'black',
 					borderColor: 'gray',
 					boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
 					transform: 'translateY(-2px)'
