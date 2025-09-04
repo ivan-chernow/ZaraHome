@@ -21,6 +21,8 @@ interface OrderState {
   orders: Order[];
   currentOrder: Order | null;
   currentOrderId: number | null;
+  // Итоговая сумма с учётом скидок (если есть), чтобы страницы могли читать без загрузки заказа
+  currentTotalOverride: number | null;
   loading: boolean;
   error: string | null;
 }
@@ -29,6 +31,7 @@ const initialState: OrderState = {
   orders: [],
   currentOrder: null,
   currentOrderId: null,
+  currentTotalOverride: null,
   loading: false,
   error: null,
 };
@@ -97,6 +100,16 @@ const orderSlice = createSlice({
     setCurrentOrderId: (state, action: PayloadAction<number>) => {
       state.currentOrderId = action.payload;
     },
+
+    // Обновляем итоговую сумму текущего заказа (для учета скидки по промокоду)
+    setOrderTotals: (state, action: PayloadAction<{ totalPrice: number }>) => {
+      const { totalPrice } = action.payload;
+      // Сохраняем как оверрайд, чтобы использовать на payment и др. страницах
+      state.currentTotalOverride = totalPrice;
+      if (state.currentOrder) {
+        state.currentOrder.totalPrice = totalPrice;
+      }
+    },
   },
 });
 
@@ -107,6 +120,7 @@ export const {
   setLoading,
   setError,
   setCurrentOrderId,
+  setOrderTotals,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

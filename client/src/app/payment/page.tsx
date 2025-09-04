@@ -29,6 +29,7 @@ const PaymentPage = () => {
   const { selectedAddress } = useSelector((s: RootState) => s.delivery);
   const cartItems = useSelector((s: RootState) => selectCartItems(s) as CartItem[]);
   const cartTotal = useSelector((s: RootState) => selectCartTotalPrice(s) as number);
+  const currentOrderTotal = useSelector((s: RootState) => s.order.currentTotalOverride ?? s.order.currentOrder?.totalPrice);
 
   const totalCount = useMemo(
     () => cartItems.reduce((sum, i) => sum + i.quantity, 0),
@@ -112,7 +113,7 @@ const PaymentPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <p className="text-sm text-[#00000099]">Сумма</p>
-                  <p className="text-[22px] font-roboto font-medium">{cartTotal.toLocaleString("ru-RU")} ₽</p>
+                  <p className="text-[22px] font-roboto font-medium">{(currentOrderTotal ?? cartTotal).toLocaleString("ru-RU")} ₽</p>
                 </div>
                 <div>
                   <p className="text-sm text-[#00000099]">Товаров</p>
@@ -228,7 +229,7 @@ const PaymentPage = () => {
               <HorizontalLine width="146px" />
             </div>
             <p className="font-medium text-[32px] font-roboto">
-              {cartTotal.toLocaleString("ru-RU")} <span className="text-[24px] font-bold">₽</span>
+              {(currentOrderTotal ?? cartTotal).toLocaleString("ru-RU")} <span className="text-[24px] font-bold">₽</span>
             </p>
             <p className="font-medium mb-[20px]">{totalCount} товаров</p>
             <div className="text-xs text-[#00000099] flex items-center gap-1"><HttpsOutlinedIcon fontSize="inherit"/> Безопасное соединение</div>

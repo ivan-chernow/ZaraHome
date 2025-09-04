@@ -68,8 +68,8 @@ const CartButton = ({
   const handleGuestToggle = useCallback(() => {
     const cart = getLocalStorage("cart", []);
     const updatedCart = isInCart
-      ? cart.filter((item: any) => item.id !== productId)
-      : [...cart, { id: productId, price, quantity: 1, img }];
+      ? cart.filter((item: any) => !(item.id === productId && item.size === selectedSize && item.color === selectedColor))
+      : [...cart, { id: productId, price, quantity: 1, img, size: selectedSize, color: selectedColor }];
 
     setLocalStorage("cart", updatedCart);
     dispatch(setCartItems(updatedCart));

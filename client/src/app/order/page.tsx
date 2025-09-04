@@ -12,7 +12,7 @@ import MainButton from "@/shared/ui/Button/MainButton";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/shared/config/store/store";
 import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
-import { setCurrentOrderId } from "@/entities/order/model/order.slice";
+import { setCurrentOrderId, setOrderTotals } from "@/entities/order/model/order.slice";
 import { useUpdateOrderMutation, useGetActiveOrderQuery } from "@/entities/order/api/orders.api";
 import {
   selectCartItems,
@@ -118,11 +118,13 @@ const Page = () => {
         discount: res.discount,
         finalAmount: res.finalAmount,
       });
+      // Сохраняем итоговую сумму в текущем заказе, чтобы страница оплаты показывала скидку
+      dispatch(setOrderTotals({ totalPrice: res.finalAmount }));
     } catch (e: any) {
       const msg = e?.data?.message || "Промокод недействителен";
       setPromoError(msg);
     }
-  }, [promo, cartTotal, applyPromocode]);
+  }, [promo, cartTotal, applyPromocode, dispatch]);
 
   // Адреса доставки
   // DeliveryAddress компонент сам загружает адреса и синхронизирует выбранный адрес с Redux

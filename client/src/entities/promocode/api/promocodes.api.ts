@@ -61,12 +61,15 @@ export const promocodesApi = createApi({
                 method: 'POST',
                 body,
             }),
+            // Сервер оборачивает ответ в { success, data, message }
+            transformResponse: (response: { success: boolean; data: ApplyPromocodeResponse; message?: string }) =>
+                (response?.data ?? (response as unknown as ApplyPromocodeResponse)),
         }),
 
         // Получение всех активных промокодов
         getAllActive: builder.query<Promocode[], void>({
             query: () => ({
-                url: '/promocodes',
+                url: '/promocodes/active',
                 method: 'GET',
             }),
             transformResponse: (response: any) => {

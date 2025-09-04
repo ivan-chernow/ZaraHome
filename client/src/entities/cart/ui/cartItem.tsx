@@ -85,6 +85,7 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
             <p className="font-medium text-[#00000080] text-[15px] leading-4 truncate">
               {product.name_ru}
             </p>
+            
           </>
         ) : (
           <>

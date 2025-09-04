@@ -154,6 +154,8 @@ const ProductCard = ({
           productId={product.id}
           price={Object.values(product.size)[0]?.price}
           img={product.img?.[0]}
+          selectedSize={Object.keys(product.size)?.[0]}
+          selectedColor={activeColor}
         />
       </div>
 
