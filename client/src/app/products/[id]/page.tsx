@@ -119,12 +119,12 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         dispatch(removeCartItem({ id: product.id, size: selectedSize, color: activeColor }));
         await removeFromCart(product.id).unwrap();
       } else {
-        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor }));
+        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor, name_eng: product.name_eng, name_ru: product.name_ru }));
         await addToCart(product.id).unwrap();
       }
     } catch (error) {
       if (isInCart) {
-        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor }));
+        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor, name_eng: product.name_eng, name_ru: product.name_ru }));
       } else {
         dispatch(removeCartItem({ id: product.id, size: selectedSize, color: activeColor }));
       }
@@ -136,10 +136,10 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     const cart = getLocalStorage("cart", []);
     const updatedCart = isInCart
       ? cart.filter((item: any) => !(item.id === product.id && item.size === selectedSize && item.color === activeColor))
-      : [...cart, { id: product.id, price: currentPrice, quantity: 1, img: product.img?.[0], size: selectedSize, color: activeColor }];
+      : [...cart, { id: product.id, price: currentPrice, quantity: 1, img: product.img?.[0], size: selectedSize, color: activeColor, name_eng: product.name_eng, name_ru: product.name_ru }];
     setLocalStorage("cart", updatedCart);
     dispatch(setCartItems(updatedCart));
-  }, [isInCart, product?.id, currentPrice, product?.img, selectedSize, activeColor, dispatch]);
+  }, [isInCart, product?.id, currentPrice, product?.img, selectedSize, activeColor, product?.name_eng, product?.name_ru, dispatch]);
 
   const handleCartClick = useCallback(() => {
     if (isAuthenticated) {

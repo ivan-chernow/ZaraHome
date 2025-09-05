@@ -156,6 +156,8 @@ const ProductCard = ({
           img={product.img?.[0]}
           selectedSize={Object.keys(product.size)?.[0]}
           selectedColor={activeColor}
+          name_eng={product.name_eng}
+          name_ru={product.name_ru}
         />
       </div>
 

@@ -31,6 +31,8 @@ const sanitizeCartItems = (raw: any): any[] => {
       img: typeof i.img === "string" ? i.img : undefined,
       size: typeof i.size === "string" ? i.size : undefined,
       color: typeof i.color === "string" ? i.color : undefined,
+      name_eng: typeof i.name_eng === "string" ? i.name_eng : undefined,
+      name_ru: typeof i.name_ru === "string" ? i.name_ru : undefined,
       quantity:
         typeof i.quantity === "number" && Number.isFinite(i.quantity) && i.quantity > 0
           ? i.quantity

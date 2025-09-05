@@ -23,6 +23,7 @@ import { useDispatch } from "react-redux";
 import { setCurrentOrderId } from "@/entities/order/model/order.slice";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import Link from "next/link";
+import Image from "next/image";
 import { RootState } from "@/shared/config/store/store";
 import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -86,8 +87,10 @@ const Page = () => {
 
   // Быстрый запрос названий товаров по id, чтобы сразу показать имена без skeleton
   const ids = cartItems.map((i) => i.id);
-  const { data: productsByIds } = useGetProductsByIdsQuery(ids, {
+  const { data: productsByIds, isLoading: isLoadingProducts, error: productsError, isError: isProductsError } = useGetProductsByIdsQuery(ids, {
     skip: !mounted || ids.length === 0,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
   });
   const safeProducts: Product[] = Array.isArray(productsByIds) ? productsByIds : [];
   const idToProduct: Record<number, Product> = safeProducts.reduce(
@@ -97,6 +100,26 @@ const Page = () => {
     },
     {} as Record<number, Product>
   );
+
+  // Отладочная информация
+  console.log('Cart debug:', {
+    cartItems: cartItems.length,
+    ids,
+    isLoadingProducts,
+    productsError,
+    productsByIds: productsByIds?.length,
+    idToProduct: Object.keys(idToProduct).length,
+    categories: categories?.length
+  });
+
+  // Дополнительная отладка для каждого товара
+  if (cartItems.length > 0) {
+    console.log('Cart items details:', cartItems.map(item => ({
+      id: item.id,
+      hasInIdToProduct: !!idToProduct[item.id],
+      foundInCategories: !!findProductById(categories, item.id)
+    })));
+  }
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const getFullImageUrl = (path?: string): string | undefined => {
@@ -163,6 +186,10 @@ const Page = () => {
                     const productId = Number(productIdStr);
                     const variants = groups[productId];
                     const product = idToProduct[productId] || findProductById(categories, productId);
+                    const hasProductData = !!product;
+                    // Используем названия из localStorage как fallback
+                    const fallbackNameEng = variants[0]?.name_eng;
+                    const fallbackNameRu = variants[0]?.name_ru;
                     const totalForProduct = variants.reduce((sum, it) => sum + it.price * it.quantity, 0);
                     const totalQty = variants.reduce((sum, it) => sum + it.quantity, 0);
 
@@ -172,17 +199,41 @@ const Page = () => {
                         <li className="flex flex-col py-4">
                           <div className="flex items-start min-w-0 justify-between">
                             <div className="flex items-center min-w-0">
-                              <img
-                                alt={(product?.name_ru || `Товар #${productId}`)}
+                              <Image
+                                alt={product?.name_ru || `Товар ${productId}`}
                                 src={getFullImageUrl(product?.img?.[0]) || getFullImageUrl(variants[0]?.img) || "/assets/img/Catalog/product2.png"}
                                 width={79}
                                 height={79}
                                 className="mr-4 rounded object-cover"
                               />
                               <div className="flex flex-col min-w-0">
-                                <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{product?.name_eng || `Товар #${productId}`}</h4>
-                                <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{product?.name_ru || ''}</p>
-                                <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                {isLoadingProducts && !hasProductData ? (
+                                  <>
+                                    <div className="h-4 w-32 bg-gray-200 animate-pulse rounded mb-1" />
+                                    <div className="h-3 w-24 bg-gray-200 animate-pulse rounded mb-1" />
+                                    <div className="h-3 w-16 bg-gray-200 animate-pulse rounded" />
+                                  </>
+                                ) : product ? (
+                                  <>
+                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{product.name_eng}</h4>
+                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{product.name_ru}</p>
+                                    <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                  </>
+                                ) : fallbackNameEng || fallbackNameRu ? (
+                                  <>
+                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{fallbackNameEng || `Товар #${productId}`}</h4>
+                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{fallbackNameRu || 'Название недоступно'}</p>
+                                    <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">Товар #{productId}</h4>
+                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
+                                      {isProductsError ? 'Ошибка загрузки' : 'Название недоступно'}
+                                    </p>
+                                    <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                  </>
+                                )}
                               </div>
                             </div>
                             <span className="font-medium text-[16px] font-roboto whitespace-nowrap">
