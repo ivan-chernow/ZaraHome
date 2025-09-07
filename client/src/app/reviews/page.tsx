@@ -82,7 +82,7 @@ const ReviewCard = ({ review }: { review: Review }) => (
 
 const REVIEWS_TO_SHOW = 5;
 
-const ReviewsPage = () => {
+const ReviewsPage: React.FC = () => {
   const [reviews] = useState<Review[]>(MOCK_REVIEWS);
   const [isLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);

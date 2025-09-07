@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from '../../../shared/api/baseQueryWithReauth';
-import { Product } from './products.api';
+import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
+import { Product } from '@/entities/product/api/products.api';
 
 export const favoritesApi = createApi({
     reducerPath: 'favoritesApi',

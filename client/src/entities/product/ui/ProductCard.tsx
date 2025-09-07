@@ -1,26 +1,26 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CartButton from "@/shared/ui/Button/CartButton";
 import Link from "next/link";
 import { RootState } from "@/shared/config/store/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setActiveColor } from "@/entities/favorite/model/productCard.slice";
-import SliderSwiper from "../../../shared/ui/SliderSwiper";
-import FavoriteButton from "../../../shared/ui/Button/FavoriteButton";
-import Color from "../../../shared/ui/Color";
-import New from "../../../shared/ui/New";
+import SliderSwiper from "@/shared/ui/SliderSwiper";
+import FavoriteButton from "@/shared/ui/Button/FavoriteButton";
+import Color from "@/shared/ui/Color";
+import New from "@/shared/ui/New";
 import { Product } from "@/entities/product/api/products.api";
-import Discount from "../../../widgets/discount/Discount";
+import Discount from "@/widgets/discount/Discount";
 
 interface ProductCardProps {
   product: Product;
   cartButtonSize?: "default" | "small";
 }
 
-const ProductCard = ({
+const ProductCard: React.FC<ProductCardProps> = ({
   product,
   cartButtonSize = "default",
-}: ProductCardProps) => {
+}) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const activeColors = useSelector(
@@ -42,9 +42,9 @@ const ProductCard = ({
 
   const activeColor = activeColors[product.id];
 
-  const handleColorClick = (color: string) => {
+  const handleColorClick = useCallback((color: string) => {
     dispatch(setActiveColor({ productId: product.id, color }));
-  };
+  }, [dispatch, product.id]);
 
   return (
     <li

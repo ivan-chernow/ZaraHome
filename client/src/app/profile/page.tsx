@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import MainLayout from "@/widgets/layout/MainLayout";
 import Container from "@mui/material/Container";
@@ -17,7 +17,7 @@ import { RootState } from "@/shared/config/store/store";
 import { setActiveView } from "@/features/profile/model/profile.slice";
 import { useRestoreActiveView } from "@/shared/lib/hooks/useRestoreActiveView";
 
-const ProfilePage = () => {
+const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const { activeView } = useSelector((state: RootState) => state.profile);
   const router = useRouter();

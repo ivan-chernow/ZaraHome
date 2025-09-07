@@ -3,7 +3,7 @@ import Container from "@mui/material/Container";
 import CatalogItem from "@/entities/catalog/ui/CatalogItem";
 import { catalog } from 'public/assets/data/catalog';
 
-const Catalog = () => {
+const Catalog: React.FC = () => {
 	return (
 		<section id="catalog" data-section="catalog" className='mt-[85px]'>
 			<Container maxWidth='lg'>

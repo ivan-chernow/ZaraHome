@@ -1,13 +1,13 @@
 import React from 'react';
 import DeliveryTimeline from "@/shared/ui/DeliveryTimeline";
-import PersonalLayer from "@/widgets/layout/MainLayout";
+import MainLayout from "@/widgets/layout/MainLayout";
 
-const Page = () => {
-	return (
-		<PersonalLayer>
-			<DeliveryTimeline/>
-		</PersonalLayer>
-	);
+const InfoPage: React.FC = () => {
+  return (
+    <MainLayout>
+      <DeliveryTimeline />
+    </MainLayout>
+  );
 };
 
-export default Page;
+export default InfoPage;

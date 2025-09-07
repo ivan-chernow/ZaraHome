@@ -3,7 +3,7 @@ import HomeIcon from '@/shared/ui/HomeIcon';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 
-const AdminNavigationSkeleton = () => {
+const AdminNavigationSkeleton: React.FC = () => {
   return (
     <div>
       {/* Breadcrumb - отображаем сразу, без скелетона */}

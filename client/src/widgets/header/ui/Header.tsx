@@ -22,7 +22,7 @@ import {
 import { useGetCartQuery } from "@/entities/cart/api/cart.api";
 import { setCartItems } from "@/entities/cart/model/cartItems.slice";
 
-const Header = () => {
+const Header: React.FC = () => {
   const pathname = usePathname();
   const dispatch: AppDispatch = useDispatch();
   const { isOpenCart } = useSelector((state: RootState) => state.cart);

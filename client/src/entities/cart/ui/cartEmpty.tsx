@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from "next/image";
 
-const CartEmpty = () => {
+const CartEmpty: React.FC = () => {
 	return (
 		<div
 			className="w-full max-w-[360px] h-full bg-white shadow-xl flex flex-col z-100">

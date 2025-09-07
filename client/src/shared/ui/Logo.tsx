@@ -2,7 +2,7 @@ import React from 'react';
 import Image from "next/image";
 import Link from 'next/link'
 
-const Logo = () => {
+const Logo: React.FC = () => {
 	return (
 		<div className='text-center'>
 			<Link href="/" className='inline-block '>

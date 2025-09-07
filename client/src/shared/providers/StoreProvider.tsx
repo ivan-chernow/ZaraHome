@@ -3,6 +3,6 @@
 import { Provider } from 'react-redux'
 import { store } from '../config/store/store'
  
-export function Providers({ children }: { children: React.ReactNode }) {
+export const Providers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <Provider store={store}>{children}</Provider>
-} 
+}

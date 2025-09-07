@@ -25,11 +25,12 @@ import DeliveryAddress from "@/features/profile/delivery-address/ui/DeliveryAddr
 import { useRouter } from "next/navigation";
 import { useGetDeliveryAddressesQuery } from "@/entities/user/api/profile.api";
 
-const Page = () => {
+const OrderPage: React.FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [mounted, setMounted] = useState(false);
+  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -371,4 +372,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default OrderPage;

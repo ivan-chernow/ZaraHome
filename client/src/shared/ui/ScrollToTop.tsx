@@ -43,6 +43,7 @@ const ScrollToTop: React.FC = () => {
             duration: 0.2, 
             ease: "easeOut"
           }}
+          aria-label="Прокрутить наверх"
         >
           {/* Иконка стрелки */}
           <motion.svg 

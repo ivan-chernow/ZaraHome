@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import MainLayout from "@/widgets/layout/MainLayout";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import Container from "@mui/material/Container";
@@ -28,7 +28,7 @@ import { RootState } from "@/shared/config/store/store";
 import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-const Page = () => {
+const CartPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -39,29 +39,27 @@ const Page = () => {
   const { data: activeOrder } = useGetActiveOrderQuery();
 
   // Функция для проверки изменения товаров
-  const haveItemsChanged = (currentItems: any[], newItems: any[]): boolean => {
-    // Если количество товаров разное, значит товары изменились
+  const haveItemsChanged = useCallback((currentItems: any[], newItems: any[]): boolean => {
     if (currentItems.length !== newItems.length) {
       return true;
     }
 
-    // Создаем мапы для быстрого сравнения
+    const createItemKey = (item: any) => 
+      `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
+
     const currentItemsMap = new Map();
     const newItemsMap = new Map();
 
-    // Заполняем мапы текущими товарами
     currentItems.forEach(item => {
-      const key = `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
+      const key = createItemKey(item);
       currentItemsMap.set(key, (currentItemsMap.get(key) || 0) + 1);
     });
 
-    // Заполняем мапы новыми товарами
     newItems.forEach(item => {
-      const key = `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
+      const key = createItemKey(item);
       newItemsMap.set(key, (newItemsMap.get(key) || 0) + 1);
     });
 
-    // Сравниваем мапы
     if (currentItemsMap.size !== newItemsMap.size) {
       return true;
     }
@@ -73,7 +71,7 @@ const Page = () => {
     }
 
     return false;
-  };
+  }, []);
   
   useEffect(() => {
     setMounted(true);
@@ -122,7 +120,8 @@ const Page = () => {
   }
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-  const getFullImageUrl = (path?: string): string | undefined => {
+  
+  const getFullImageUrl = useCallback((path?: string): string | undefined => {
     if (!path) return undefined;
     try {
       const cleanPath = path.replace(/^\/+/, "");
@@ -130,7 +129,7 @@ const Page = () => {
     } catch {
       return path;
     }
-  };
+  }, [API_URL]);
 
   return (
     <MainLayout>
@@ -441,4 +440,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default CartPage;

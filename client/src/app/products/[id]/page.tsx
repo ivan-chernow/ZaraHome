@@ -33,7 +33,11 @@ import { useAddToCartMutation, useRemoveFromCartMutation } from "@/entities/cart
 import { addCartItem, removeCartItem, setCartItems } from "@/entities/cart/model/cartItems.slice";
 import { getLocalStorage, setLocalStorage } from "@/shared/lib/storage";
 
-const Page = ({ params }: { params: Promise<{ id: string }> }) => {
+interface ProductPageProps {
+  params: Promise<{ id: string }>;
+}
+
+const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
   const resolvedParams = use(params);
   const { data: categories, isLoading } = useGetCatalogQuery();
   const dispatch = useDispatch();
@@ -352,4 +356,4 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   );
 };
 
-export default Page;
+export default ProductPage;

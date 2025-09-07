@@ -15,7 +15,7 @@ import { useRestoreActiveView } from '@/shared/lib/hooks/useRestoreActiveView';
 // Skeleton is not used during initial restore to avoid style flicker like in user profile
 
 
-const AdminPage = () => {
+const AdminPage: React.FC = () => {
   const dispatch = useDispatch();
   const { activeView } = useSelector((state: RootState) => state.admin);
   const { isReady } = useRestoreActiveView<

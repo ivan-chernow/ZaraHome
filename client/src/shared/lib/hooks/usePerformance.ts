@@ -12,22 +12,20 @@ import { useEffect, useRef, useCallback, useState } from 'react';
  */
 export const usePerformanceMeasure = <T extends (...args: any[]) => any>(
   fn: T,
-  deps: React.DependencyList = []
 ): T => {
-  const measureRef = useRef<PerformanceMeasure | null>(null);
 
   return useCallback((...args: Parameters<T>) => {
     const startTime = performance.now();
     const result = fn(...args);
     const endTime = performance.now();
     
-    // Performance measurement disabled in production
+    // Log only in development to avoid noise in production
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Function ${fn.name || 'anonymous'} took ${endTime - startTime} milliseconds`);
+      console.log(`Function ${fn.name || 'anonymous'} took ${endTime - startTime} ms`);
     }
     
     return result;
-  }, deps) as T;
+  }, [fn]) as T;
 };
 
 /**
@@ -39,7 +37,7 @@ export const useFPSMonitor = (threshold: number = 30) => {
   const [fps, setFps] = useState(0);
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(performance.now());
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const measureFPS = () => {
@@ -64,7 +62,7 @@ export const useFPSMonitor = (threshold: number = 30) => {
     animationFrameRef.current = requestAnimationFrame(measureFPS);
 
     return () => {
-      if (animationFrameRef.current) {
+      if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
@@ -134,7 +132,7 @@ export const useDOMMonitor = () => {
 export const useIntersectionObserver = (threshold: number = 0.1) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasIntersected, setHasIntersected] = useState(false);
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const element = ref.current;
@@ -168,7 +166,7 @@ export const useIntersectionObserver = (threshold: number = 0.1) => {
  */
 export const useLazyComponent = <T extends React.ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
-  fallback: React.ComponentType<any> = () => React.createElement('div', null, 'Loading...')
+  fallback: React.ComponentType<any> = () => null
 ) => {
   const [Component, setComponent] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -187,7 +185,7 @@ export const useLazyComponent = <T extends React.ComponentType<any>>(
   }, [importFn]);
 
   if (isLoading) return fallback;
-  if (error) return () => <div>Error loading component: {error.message}</div>;
+  if (error) return () => null;
   if (!Component) return fallback;
 
   return Component;
@@ -201,36 +199,35 @@ export const useLazyComponent = <T extends React.ComponentType<any>>(
  */
 export const useAnimationFrame = (
   callback: (time: number) => void,
-  deps: React.DependencyList = []
 ) => {
-  const requestRef = useRef<number>();
-  const previousTimeRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
+  const previousTimeRef = useRef<number | null>(null);
 
   const animate = useCallback((time: number) => {
-    if (previousTimeRef.current !== undefined) {
+    if (previousTimeRef.current !== null) {
       const deltaTime = time - previousTimeRef.current;
       callback(deltaTime);
     }
     previousTimeRef.current = time;
     requestRef.current = requestAnimationFrame(animate);
-  }, deps);
+  }, [callback]);
 
   const startAnimation = useCallback(() => {
-    if (requestRef.current) {
+    if (requestRef.current !== null) {
       cancelAnimationFrame(requestRef.current);
     }
     requestRef.current = requestAnimationFrame(animate);
   }, [animate]);
 
   const stopAnimation = useCallback(() => {
-    if (requestRef.current) {
+    if (requestRef.current !== null) {
       cancelAnimationFrame(requestRef.current);
     }
   }, []);
 
   useEffect(() => {
     return () => {
-      if (requestRef.current) {
+      if (requestRef.current !== null) {
         cancelAnimationFrame(requestRef.current);
       }
     };

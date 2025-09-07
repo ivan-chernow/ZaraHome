@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ProductColors {
     [productId: number]: string;
@@ -12,7 +12,7 @@ const productCardSlice = createSlice({
     name: 'productCard',
     initialState,
     reducers: {
-        setActiveColor: (state, action: { payload: { productId: number, color: string } }) => {
+        setActiveColor: (state, action: PayloadAction<{ productId: number; color: string }>) => {
             state.activeColors[action.payload.productId] = action.payload.color;
         },
     },

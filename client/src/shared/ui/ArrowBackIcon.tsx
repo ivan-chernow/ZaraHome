@@ -1,9 +1,9 @@
 import React from 'react';
-import {useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { setView } from '@/features/auth/model/auth.slice';
 
-const ArrowBackIconCart = () => {
+const ArrowBackIconCart: React.FC = () => {
 	const dispatch = useDispatch()
 	return (
 		<div

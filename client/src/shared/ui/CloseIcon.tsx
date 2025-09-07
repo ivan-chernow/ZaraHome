@@ -1,9 +1,9 @@
 import React from 'react';
-import {useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import CloseIcon from "@mui/icons-material/Close";
 import { closeModalAuth } from '@/features/auth/model/auth.slice';
 
-const CloseIconCart = () => {
+const CloseIconCart: React.FC = () => {
 	const dispatch = useDispatch()
 	return (
 		<div

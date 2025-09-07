@@ -1,5 +1,5 @@
-// app/AppContent.tsx
 "use client";
+
 import React from "react";
 import Header from "@/widgets/header/ui/Header";
 import NavMenu from "@/widgets/nav-menu/ui/NavMenu";
@@ -11,7 +11,7 @@ import Help from "@/widgets/help/ui/Help";
 import Footer from "@/widgets/footer/ui/Footer";
 import ScrollToTop from "@/shared/ui/ScrollToTop";
 
-export function App() {
+const App: React.FC = () => {
   return (
     <>
       <Header />
@@ -27,4 +27,6 @@ export function App() {
       <ScrollToTop />
     </>
   );
-}
+};
+
+export { App };

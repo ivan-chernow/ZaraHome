@@ -2,13 +2,18 @@ import React from "react";
 import Container from "@mui/material/Container";
 import HelpElement from "@/shared/ui/HelpElement";
 
-const Help = ({ title, style }) => {
+interface HelpProps {
+  title: string;
+  style?: React.CSSProperties["justifyContent"];
+}
+
+const Help: React.FC<HelpProps> = ({ title, style }) => {
   return (
     <section id="help" data-section="help" className=" mt-[76px]">
       <Container maxWidth="lg">
         <div
           className="flex justify-end mb-[71px]"
-          style={{ justifyContent: `${style}` }}
+          style={{ justifyContent: style }}
         >
           <div className="text-left">
             <h2 className="font-light text-[42px] mb-[12px]">{title}</h2>

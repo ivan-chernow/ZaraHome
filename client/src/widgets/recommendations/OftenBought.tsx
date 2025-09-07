@@ -5,7 +5,7 @@ import { useGetCatalogQuery } from "@/entities/product/api/products.api";
 import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import CircularProgress from "@mui/material/CircularProgress";
 
-const OftenBought = () => {
+const OftenBought: React.FC = () => {
   const { data: categories, isLoading, error } = useGetCatalogQuery();
 
   const randomProducts = useMemo(() => {

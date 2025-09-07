@@ -1,6 +1,6 @@
 import Skeleton from "@mui/material/Skeleton";
 
-export const ProductCardSkeleton = () => (
+export const ProductCardSkeleton: React.FC = () => (
   <li className="w-[300px] h-[497px] mr-[-1px] bg-white relative group overflow-hidden rounded-xl shadow animate-pulse flex flex-col">
     <div
       className="mb-[18px] relative overflow-hidden"

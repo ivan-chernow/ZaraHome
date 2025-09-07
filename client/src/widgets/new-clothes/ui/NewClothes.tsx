@@ -7,7 +7,7 @@ import { getAllProducts } from "@/entities/category/lib/catalog.utils";
 import slugify from "slugify";
 import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";
 
-const NewClothes = () => {
+const NewClothes: React.FC = () => {
   const { data: categories, isLoading } = useGetCatalogQuery();
 
   const allProducts = useMemo(() => {

@@ -2,16 +2,18 @@ import React from 'react';
 import MainButton from "@/shared/ui/Button/MainButton";
 import Link from 'next/link';
 
-const NewsBlock = ({
-	title,
-	subtitle,
-	btnText,
-	categorySlug
-}: {
-	title: string,
-	subtitle: string,
-	btnText: string,
-	categorySlug: string
+interface NewsBlockProps {
+  title: string;
+  subtitle: string;
+  btnText: string;
+  categorySlug: string;
+}
+
+const NewsBlock: React.FC<NewsBlockProps> = ({
+  title,
+  subtitle,
+  btnText,
+  categorySlug
 }) => {
 	
 	return (

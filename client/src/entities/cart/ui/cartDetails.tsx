@@ -16,7 +16,7 @@ interface CartDetailsProps {
   cartButtonRef: RefObject<HTMLDivElement | null>;
 }
 
-const CartDetails = ({ cartButtonRef }: CartDetailsProps) => {
+const CartDetails: React.FC<CartDetailsProps> = ({ cartButtonRef }) => {
   const dispatch = useDispatch();
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const cartItems = useSelector(selectCartItems);

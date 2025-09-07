@@ -33,15 +33,7 @@ export function getProductsByType(type?: Type): Product[] {
 }
 
 export function getAllProducts(categories?: Category[]): Product[] {
-  console.log('getAllProducts called with:', categories);
-  
-  if (!categories) {
-    console.log('Categories is undefined or null');
-    return [];
-  }
-  
-  if (!Array.isArray(categories)) {
-    console.log('Categories is not an array:', typeof categories, categories);
+  if (!categories || !Array.isArray(categories)) {
     return [];
   }
   
@@ -72,22 +64,16 @@ export const findProductPathById = (
   type?: Type;
   product: Product;
 } | null => {
-  console.log("findProductPathById called with:", { categories, productId });
-
   if (!categories) {
-    console.log("No categories provided");
     return null;
   }
 
   for (const category of categories) {
-    console.log("Checking category:", category.name);
-
     // Проверяем товары на уровне категории
     const categoryProduct = category.products?.find(
       (p) => p.id.toString() === productId
     );
     if (categoryProduct) {
-      console.log("Found product in category:", categoryProduct.name_ru);
       // Если товар найден на уровне категории, возвращаем с пустой подкатегорией
       return {
         category,
@@ -97,14 +83,11 @@ export const findProductPathById = (
     }
 
     for (const subCategory of category.subCategories) {
-      console.log("Checking subCategory:", subCategory.name);
-
       // Проверяем товары на уровне подкатегории
       const subCategoryProduct = subCategory.products?.find(
         (p) => p.id.toString() === productId
       );
       if (subCategoryProduct) {
-        console.log("Found product in subCategory:", subCategoryProduct.name_ru);
         return {
           category,
           subCategory,
@@ -115,12 +98,10 @@ export const findProductPathById = (
       // Проверяем товары в типах подкатегории
       if (subCategory.types) {
         for (const type of subCategory.types) {
-          console.log("Checking type:", type.name);
           const foundProduct = type.products?.find(
             (p) => p.id.toString() === productId
           );
           if (foundProduct) {
-            console.log("Found product in type:", foundProduct.name_ru);
             return {
               category,
               subCategory,
@@ -132,7 +113,5 @@ export const findProductPathById = (
       }
     }
   }
-
-  console.log("Product not found in any location");
   return null;
 };

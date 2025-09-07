@@ -1,7 +1,17 @@
 import React from 'react';
 import { Button } from "@mui/material";
 
-const MainButton = ({ text, disabled, onClick, type, height, width, active = false }: { text: string, disabled: boolean, onClick?: () => void, type: 'button' | 'submit', height?: string, width?: string, active?: boolean }) => {
+interface MainButtonProps {
+  text: string;
+  disabled: boolean;
+  onClick?: () => void;
+  type: 'button' | 'submit';
+  height?: string;
+  width?: string;
+  active?: boolean;
+}
+
+const MainButton: React.FC<MainButtonProps> = ({ text, disabled, onClick, type, height, width, active = false }) => {
 	return (
 		<Button
 			variant="outlined"

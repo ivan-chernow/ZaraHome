@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import Image from "next/image";
@@ -16,14 +16,14 @@ interface SliderSwiperProps {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const SliderSwiper = ({
+const SliderSwiper: React.FC<SliderSwiperProps> = ({
   product,
   isHovered,
   quantity,
   height = 326,
-}: SliderSwiperProps) => {
+}) => {
   // Функция для формирования полного URL изображения
-  const getImageUrl = (path: string) => {
+  const getImageUrl = useCallback((path: string) => {
     try {
       // Если путь уже является полным URL
       if (path.startsWith("http")) {
@@ -35,14 +35,13 @@ const SliderSwiper = ({
 
       // Формируем полный URL
       return `${API_URL}/${cleanPath}`;
-    } catch (error) {
-      console.error("Error forming image URL:", error);
+    } catch {
       return path; // Возвращаем исходный путь в случае ошибки
     }
-  };
+  }, []);
 
   // Получаем массив картинок, которые будут показаны
-  const images = product.img.slice(0, quantity);
+  const images = useMemo(() => product.img.slice(0, quantity), [product.img, quantity]);
 
   // Определяем, нужно ли показывать пагинацию
   const showPagination = images.length > 1;

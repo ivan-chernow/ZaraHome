@@ -5,7 +5,7 @@ import VerticalLine from "@/shared/ui/VerticalLine";
 import HorizontalLine from "@/shared/ui/HorizontalLine";
 import Link from "next/link";
 
-const WhyUs = () => {
+const WhyUs: React.FC = () => {
   return (
     <section id="why-us" data-section="why-us" className="mb-[120px] mt-[10px]">
       <Container maxWidth="lg" className="relative">

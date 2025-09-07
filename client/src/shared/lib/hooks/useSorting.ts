@@ -29,7 +29,6 @@ export const useSorting = ({ products }: UseSortingProps): UseSortingReturn => {
       return [...products].sort((a, b) => {
         // Проверяем, что у товаров есть необходимые поля
         if (!a || !b || !a.size || !b.size) {
-          console.warn('Товар без размеров или цен:', { a: a?.id, b: b?.id });
           return 0;
         }
         
@@ -44,15 +43,6 @@ export const useSorting = ({ products }: UseSortingProps): UseSortingReturn => {
         
         const aMinPrice = Math.min(...aPrices);
         const bMinPrice = Math.min(...bPrices);
-        
-        // Логируем для отладки первые несколько сравнений
-        if (Math.random() < 0.1) { // Логируем только 10% случаев
-          console.log('Сравнение цен:', {
-            a: { id: a.id, name: a.name_ru, minPrice: aMinPrice },
-            b: { id: b.id, name: b.name_ru, minPrice: bMinPrice },
-            result: aMinPrice - bMinPrice
-          });
-        }
         
         // Если цены одинаковые, сортируем по ID для стабильности
         if (aMinPrice === bMinPrice) {
@@ -87,26 +77,14 @@ export const useSorting = ({ products }: UseSortingProps): UseSortingReturn => {
     const newSortType = sortType === 'price' ? 'default' : 'price';
     setSortType(newSortType);
     
-    // Логируем для отладки
-    if (newSortType === 'price') {
-      console.log('Сортировка по цене включена');
-      console.log('Товары для сортировки:', products.length);
-    } else {
-      console.log('Сортировка по цене отключена');
-    }
+    // без консольных логов
   };
 
   const handleSortByDate = () => {
     const newSortType = sortType === 'date' ? 'default' : 'date';
     setSortType(newSortType);
     
-    // Логируем для отладки
-    if (newSortType === 'date') {
-      console.log('Сортировка по дате включена');
-      console.log('Товары для сортировки:', products.length);
-    } else {
-      console.log('Сортировка по дате отключена');
-    }
+    // без консольных логов
   };
 
   return {

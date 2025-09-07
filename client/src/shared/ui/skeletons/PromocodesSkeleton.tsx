@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PromocodesSkeleton = () => {
+const PromocodesSkeleton: React.FC = () => {
   return (
     <div className="animate-pulse">
       <div className="max-w-[1200px] mx-auto p-6">

@@ -2,11 +2,11 @@ import CatalogAccordion from "@/entities/catalog/ui/CatalogAccordion";
 import MainLayout from "@/widgets/layout/MainLayout";
 import Container from "@mui/material/Container";
 
-export default function ProductsLayout({
-  children,
-}: {
+interface ProductsLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+const ProductsLayout: React.FC<ProductsLayoutProps> = ({ children }) => {
   return (
     <MainLayout>
       <Container maxWidth="lg" className="pb-[105px]">
@@ -19,4 +19,6 @@ export default function ProductsLayout({
       </Container>
     </MainLayout>
   );
-}
+};
+
+export default ProductsLayout;

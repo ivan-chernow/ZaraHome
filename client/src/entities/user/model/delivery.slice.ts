@@ -6,12 +6,16 @@ interface DeliveryState {
   selectedAddressIndex: number | null;
 }
 
-// Получаем сохраненный адрес из localStorage
-const getSavedAddress = () => {
+// Получаем сохраненный адрес из localStorage безопасно
+const getSavedAddress = (): DeliveryAddressDto | null => {
   if (typeof window === 'undefined') return null;
   try {
     const saved = localStorage.getItem('selectedDeliveryAddress');
-    return saved ? JSON.parse(saved) : null;
+    const parsed = saved ? JSON.parse(saved) : null;
+    if (parsed && typeof parsed === 'object' && 'city' in parsed && 'region' in parsed) {
+      return parsed as DeliveryAddressDto;
+    }
+    return null;
   } catch {
     return null;
   }

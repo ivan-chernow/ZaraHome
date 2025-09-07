@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from '../../../shared/api/baseQueryWithReauth';
-import type { Product } from './products.api';
+import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
+import type { Product } from '@/entities/product/api/products.api';
 
 export const cartApi = createApi({
   reducerPath: 'cartApi',

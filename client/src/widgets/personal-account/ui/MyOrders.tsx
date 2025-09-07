@@ -7,7 +7,7 @@ import { useGetUserOrdersQuery } from "@/entities/order/api/orders.api";
 import { useGetProductsByIdsQuery } from "@/entities/product/api/products.api";
 import OrderItem from "@/entities/order/ui/OrderItem";
 
-const MyOrders = () => {
+const MyOrders: React.FC = () => {
   const [openOrderId, setOpenOrderId] = useState<number | null>(null);
   const [localOrders, setLocalOrders] = useState<any[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());

@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function NavigationProgress() {
+const NavigationProgress: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
@@ -107,3 +107,5 @@ export default function NavigationProgress() {
     />
   );
 }
+
+export default NavigationProgress;

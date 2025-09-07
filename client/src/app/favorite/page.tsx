@@ -13,7 +13,7 @@ import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";
 import { getLocalStorage } from "@/shared/lib/storage";
 import { setFavorites } from "@/entities/favorite/model/favorites.slice";
 
-const Page = () => {
+const FavoritePage: React.FC = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
@@ -159,4 +159,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default FavoritePage;

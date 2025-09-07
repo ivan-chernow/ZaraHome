@@ -22,11 +22,10 @@ import { useRouter } from "next/navigation";
 
 type Step = "form" | "3ds" | "result";
 
-const PaymentPage = () => {
+const PaymentPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((s: RootState) => s.auth);
-  const { selectedAddress } = useSelector((s: RootState) => s.delivery);
   const cartItems = useSelector((s: RootState) => selectCartItems(s) as CartItem[]);
   const cartTotal = useSelector((s: RootState) => selectCartTotalPrice(s) as number);
   const currentOrderTotal = useSelector((s: RootState) => s.order.currentTotalOverride ?? s.order.currentOrder?.totalPrice);
@@ -45,10 +44,10 @@ const PaymentPage = () => {
   const [cvc, setCvc] = useState("");
   const [code3ds, setCode3ds] = useState("");
   const [error, setError] = useState<string | null>(null);
+  
   useEffect(() => setMounted(true), []);
+  
   if (!mounted) return null;
-
-  const isCartEmpty = cartItems.length === 0;
 
   const formatCardNumber = (value: string) =>
     value

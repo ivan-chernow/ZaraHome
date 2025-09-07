@@ -7,7 +7,7 @@ import { Mutex } from 'async-mutex';
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:3001',
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     // Берем токен из Redux, а не из localStorage, чтобы избежать авто-логина на перезагрузке

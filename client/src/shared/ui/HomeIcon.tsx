@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-const HomeIcon = () => {
+const HomeIcon: React.FC = () => {
     const router = useRouter();
     return (
         <HomeOutlinedIcon

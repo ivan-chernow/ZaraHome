@@ -19,7 +19,7 @@ import type { Product } from "@/entities/product/api/products.api";
  * - Не выполняет автоматическую авторизацию
  * - Только инициализирует локальные состояния в redux для гостей
  */
-const AuthCheck = () => {
+const AuthCheck: React.FC = () => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth

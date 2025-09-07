@@ -2,7 +2,16 @@ import React from 'react';
 import Container from "@mui/material/Container";
 import NewsBlock from "@/widgets/news/NewsBlock";
 
-const NewsBlockSection = ({title, subtitle, btnText, bgImg, margin, categorySlug}: {title: string, subtitle: string, btnText: string, bgImg: string, margin: string, categorySlug: string}) => {
+interface NewsBlockSectionProps {
+  title: string;
+  subtitle: string;
+  btnText: string;
+  bgImg: string;
+  margin: string | number;
+  categorySlug: string;
+}
+
+const NewsBlockSection: React.FC<NewsBlockSectionProps> = ({title, subtitle, btnText, bgImg, margin, categorySlug}) => {
 	return (
 		<div
 			style={{backgroundImage: `url(${bgImg})`, marginTop: margin}}

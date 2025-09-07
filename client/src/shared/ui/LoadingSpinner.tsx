@@ -1,3 +1,4 @@
+import React from 'react';
 import { CircularProgress, Box } from '@mui/material';
 import { keyframes } from '@mui/system';
 
@@ -10,7 +11,7 @@ const spin = keyframes`
   }
 `;
 
-const LoadingSpinner = () => {
+const LoadingSpinner: React.FC = () => {
   return (
     <Box
       sx={{
@@ -36,6 +37,9 @@ const LoadingSpinner = () => {
             strokeLinecap: 'round',
           },
         }}
+        role="status"
+        aria-live="polite"
+        aria-label="Загрузка"
       />
     </Box>
   );

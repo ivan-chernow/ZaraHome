@@ -22,7 +22,7 @@ interface ErrorResponse {
   };
 }
 
-const ResetPasswordPage = () => {
+const ResetPasswordPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const searchParams = useSearchParams();

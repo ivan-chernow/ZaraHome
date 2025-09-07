@@ -2,7 +2,12 @@ import React from "react";
 import Typography from "@mui/material/Typography";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 
-const AccordionSection = ({ expanded, onChange }) => {
+interface AccordionSectionProps {
+  expanded: boolean;
+  onChange: (event: React.SyntheticEvent, isExpanded: boolean) => void;
+}
+
+const AccordionSection: React.FC<AccordionSectionProps> = ({ expanded, onChange }) => {
   return (
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
