@@ -6,7 +6,7 @@ export class FavoriteProductIdDto {
   @ApiProperty({
     description: 'ID товара',
     example: 1,
-    minimum: 1
+    minimum: 1,
   })
   @IsNumber()
   @IsPositive({ message: 'ID товара должен быть положительным числом' })

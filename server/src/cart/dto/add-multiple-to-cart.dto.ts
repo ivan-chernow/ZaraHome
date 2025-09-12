@@ -7,7 +7,7 @@ export class AddMultipleToCartDto {
     example: [1, 2, 3],
     type: [Number],
     minItems: 1,
-    maxItems: 50
+    maxItems: 50,
   })
   @IsArray()
   @IsNumber({}, { each: true })

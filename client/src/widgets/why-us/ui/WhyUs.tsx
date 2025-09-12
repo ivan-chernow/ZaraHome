@@ -1,9 +1,9 @@
-import React from "react";
-import Image from "next/image";
-import Container from "@mui/material/Container";
-import VerticalLine from "@/shared/ui/VerticalLine";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import Link from "next/link";
+import React from 'react';
+import Image from 'next/image';
+import Container from '@mui/material/Container';
+import VerticalLine from '@/shared/ui/VerticalLine';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import Link from 'next/link';
 
 const WhyUs: React.FC = () => {
   return (
@@ -44,7 +44,7 @@ const WhyUs: React.FC = () => {
             <VerticalLine height="215px" />
             <div className="flex flex-col ml-[39px]">
               <h3 className="text-[32px] mb-[12px] max-w-[235px]">
-                Удобная оплата{" "}
+                Удобная оплата{' '}
               </h3>
               <p className="max-w-[346px]">
                 Работаем через платежный терминал от Тинькофф. Принимаем карты

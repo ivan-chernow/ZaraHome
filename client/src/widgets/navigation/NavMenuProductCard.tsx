@@ -1,15 +1,15 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import Discount from "../discount/Discount";
-import New from "../../shared/ui/New";
-import type { Product } from "@/entities/product/api/products.api";
-import { useDispatch } from "react-redux";
-import { closeAllMenus } from "@/widgets/nav-menu/model/navMenu.slice";
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import Discount from '../discount/Discount';
+import New from '../../shared/ui/New';
+import type { Product } from '@/entities/product/api/products.api';
+import { useDispatch } from 'react-redux';
+import { closeAllMenus } from '@/widgets/nav-menu/model/navMenu.slice';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface NavMenuProductCardProps {
   product: Product;
@@ -56,8 +56,8 @@ const NavMenuProductCard: React.FC<NavMenuProductCardProps> = ({ product }) => {
             <div className="mt-2">
               <span className="text-lg font-bold text-gray-900">
                 {Object.values(product.size)
-                  .find((s) => s.price)
-                  ?.price?.toLocaleString("ru-RU")}{" "}
+                  .find(s => s.price)
+                  ?.price?.toLocaleString('ru-RU')}{' '}
                 ₽
               </span>
             </div>

@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ResourceNotFoundException } from 'src/shared/shared.interfaces';
 import { Order } from './entity/order.entity';
 import { OrderStatus } from 'src/shared/shared.interfaces';
@@ -20,12 +24,21 @@ export interface OrderStatistics {
 
 @Injectable()
 export class OrdersService implements IOrderService {
-  constructor(
-    private readonly ordersRepository: OrdersRepository,
-    private readonly promocodesService: PromocodesService,
-  ) {}
+  private readonly ordersRepository: OrdersRepository;
+  private readonly promocodesService: PromocodesService;
 
-  async createOrder(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
+  constructor(
+    ordersRepository: OrdersRepository,
+    promocodesService: PromocodesService
+  ) {
+    this.ordersRepository = ordersRepository;
+    this.promocodesService = promocodesService;
+  }
+
+  async createOrder(
+    createOrderDto: CreateOrderDto,
+    userId: number
+  ): Promise<Order> {
     // Валидация входных данных
     this.validateCreateOrderDto(createOrderDto);
 
@@ -36,28 +49,34 @@ export class OrdersService implements IOrderService {
     }
 
     // Проверяем, есть ли уже активный заказ у пользователя
-    const existingActiveOrder = await this.ordersRepository.findActiveOrderByUser(userId);
+    const existingActiveOrder =
+      await this.ordersRepository.findActiveOrderByUser(userId);
 
     // Если есть активный заказ, проверяем, изменились ли товары
     if (existingActiveOrder) {
       const currentItems = existingActiveOrder.items;
       const newItems = createOrderDto.items;
-      
+
       // Проверяем, одинаковые ли товары и количества
-      const itemsChanged = this.haveItemsChanged(currentItems as any, newItems as any);
-      
+      const itemsChanged = this.haveItemsChanged(
+        currentItems as any,
+        newItems as any
+      );
+
       // Если товары не изменились, возвращаем существующий заказ
       if (!itemsChanged) {
         return existingActiveOrder;
       }
-      
+
       // Если товары изменились, отменяем старый заказ
       existingActiveOrder.status = OrderStatus.CANCELLED;
       await this.ordersRepository.updateOrder(existingActiveOrder);
     }
 
     // Рассчитываем общую стоимость и количество
-    const { totalPrice, totalCount } = this.calculateOrderTotals(createOrderDto.items as any);
+    const { totalPrice, totalCount } = this.calculateOrderTotals(
+      createOrderDto.items as any
+    );
 
     // Применяем промокод, если указан
     let finalPrice = totalPrice;
@@ -71,7 +90,11 @@ export class OrdersService implements IOrderService {
         userId
       );
 
-      if (promocodeResult.isValid && promocodeResult.finalAmount !== undefined && promocodeResult.discount !== undefined) {
+      if (
+        promocodeResult.isValid &&
+        promocodeResult.finalAmount !== undefined &&
+        promocodeResult.discount !== undefined
+      ) {
         finalPrice = promocodeResult.finalAmount;
         discount = promocodeResult.discount;
         promocode = createOrderDto.promocode;
@@ -92,7 +115,11 @@ export class OrdersService implements IOrderService {
     return order;
   }
 
-  async getUserOrders(userId: number, page: number = 1, limit: number = 20): Promise<OrderListResponse> {
+  async getUserOrders(
+    userId: number,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<OrderListResponse> {
     if (page < 1 || limit < 1 || limit > 100) {
       throw new BadRequestException('Некорректные параметры пагинации');
     }
@@ -108,7 +135,11 @@ export class OrdersService implements IOrderService {
     return await this.ordersRepository.findOrderByIdAndUser(orderId, userId);
   }
 
-  async updateOrderStatus(orderId: number, status: OrderStatus, userId: number): Promise<Order> {
+  async updateOrderStatus(
+    orderId: number,
+    status: OrderStatus,
+    userId: number
+  ): Promise<Order> {
     const order = await this.getOrderById(orderId, userId);
     if (!order) {
       throw new ResourceNotFoundException('Заказ не найден');
@@ -126,7 +157,11 @@ export class OrdersService implements IOrderService {
     return await this.updateOrderStatus(orderId, OrderStatus.CANCELLED, userId);
   }
 
-  async updateOrder(orderId: number, updateOrderDto: UpdateOrderDto, userId: number): Promise<Order> {
+  async updateOrder(
+    orderId: number,
+    updateOrderDto: UpdateOrderDto,
+    userId: number
+  ): Promise<Order> {
     const order = await this.getOrderById(orderId, userId);
     if (!order) {
       throw new ResourceNotFoundException('Заказ не найден');
@@ -134,7 +169,9 @@ export class OrdersService implements IOrderService {
 
     // Проверяем, можно ли редактировать заказ
     if (order.status !== OrderStatus.PENDING) {
-      throw new ForbiddenException('Нельзя редактировать заказ, который не в статусе "Ожидает"');
+      throw new ForbiddenException(
+        'Нельзя редактировать заказ, который не в статусе "Ожидает"'
+      );
     }
 
     // Валидация обновляемых данных
@@ -154,7 +191,11 @@ export class OrdersService implements IOrderService {
     return await this.ordersRepository.updateOrder(order);
   }
 
-  async getOrdersByStatus(status: OrderStatus, page: number = 1, limit: number = 20): Promise<OrderListResponse> {
+  async getOrdersByStatus(
+    status: OrderStatus,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<OrderListResponse> {
     if (page < 1 || limit < 1 || limit > 100) {
       throw new BadRequestException('Некорректные параметры пагинации');
     }
@@ -166,9 +207,15 @@ export class OrdersService implements IOrderService {
     return await this.ordersRepository.getOrdersStatistics();
   }
 
-  async searchOrders(query: string, page: number = 1, limit: number = 20): Promise<OrderListResponse> {
+  async searchOrders(
+    query: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<OrderListResponse> {
     if (!query || query.trim().length < 2) {
-      throw new BadRequestException('Поисковый запрос должен содержать минимум 2 символа');
+      throw new BadRequestException(
+        'Поисковый запрос должен содержать минимум 2 символа'
+      );
     }
 
     if (page < 1 || limit < 1 || limit > 100) {
@@ -190,15 +237,25 @@ export class OrdersService implements IOrderService {
     // Проверяем каждый товар
     createOrderDto.items.forEach((item, index) => {
       if (!item.productId || item.productId <= 0) {
-        throw new BadRequestException(`${ORDERS_CONSTANTS.ERRORS.INVALID_ITEM_DATA} в позиции ${index + 1}`);
+        throw new BadRequestException(
+          `${ORDERS_CONSTANTS.ERRORS.INVALID_ITEM_DATA} в позиции ${index + 1}`
+        );
       }
 
-      if (!item.quantity || item.quantity <= 0 || item.quantity > ORDERS_CONSTANTS.VALIDATION.MAX_QUANTITY) {
-        throw new BadRequestException(`Некорректное количество товара в позиции ${index + 1}`);
+      if (
+        !item.quantity ||
+        item.quantity <= 0 ||
+        item.quantity > ORDERS_CONSTANTS.VALIDATION.MAX_QUANTITY
+      ) {
+        throw new BadRequestException(
+          `Некорректное количество товара в позиции ${index + 1}`
+        );
       }
 
       if (!item.price || item.price <= 0) {
-        throw new BadRequestException(`Некорректная цена товара в позиции ${index + 1}`);
+        throw new BadRequestException(
+          `Некорректная цена товара в позиции ${index + 1}`
+        );
       }
     });
 
@@ -224,22 +281,30 @@ export class OrdersService implements IOrderService {
     }
   }
 
-  private validateStatusTransition(currentStatus: OrderStatus, newStatus: OrderStatus): void {
+  private validateStatusTransition(
+    currentStatus: OrderStatus,
+    newStatus: OrderStatus
+  ): void {
     const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
       [OrderStatus.PENDING]: [OrderStatus.PAID, OrderStatus.CANCELLED],
       [OrderStatus.PAID]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
       [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
       [OrderStatus.DELIVERED]: [],
-      [OrderStatus.CANCELLED]: []
+      [OrderStatus.CANCELLED]: [],
     };
 
     const allowed = allowedTransitions[currentStatus] || [];
     if (!allowed.includes(newStatus)) {
-      throw new BadRequestException(`Нельзя изменить статус с "${currentStatus}" на "${newStatus}"`);
+      throw new BadRequestException(
+        `Нельзя изменить статус с "${currentStatus}" на "${newStatus}"`
+      );
     }
   }
 
-  private calculateOrderTotals(items: OrderItem[]): { totalPrice: number; totalCount: number } {
+  private calculateOrderTotals(items: OrderItem[]): {
+    totalPrice: number;
+    totalCount: number;
+  } {
     let totalPrice = 0;
     let totalCount = 0;
 
@@ -251,7 +316,10 @@ export class OrdersService implements IOrderService {
     return { totalPrice, totalCount };
   }
 
-  private haveItemsChanged(currentItems: OrderItem[], newItems: OrderItem[]): boolean {
+  private haveItemsChanged(
+    currentItems: OrderItem[],
+    newItems: OrderItem[]
+  ): boolean {
     // Если количество товаров разное, значит товары изменились
     if (currentItems.length !== newItems.length) {
       return true;

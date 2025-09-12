@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import NavMenuProductCard from "./NavMenuProductCard";
-import type { Product } from "@/entities/product/api/products.api";
-import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
-import NavMenuGridSkeleton from "../../shared/ui/skeletons/NavMenuGridSkeleton";
+import { useMemo } from 'react';
+import { Container } from '@mui/material';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import NavMenuProductCard from './NavMenuProductCard';
+import type { Product } from '@/entities/product/api/products.api';
+import NavMenuSearchWrapper from './NavMenuSearchWrapper';
+import NavMenuGridSkeleton from '../../shared/ui/skeletons/NavMenuGridSkeleton';
 
 const NavMenuOpenDiscounts = () => {
   const { data: categories, isLoading } = useGetCatalogQuery();

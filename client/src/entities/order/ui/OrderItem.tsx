@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import type { Product } from "@/entities/product/api/products.api";
+import React from 'react';
+import Image from 'next/image';
+import type { Product } from '@/entities/product/api/products.api';
 
 interface OrderItemProps {
   productId: number;
@@ -14,12 +14,12 @@ interface OrderItemProps {
   product?: Product;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const getFullImageUrl = (path?: string): string | undefined => {
   if (!path) return undefined;
   try {
-    const cleanPath = path.replace(/^\/+/, "");
+    const cleanPath = path.replace(/^\/+/, '');
     return `${API_URL}/${cleanPath}`;
   } catch {
     return path;
@@ -43,14 +43,14 @@ const OrderItem: React.FC<OrderItemProps> = ({
           alt={product?.name_ru || productName || `img-${productId}`}
           src={
             getFullImageUrl(product?.img?.[0]) ||
-            "/assets/img/Catalog/product2.png"
+            '/assets/img/Catalog/product2.png'
           }
           width={79}
           height={79}
           className="rounded object-cover w-full h-full"
         />
       </div>
-      
+
       {/* Информация о товаре */}
       <div className="flex flex-col flex-1 min-w-0">
         {product ? (
@@ -72,14 +72,14 @@ const OrderItem: React.FC<OrderItemProps> = ({
             </p>
           </>
         )}
-        
+
         {/* Дополнительные характеристики */}
         <div className="flex flex-wrap gap-2">
           <span className="bg-gray-100 px-2 py-1 rounded text-[13px] text-gray-600">
             Количество: {quantity}
           </span>
           <span className="bg-gray-100 px-2 py-1 rounded text-[13px] text-gray-600">
-            Цена: {price.toLocaleString("ru-RU")} ₽
+            Цена: {price.toLocaleString('ru-RU')} ₽
           </span>
           {size && size.trim() && (
             <span className="bg-blue-100 px-2 py-1 rounded text-[13px] text-blue-700">
@@ -93,11 +93,11 @@ const OrderItem: React.FC<OrderItemProps> = ({
           )}
         </div>
       </div>
-      
+
       {/* Общая стоимость */}
       <div className="flex flex-col items-end min-w-[100px] flex-shrink-0">
         <span className="font-roboto font-semibold text-[20px] text-gray-800">
-          {(price * quantity).toLocaleString("ru-RU")} ₽
+          {(price * quantity).toLocaleString('ru-RU')} ₽
         </span>
         <span className="text-[12px] text-gray-500">
           за {quantity} {quantity === 1 ? 'шт.' : 'шт.'}

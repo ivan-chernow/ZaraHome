@@ -4,8 +4,8 @@ import { DatabaseSeeder } from './seeds';
 import { DatabaseService } from './database.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([])],
-    providers: [DatabaseSeeder, DatabaseService],
-    exports: [DatabaseSeeder, DatabaseService],
+  imports: [TypeOrmModule.forFeature([])],
+  providers: [DatabaseSeeder, DatabaseService],
+  exports: [DatabaseSeeder, DatabaseService],
 })
-export class DatabaseModule {} 
+export class DatabaseModule {}

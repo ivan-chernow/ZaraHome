@@ -20,8 +20,8 @@ import { SharedModule } from 'src/shared/modules/shared.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
-        signOptions: { 
-          expiresIn: configService.get<string>('jwt.accessExpiresIn') || '24h' 
+        signOptions: {
+          expiresIn: configService.get<string>('jwt.accessExpiresIn') || '24h',
         },
       }),
     }),

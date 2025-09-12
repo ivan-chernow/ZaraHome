@@ -33,5 +33,3 @@ export const useRestoreActiveView = <T extends string>({
 
   return { isReady };
 };
-
-

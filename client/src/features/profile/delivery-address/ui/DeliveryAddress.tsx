@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {
   Fade,
   TextField,
@@ -13,40 +13,40 @@ import {
   DialogContent,
   DialogActions,
   Button,
-} from "@mui/material";
-import MainButton from "@/shared/ui/Button/MainButton";
-import { useForm } from "react-hook-form";
+} from '@mui/material';
+import MainButton from '@/shared/ui/Button/MainButton';
+import { useForm } from 'react-hook-form';
 import {
   ChangeDeliveryAddressDto,
   DeliveryAddressDto,
-} from "@/entities/user/model/profile.types";
-import { motion, AnimatePresence } from "framer-motion";
+} from '@/entities/user/model/profile.types';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   useGetDeliveryAddressesQuery,
   useAddDeliveryAddressMutation,
   useUpdateDeliveryAddressMutation,
   useDeleteDeliveryAddressMutation,
-} from "@/entities/user/api/profile.api";
-import { profileApi } from "@/entities/user/api/profile.api";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
+} from '@/entities/user/api/profile.api';
+import { profileApi } from '@/entities/user/api/profile.api';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
 import {
   setSelectedAddress,
   clearSelectedAddress,
-} from "@/entities/user/model/delivery.slice";
+} from '@/entities/user/model/delivery.slice';
 
 const emptyAddress: ChangeDeliveryAddressDto = {
-  firstName: "",
-  lastName: "",
-  patronymic: "",
-  phone: "",
-  region: "",
-  city: "",
-  street: "",
-  building: "",
-  house: "",
-  apartment: "",
-  additionalInfo: "",
+  firstName: '',
+  lastName: '',
+  patronymic: '',
+  phone: '',
+  region: '',
+  city: '',
+  street: '',
+  building: '',
+  house: '',
+  apartment: '',
+  additionalInfo: '',
 };
 
 const MAX_ADDRESSES = 3;
@@ -55,7 +55,7 @@ const hasChanges = (
   newData: ChangeDeliveryAddressDto,
   oldData: DeliveryAddressDto
 ) => {
-  return Object.keys(newData).some((key) => {
+  return Object.keys(newData).some(key => {
     const typedKey = key as keyof ChangeDeliveryAddressDto;
     return newData[typedKey] !== oldData[typedKey];
   });
@@ -67,9 +67,11 @@ interface DeliveryAddressProps {
   compact?: boolean;
 }
 
-const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = false }: DeliveryAddressProps) => {
-
-
+const DeliveryAddress = ({
+  hideHeader = false,
+  hideLimitInfo = false,
+  compact = false,
+}: DeliveryAddressProps) => {
   const dispatch = useDispatch();
 
   const { selectedAddressIndex, selectedAddress } = useSelector(
@@ -93,7 +95,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
     reset,
     watch,
   } = useForm<ChangeDeliveryAddressDto>({
-    mode: "onBlur",
+    mode: 'onBlur',
     defaultValues: emptyAddress,
   });
 
@@ -126,7 +128,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
     // Если в Redux уже есть сохраненный адрес — пытаемся найти его индекс в свежем списке
     if (selectedAddress) {
       const savedIndex = addresses.findIndex(
-        (addr) => addr.id === selectedAddress.id
+        addr => addr.id === selectedAddress.id
       );
       if (savedIndex !== -1) {
         setSelectedIndex(savedIndex);
@@ -169,7 +171,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
 
   // Отслеживание изменения токена
   useEffect(() => {
-    const currentToken = localStorage.getItem("accessToken");
+    const currentToken = localStorage.getItem('accessToken');
 
     // Если токен изменился (включая случай, когда он стал null)
     if (currentToken !== prevTokenRef.current) {
@@ -194,58 +196,58 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
 
   const onSubmit = async (data: ChangeDeliveryAddressDto) => {
     try {
-      console.log("Submitting form data:", data);
-      console.log("Current token:", localStorage.getItem("accessToken"));
+      console.log('Submitting form data:', data);
+      console.log('Current token:', localStorage.getItem('accessToken'));
       console.log(
-        "Request URL:",
-        "http://localhost:5000/api/user/delivery-addresses"
+        'Request URL:',
+        'http://localhost:5000/api/user/delivery-addresses'
       );
 
       if (editingIndex !== null) {
         // Проверяем, есть ли изменения
         if (!hasChanges(data, addresses[editingIndex])) {
-          setSuccess("Нет изменений для сохранения");
+          setSuccess('Нет изменений для сохранения');
           setEditingIndex(null);
           reset(emptyAddress);
           return;
         }
 
-        console.log("Updating address with id:", addresses[editingIndex].id);
+        console.log('Updating address with id:', addresses[editingIndex].id);
         await updateAddress({
           id: addresses[editingIndex].id,
           address: data,
         }).unwrap();
-        console.log("Update result:", data);
-        setSuccess("Адрес успешно обновлен");
+        console.log('Update result:', data);
+        setSuccess('Адрес успешно обновлен');
       } else {
-        console.log("Adding new address");
+        console.log('Adding new address');
         await addAddress(data).unwrap();
-        console.log("Add result:", data);
-        setSuccess("Адрес успешно добавлен");
+        console.log('Add result:', data);
+        setSuccess('Адрес успешно добавлен');
       }
       setEditingIndex(null);
       setAddMode(false);
       reset(emptyAddress);
     } catch (error: any) {
-      console.error("Error details:", error);
-      console.error("Error status:", error.status);
-      console.error("Error data:", error.data);
-      console.error("Error message:", error.message);
-      console.error("Error originalStatus:", error.originalStatus);
-      console.error("Error originalError:", error.originalError);
+      console.error('Error details:', error);
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      console.error('Error message:', error.message);
+      console.error('Error originalStatus:', error.originalStatus);
+      console.error('Error originalError:', error.originalError);
 
-      if (error.status === "FETCH_ERROR") {
+      if (error.status === 'FETCH_ERROR') {
         setError(
-          "Ошибка соединения с сервером. Проверьте, запущен ли сервер на порту 3001 и доступен ли он"
+          'Ошибка соединения с сервером. Проверьте, запущен ли сервер на порту 3001 и доступен ли он'
         );
-      } else if (error.status === "PARSING_ERROR") {
-        setError("Ошибка обработки ответа сервера");
+      } else if (error.status === 'PARSING_ERROR') {
+        setError('Ошибка обработки ответа сервера');
       } else if (error.data?.message) {
         setError(error.data.message);
       } else if (error.error) {
         setError(error.error);
       } else {
-        setError("Произошла ошибка при сохранении адреса");
+        setError('Произошла ошибка при сохранении адреса');
       }
     }
   };
@@ -284,11 +286,11 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
         setSelectedIndex(null);
       }
 
-      setSuccess("Адрес успешно удален");
+      setSuccess('Адрес успешно удален');
       setDeleteDialogOpen(false);
       setAddressToDelete(null);
     } catch (error: any) {
-      setError(error.data?.message || "Ошибка при удалении адреса");
+      setError(error.data?.message || 'Ошибка при удалении адреса');
     }
   };
 
@@ -326,7 +328,9 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
       <div className={`w-full ${compact ? 'mb-0' : 'mb-[89px]'}`}>
         <div className="mb-[19px] w-full">
           {!hideHeader && (
-            <h3 className="font-light text-[42px] mb-[32px]">Адреса доставки</h3>
+            <h3 className="font-light text-[42px] mb-[32px]">
+              Адреса доставки
+            </h3>
           )}
 
           <AnimatePresence>
@@ -350,7 +354,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                     <div className="bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg mr-[29px] relative flex items-center justify-center">
                       <span
                         className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
-                          selectedIndex === index ? "bg-black" : "bg-gray-300"
+                          selectedIndex === index ? 'bg-black' : 'bg-gray-300'
                         }`}
                       ></span>
                     </div>
@@ -360,7 +364,7 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         {`${address.region}, ${address.city}, ул.${
                           address.street
                         }, д.${address.house}${
-                          address.building ? `, к.${address.building}` : ""
+                          address.building ? `, к.${address.building}` : ''
                         }, кв.${address.apartment}`}
                       </p>
                     </div>
@@ -376,55 +380,55 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                       className="group-hover:scale-110 group-hover:rotate-15 transition-transform duration-200"
                     >
                       <IconButton
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           handleEditClick(index);
                         }}
                         sx={{
-                          width: "32px",
-                          height: "32px",
-                          borderRadius: "50%",
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
                           backgroundColor:
-                            editingIndex === index ? "black" : "transparent",
-                          "&:hover": {
+                            editingIndex === index ? 'black' : 'transparent',
+                          '&:hover': {
                             backgroundColor:
-                              editingIndex === index ? "#333" : "#f0f0f0",
-                            transform: "scale(1.1)",
+                              editingIndex === index ? '#333' : '#f0f0f0',
+                            transform: 'scale(1.1)',
                           },
-                          transition: "background-color 0.3s, transform 0.2s",
+                          transition: 'background-color 0.3s, transform 0.2s',
                         }}
                       >
                         {editingIndex === index ? (
-                          <CloseIcon fontSize="small" sx={{ color: "white" }} />
+                          <CloseIcon fontSize="small" sx={{ color: 'white' }} />
                         ) : (
                           <ModeEditOutlinedIcon
                             fontSize="small"
-                            sx={{ color: "gray" }}
+                            sx={{ color: 'gray' }}
                           />
                         )}
                       </IconButton>
                     </motion.div>
                     <IconButton
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleDeleteClick(address.id);
                       }}
                       disabled={isDeleting}
                       sx={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "50%",
-                        backgroundColor: "transparent",
-                        "&:hover": {
-                          backgroundColor: "#ffebee",
-                          transform: "scale(1.1)",
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: 'transparent',
+                        '&:hover': {
+                          backgroundColor: '#ffebee',
+                          transform: 'scale(1.1)',
                         },
-                        transition: "background-color 0.3s, transform 0.2s",
+                        transition: 'background-color 0.3s, transform 0.2s',
                       }}
                     >
                       <DeleteOutlineIcon
                         fontSize="small"
-                        sx={{ color: "#d32f2f" }}
+                        sx={{ color: '#d32f2f' }}
                       />
                     </IconButton>
                   </div>
@@ -442,9 +446,9 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
           <AnimatePresence mode="wait">
             {(addMode || editingIndex !== null) && (
               <motion.form
-                key={editingIndex !== null ? "edit" : "add"}
+                key={editingIndex !== null ? 'edit' : 'add'}
                 initial={{ opacity: 0, height: 0, y: 30 }}
-                animate={{ opacity: 1, height: "auto", y: 0 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
                 exit={{ opacity: 0, height: 0, y: -30 }}
                 transition={{
                   duration: 0.3,
@@ -461,31 +465,31 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Ваше имя
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px" }}
+                        sx={{ width: '100%', height: '48px' }}
                         type="text"
                         inputProps={{ maxLength: 30 }}
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (/\d/.test(e.key)) {
                             e.preventDefault();
                           }
                         }}
-                        {...register("firstName", {
-                          required: "Это поле обязательное",
-                          minLength: { value: 2, message: "Минимум 2 символа" },
+                        {...register('firstName', {
+                          required: 'Это поле обязательное',
+                          minLength: { value: 2, message: 'Минимум 2 символа' },
                           maxLength: {
                             value: 30,
-                            message: "Максимум 30 символов",
+                            message: 'Максимум 30 символов',
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Поле заполнено некорректно",
+                            message: 'Поле заполнено некорректно',
                           },
                         })}
                         error={!!errors.firstName}
                         helperText={
-                          typeof errors.firstName?.message === "string"
+                          typeof errors.firstName?.message === 'string'
                             ? errors.firstName.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -494,30 +498,30 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Ваше отчество
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px" }}
+                        sx={{ width: '100%', height: '48px' }}
                         type="text"
                         inputProps={{ maxLength: 30 }}
-                        {...register("patronymic", {
-                          minLength: { value: 2, message: "Минимум 2 символа" },
+                        {...register('patronymic', {
+                          minLength: { value: 2, message: 'Минимум 2 символа' },
                           maxLength: {
                             value: 30,
-                            message: "Максимум 30 символов",
+                            message: 'Максимум 30 символов',
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Поле заполнено некорректно",
+                            message: 'Поле заполнено некорректно',
                           },
                         })}
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (/\d/.test(e.key)) {
                             e.preventDefault();
                           }
                         }}
                         error={!!errors.patronymic}
                         helperText={
-                          typeof errors.patronymic?.message === "string"
+                          typeof errors.patronymic?.message === 'string'
                             ? errors.patronymic.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -528,31 +532,31 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Ваша фамилия
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px", mb: "8px" }}
+                        sx={{ width: '100%', height: '48px', mb: '8px' }}
                         type="text"
                         inputProps={{ maxLength: 30 }}
-                        {...register("lastName", {
-                          required: "Это поле обязательное",
-                          minLength: { value: 2, message: "Минимум 2 символа" },
+                        {...register('lastName', {
+                          required: 'Это поле обязательное',
+                          minLength: { value: 2, message: 'Минимум 2 символа' },
                           maxLength: {
                             value: 30,
-                            message: "Максимум 30 символов",
+                            message: 'Максимум 30 символов',
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Поле заполнено некорректно",
+                            message: 'Поле заполнено некорректно',
                           },
                         })}
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (/\d/.test(e.key)) {
                             e.preventDefault();
                           }
                         }}
                         error={!!errors.lastName}
                         helperText={
-                          typeof errors.lastName?.message === "string"
+                          typeof errors.lastName?.message === 'string'
                             ? errors.lastName.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -561,22 +565,22 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Номер телефона
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px" }}
+                        sx={{ width: '100%', height: '48px' }}
                         type="tel"
                         placeholder="+7XXXXXXXXXX"
                         inputProps={{ maxLength: 20 }}
-                        {...register("phone", {
-                          required: "Это поле обязательное",
+                        {...register('phone', {
+                          required: 'Это поле обязательное',
                           pattern: {
                             value: /^\+7\d{10}$/,
-                            message: "Формат: +7XXXXXXXXXX (10 цифр после +7)",
+                            message: 'Формат: +7XXXXXXXXXX (10 цифр после +7)',
                           },
                         })}
                         error={!!errors.phone}
                         helperText={
-                          typeof errors.phone?.message === "string"
+                          typeof errors.phone?.message === 'string'
                             ? errors.phone.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -589,30 +593,30 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Область
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px" }}
+                        sx={{ width: '100%', height: '48px' }}
                         type="text"
                         inputProps={{ maxLength: 30 }}
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (/\d/.test(e.key)) {
                             e.preventDefault();
                           }
                         }}
-                        {...register("region", {
-                          required: "Это поле обязательное",
+                        {...register('region', {
+                          required: 'Это поле обязательное',
                           minLength: {
                             value: 2,
-                            message: "Введите корректную область",
+                            message: 'Введите корректную область',
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Поле заполнено некорректно",
+                            message: 'Поле заполнено некорректно',
                           },
                         })}
                         error={!!errors.region}
                         helperText={
-                          typeof errors.region?.message === "string"
+                          typeof errors.region?.message === 'string'
                             ? errors.region.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -621,30 +625,30 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Улица
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px" }}
+                        sx={{ width: '100%', height: '48px' }}
                         type="text"
                         inputProps={{ maxLength: 30 }}
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (/\d/.test(e.key)) {
                             e.preventDefault();
                           }
                         }}
-                        {...register("street", {
-                          required: "Это поле обязательное",
+                        {...register('street', {
+                          required: 'Это поле обязательное',
                           minLength: {
                             value: 2,
-                            message: "Введите корректную улицу",
+                            message: 'Введите корректную улицу',
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Поле заполнено некорректно",
+                            message: 'Поле заполнено некорректно',
                           },
                         })}
                         error={!!errors.street}
                         helperText={
-                          typeof errors.street?.message === "string"
+                          typeof errors.street?.message === 'string'
                             ? errors.street.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -655,30 +659,30 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                         Город
                       </label>
                       <TextField
-                        sx={{ width: "100%", height: "48px" }}
+                        sx={{ width: '100%', height: '48px' }}
                         type="text"
                         inputProps={{ maxLength: 30 }}
-                        onKeyPress={(e) => {
+                        onKeyPress={e => {
                           if (/\d/.test(e.key)) {
                             e.preventDefault();
                           }
                         }}
-                        {...register("city", {
-                          required: "Это поле обязательное",
+                        {...register('city', {
+                          required: 'Это поле обязательное',
                           minLength: {
                             value: 2,
-                            message: "Введите корректный город",
+                            message: 'Введите корректный город',
                           },
                           pattern: {
                             value: /^[А-Яа-яЁё\s-]+$/,
-                            message: "Поле заполнено некорректно",
+                            message: 'Поле заполнено некорректно',
                           },
                         })}
                         error={!!errors.city}
                         helperText={
-                          typeof errors.city?.message === "string"
+                          typeof errors.city?.message === 'string'
                             ? errors.city.message
-                            : " "
+                            : ' '
                         }
                       />
                     </div>
@@ -688,11 +692,14 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           Корпус
                         </label>
                         <TextField
-                          sx={{ width: "100%", height: "48px" }}
+                          sx={{ width: '100%', height: '48px' }}
                           type="text"
                           inputProps={{ maxLength: 10 }}
-                          {...register("building", {
-                            maxLength: { value: 10, message: "Максимум 10 символов" },
+                          {...register('building', {
+                            maxLength: {
+                              value: 10,
+                              message: 'Максимум 10 символов',
+                            },
                           })}
                         />
                       </div>
@@ -701,18 +708,21 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           Дом
                         </label>
                         <TextField
-                          sx={{ width: "100%", height: "48px" }}
+                          sx={{ width: '100%', height: '48px' }}
                           type="text"
                           inputProps={{ maxLength: 10 }}
-                          {...register("house", {
-                            required: "Дом обязателен",
-                            maxLength: { value: 10, message: "Максимум 10 символов" },
+                          {...register('house', {
+                            required: 'Дом обязателен',
+                            maxLength: {
+                              value: 10,
+                              message: 'Максимум 10 символов',
+                            },
                           })}
                           error={!!errors.house}
                           helperText={
-                            typeof errors.house?.message === "string"
+                            typeof errors.house?.message === 'string'
                               ? errors.house.message
-                              : " "
+                              : ' '
                           }
                         />
                       </div>
@@ -721,17 +731,20 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                           Квартира
                         </label>
                         <TextField
-                          sx={{ width: "100%", height: "48px" }}
+                          sx={{ width: '100%', height: '48px' }}
                           type="text"
                           inputProps={{ maxLength: 10 }}
-                          {...register("apartment", {
-                            maxLength: { value: 10, message: "Максимум 10 символов" },
+                          {...register('apartment', {
+                            maxLength: {
+                              value: 10,
+                              message: 'Максимум 10 символов',
+                            },
                           })}
                           error={!!errors.apartment}
                           helperText={
-                            typeof errors.apartment?.message === "string"
+                            typeof errors.apartment?.message === 'string'
                               ? errors.apartment.message
-                              : " "
+                              : ' '
                           }
                         />
                       </div>
@@ -739,14 +752,12 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                   </div>
                 </div>
 
-
-
                 <div className="flex mt-8 justify-center gap-4">
                   <MainButton
                     text={
                       editingIndex !== null
-                        ? "Обновить адрес"
-                        : "Добавить адрес"
+                        ? 'Обновить адрес'
+                        : 'Добавить адрес'
                     }
                     disabled={
                       isAdding ||
@@ -762,23 +773,23 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
                     onClick={handleCancelAdd}
                     disabled={isAdding || isUpdating}
                     sx={{
-                      width: "200px",
-                      height: "56px",
-                      backgroundColor: "#f3f4f6",
-                      color: "#374151",
-                      borderColor: "#d1d5db",
-                      textTransform: "none",
-                      fontSize: "18px",
+                      width: '200px',
+                      height: '56px',
+                      backgroundColor: '#f3f4f6',
+                      color: '#374151',
+                      borderColor: '#d1d5db',
+                      textTransform: 'none',
+                      fontSize: '18px',
                       fontWeight: 500,
-                      borderRadius: "0",
-                      "&:hover": {
-                        backgroundColor: "#e5e7eb",
-                        borderColor: "#9ca3af",
+                      borderRadius: '0',
+                      '&:hover': {
+                        backgroundColor: '#e5e7eb',
+                        borderColor: '#9ca3af',
                       },
-                      "&:disabled": {
-                        backgroundColor: "#f9fafb",
-                        color: "#9ca3af",
-                        borderColor: "#e5e7eb",
+                      '&:disabled': {
+                        backgroundColor: '#f9fafb',
+                        color: '#9ca3af',
+                        borderColor: '#e5e7eb',
                       },
                     }}
                   >
@@ -814,34 +825,34 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
           aria-describedby="delete-dialog-description"
           PaperProps={{
             sx: {
-              borderRadius: "12px",
-              maxWidth: "400px",
-              width: "100%",
+              borderRadius: '12px',
+              maxWidth: '400px',
+              width: '100%',
               boxShadow:
-                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
             },
           }}
         >
           <DialogTitle
             id="delete-dialog-title"
             sx={{
-              fontSize: "20px",
+              fontSize: '20px',
               fontWeight: 600,
-              color: "#1f2937",
-              padding: "24px 24px 8px 24px",
-              textAlign: "center",
+              color: '#1f2937',
+              padding: '24px 24px 8px 24px',
+              textAlign: 'center',
             }}
           >
             Удалить адрес доставки?
           </DialogTitle>
-          <DialogContent sx={{ padding: "8px 24px 24px 24px" }}>
+          <DialogContent sx={{ padding: '8px 24px 24px 24px' }}>
             <p
               id="delete-dialog-description"
               style={{
-                fontSize: "14px",
-                color: "#6b7280",
-                lineHeight: "1.5",
-                textAlign: "center",
+                fontSize: '14px',
+                color: '#6b7280',
+                lineHeight: '1.5',
+                textAlign: 'center',
                 margin: 0,
               }}
             >
@@ -851,25 +862,25 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
           </DialogContent>
           <DialogActions
             sx={{
-              padding: "0 24px 24px 24px",
-              justifyContent: "center",
-              gap: "12px",
+              padding: '0 24px 24px 24px',
+              justifyContent: 'center',
+              gap: '12px',
             }}
           >
             <Button
               onClick={handleCancelDelete}
               variant="outlined"
               sx={{
-                borderRadius: "8px",
-                textTransform: "none",
-                fontSize: "14px",
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontSize: '14px',
                 fontWeight: 500,
-                padding: "10px 20px",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                "&:hover": {
-                  borderColor: "#9ca3af",
-                  backgroundColor: "#f9fafb",
+                padding: '10px 20px',
+                borderColor: '#d1d5db',
+                color: '#374151',
+                '&:hover': {
+                  borderColor: '#9ca3af',
+                  backgroundColor: '#f9fafb',
                 },
               }}
             >
@@ -880,22 +891,22 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
               variant="contained"
               disabled={isDeleting}
               sx={{
-                borderRadius: "8px",
-                textTransform: "none",
-                fontSize: "14px",
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontSize: '14px',
                 fontWeight: 500,
-                padding: "10px 20px",
-                backgroundColor: "#dc2626",
-                "&:hover": {
-                  backgroundColor: "#b91c1c",
+                padding: '10px 20px',
+                backgroundColor: '#dc2626',
+                '&:hover': {
+                  backgroundColor: '#b91c1c',
                 },
-                "&:disabled": {
-                  backgroundColor: "#fca5a5",
-                  color: "#ffffff",
+                '&:disabled': {
+                  backgroundColor: '#fca5a5',
+                  color: '#ffffff',
                 },
               }}
             >
-              {isDeleting ? "Удаление..." : "Удалить"}
+              {isDeleting ? 'Удаление...' : 'Удалить'}
             </Button>
           </DialogActions>
         </Dialog>
@@ -904,12 +915,12 @@ const DeliveryAddress = ({ hideHeader = false, hideLimitInfo = false, compact = 
           open={!!error || !!success}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
           <Alert
             onClose={handleCloseSnackbar}
-            severity={error ? "error" : "success"}
-            sx={{ width: "100%" }}
+            severity={error ? 'error' : 'success'}
+            sx={{ width: '100%' }}
           >
             {error || success}
           </Alert>

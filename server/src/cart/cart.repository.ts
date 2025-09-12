@@ -5,10 +5,11 @@ import { Cart } from './entity/cart.entity';
 
 @Injectable()
 export class CartRepository {
-  constructor(
-    @InjectRepository(Cart)
-    private readonly cartRepository: Repository<Cart>,
-  ) {}
+  private readonly cartRepository: Repository<Cart>;
+
+  constructor(@InjectRepository(Cart) cartRepository: Repository<Cart>) {
+    this.cartRepository = cartRepository;
+  }
 
   /**
    * Найти корзину по ID с отношениями
@@ -16,14 +17,17 @@ export class CartRepository {
   async findById(id: number): Promise<Cart | null> {
     return this.cartRepository.findOne({
       where: { id },
-      relations: ['user', 'product']
+      relations: ['user', 'product'],
     });
   }
 
   /**
    * Найти товар в корзине пользователя
    */
-  async findByUserAndProduct(userId: number, productId: number): Promise<Cart | null> {
+  async findByUserAndProduct(
+    userId: number,
+    productId: number
+  ): Promise<Cart | null> {
     return this.cartRepository.findOne({
       where: { user: { id: userId }, product: { id: productId } },
       relations: ['user', 'product'],
@@ -34,9 +38,9 @@ export class CartRepository {
    * Найти все товары в корзине пользователя
    */
   async findByUser(userId: number): Promise<Cart[]> {
-    return this.cartRepository.find({ 
-      where: { user: { id: userId } }, 
-      relations: ['product'] 
+    return this.cartRepository.find({
+      where: { user: { id: userId } },
+      relations: ['product'],
     });
   }
 
@@ -44,19 +48,22 @@ export class CartRepository {
    * Найти товары в корзине пользователя с полными деталями продукта
    */
   async findByUserWithProductDetails(userId: number): Promise<Cart[]> {
-    return this.cartRepository.find({ 
-      where: { user: { id: userId } }, 
+    return this.cartRepository.find({
+      where: { user: { id: userId } },
       relations: ['product'],
-      order: { id: 'DESC' } // Сортировка по дате добавления (новые сначала)
+      order: { id: 'DESC' }, // Сортировка по дате добавления (новые сначала)
     });
   }
 
   /**
    * Найти товары в корзине пользователя по списку ID продуктов
    */
-  async findByUserAndProducts(userId: number, productIds: number[]): Promise<Cart[]> {
+  async findByUserAndProducts(
+    userId: number,
+    productIds: number[]
+  ): Promise<Cart[]> {
     if (!productIds || productIds.length === 0) return [];
-    
+
     return this.cartRepository.find({
       where: { user: { id: userId }, product: { id: In(productIds) } },
       relations: ['product'],
@@ -68,7 +75,7 @@ export class CartRepository {
    */
   async countByUser(userId: number): Promise<number> {
     return this.cartRepository.count({
-      where: { user: { id: userId } }
+      where: { user: { id: userId } },
     });
   }
 
@@ -83,7 +90,9 @@ export class CartRepository {
   /**
    * Создать несколько записей в корзине (batch операция)
    */
-  async createMultiple(cartItems: Array<{ user: any; product: any }>): Promise<Cart[]> {
+  async createMultiple(
+    cartItems: Array<{ user: any; product: any }>
+  ): Promise<Cart[]> {
     if (!cartItems || cartItems.length === 0) return [];
 
     const carts = cartItems.map(item => this.cartRepository.create(item));
@@ -111,7 +120,10 @@ export class CartRepository {
   /**
    * Удалить товар из корзины пользователя
    */
-  async removeByUserAndProduct(userId: number, productId: number): Promise<void> {
+  async removeByUserAndProduct(
+    userId: number,
+    productId: number
+  ): Promise<void> {
     const cart = await this.findByUserAndProduct(userId, productId);
     if (cart) {
       await this.cartRepository.remove(cart);
@@ -121,7 +133,10 @@ export class CartRepository {
   /**
    * Удалить несколько товаров из корзины пользователя (batch операция)
    */
-  async removeMultipleByUserAndProducts(userId: number, productIds: number[]): Promise<void> {
+  async removeMultipleByUserAndProducts(
+    userId: number,
+    productIds: number[]
+  ): Promise<void> {
     if (!productIds || productIds.length === 0) return;
 
     const cartItems = await this.findByUserAndProducts(userId, productIds);
@@ -143,9 +158,12 @@ export class CartRepository {
   /**
    * Проверить, есть ли товар в корзине пользователя
    */
-  async existsByUserAndProduct(userId: number, productId: number): Promise<boolean> {
+  async existsByUserAndProduct(
+    userId: number,
+    productId: number
+  ): Promise<boolean> {
     const count = await this.cartRepository.count({
-      where: { user: { id: userId }, product: { id: productId } }
+      where: { user: { id: userId }, product: { id: productId } },
     });
     return count > 0;
   }
@@ -153,13 +171,15 @@ export class CartRepository {
   /**
    * Получить статистику корзины пользователя
    */
-  async getCartStats(userId: number): Promise<{ totalItems: number; totalProducts: number }> {
+  async getCartStats(
+    userId: number
+  ): Promise<{ totalItems: number; totalProducts: number }> {
     const [totalItems, totalProducts] = await Promise.all([
       this.countByUser(userId),
       this.cartRepository
         .createQueryBuilder('cart')
         .where('cart.user.id = :userId', { userId })
-        .getCount()
+        .getCount(),
     ]);
 
     return { totalItems, totalProducts };

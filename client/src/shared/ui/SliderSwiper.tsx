@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
-import Image from "next/image";
-import "swiper/css";
-import "swiper/css/pagination";
-import { Product } from "@/entities/product/api/products.api";
+import React, { useCallback, useMemo } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import Image from 'next/image';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { Product } from '@/entities/product/api/products.api';
 
 interface SliderSwiperProps {
   product: Product;
@@ -14,7 +14,7 @@ interface SliderSwiperProps {
   height?: number;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const SliderSwiper: React.FC<SliderSwiperProps> = ({
   product,
@@ -26,12 +26,12 @@ const SliderSwiper: React.FC<SliderSwiperProps> = ({
   const getImageUrl = useCallback((path: string) => {
     try {
       // Если путь уже является полным URL
-      if (path.startsWith("http")) {
+      if (path.startsWith('http')) {
         return path;
       }
 
       // Убираем начальный слеш, если он есть
-      const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+      const cleanPath = path.startsWith('/') ? path.slice(1) : path;
 
       // Формируем полный URL
       return `${API_URL}/${cleanPath}`;
@@ -41,7 +41,10 @@ const SliderSwiper: React.FC<SliderSwiperProps> = ({
   }, []);
 
   // Получаем массив картинок, которые будут показаны
-  const images = useMemo(() => product.img.slice(0, quantity), [product.img, quantity]);
+  const images = useMemo(
+    () => product.img.slice(0, quantity),
+    [product.img, quantity]
+  );
 
   // Определяем, нужно ли показывать пагинацию
   const showPagination = images.length > 1;
@@ -55,20 +58,20 @@ const SliderSwiper: React.FC<SliderSwiperProps> = ({
         },
         modules: [Pagination],
       })}
-      style={{ width: "100%", height: height, overflow: "hidden" }}
-      className={isHovered ? "show-pagination" : "hide-pagination"}
+      style={{ width: '100%', height: height, overflow: 'hidden' }}
+      className={isHovered ? 'show-pagination' : 'hide-pagination'}
       spaceBetween={0}
       slidesPerView={1}
       loop={showPagination}
     >
       {images.map((img: string, idx: number) => (
-        <SwiperSlide key={idx} style={{ width: "100%", height: "100%" }}>
+        <SwiperSlide key={idx} style={{ width: '100%', height: '100%' }}>
           <div
             style={{
-              width: "100%",
-              height: "100%",
-              overflow: "hidden",
-              position: "relative",
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+              position: 'relative',
             }}
           >
             <Image

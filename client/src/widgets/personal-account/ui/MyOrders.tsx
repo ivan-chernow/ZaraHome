@@ -1,39 +1,40 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Fade } from "@mui/material";
-import VerticalLine from "@/shared/ui/VerticalLine";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { motion, AnimatePresence } from "framer-motion";
-import { useGetUserOrdersQuery } from "@/entities/order/api/orders.api";
-import { useGetProductsByIdsQuery } from "@/entities/product/api/products.api";
-import OrderItem from "@/entities/order/ui/OrderItem";
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { Fade } from '@mui/material';
+import VerticalLine from '@/shared/ui/VerticalLine';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useGetUserOrdersQuery } from '@/entities/order/api/orders.api';
+import { useGetProductsByIdsQuery } from '@/entities/product/api/products.api';
+import OrderItem from '@/entities/order/ui/OrderItem';
 
 const MyOrders: React.FC = () => {
   const [openOrderId, setOpenOrderId] = useState<number | null>(null);
   const [localOrders, setLocalOrders] = useState<any[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const timersRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
-  
+
   // Получаем заказы с бэкенда
-  const { data: orders = [], isLoading: isOrdersLoading } = useGetUserOrdersQuery();
-  
+  const { data: orders = [], isLoading: isOrdersLoading } =
+    useGetUserOrdersQuery();
+
   // Обновляем время каждую секунду для отображения обратного отсчёта
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   // Обрабатываем заказы и устанавливаем таймеры для отменённых
   useEffect(() => {
     if (orders.length > 0) {
       setLocalOrders(orders);
-      
+
       // Очищаем старые таймеры
       timersRef.current.forEach(timer => clearTimeout(timer));
       timersRef.current.clear();
-      
+
       // Устанавливаем таймеры для отменённых заказов
       orders.forEach(order => {
         if (order.status === 'cancelled') {
@@ -41,14 +42,14 @@ const MyOrders: React.FC = () => {
           const cancelledAt = new Date(order.updatedAt || order.createdAt);
           const timeDiff = currentTime.getTime() - cancelledAt.getTime();
           const timeUntilDeletion = Math.max(0, 10 * 60 * 1000 - timeDiff); // 10 минут в миллисекундах
-          
+
           if (timeUntilDeletion > 0) {
             // Устанавливаем таймер на удаление
             const timer = setTimeout(() => {
               setLocalOrders(prev => prev.filter(o => o.id !== order.id));
               timersRef.current.delete(order.id);
             }, timeUntilDeletion);
-            
+
             timersRef.current.set(order.id, timer);
           } else {
             // Заказ уже должен быть удалён
@@ -57,14 +58,14 @@ const MyOrders: React.FC = () => {
         }
       });
     }
-    
+
     // Очистка при размонтировании компонента
     return () => {
       timersRef.current.forEach(timer => clearTimeout(timer));
       timersRef.current.clear();
     };
   }, [orders, currentTime]);
-  
+
   // Собираем все ID товаров из всех заказов для загрузки данных
   const allProductIds = useMemo(() => {
     const ids: number[] = [];
@@ -77,18 +78,21 @@ const MyOrders: React.FC = () => {
     });
     return ids;
   }, [localOrders]);
-  
+
   // Загружаем данные о товарах
   const { data: productsByIds = [] } = useGetProductsByIdsQuery(allProductIds, {
     skip: allProductIds.length === 0,
   });
-  
+
   // Создаем мапу для быстрого доступа к данным товаров
   const idToProduct = useMemo(() => {
-    return productsByIds.reduce((acc, product) => {
-      acc[product.id] = product;
-      return acc;
-    }, {} as Record<number, any>);
+    return productsByIds.reduce(
+      (acc, product) => {
+        acc[product.id] = product;
+        return acc;
+      },
+      {} as Record<number, any>
+    );
   }, [productsByIds]);
 
   // Функция для форматирования даты
@@ -144,16 +148,16 @@ const MyOrders: React.FC = () => {
   // Функция для отображения оставшегося времени до удаления отменённого заказа
   const getTimeUntilDeletion = (order: any) => {
     if (order.status !== 'cancelled') return null;
-    
+
     const cancelledAt = new Date(order.updatedAt || order.createdAt);
     const timeDiff = currentTime.getTime() - cancelledAt.getTime();
     const timeUntilDeletion = Math.max(0, 10 * 60 * 1000 - timeDiff); // 10 минут
-    
+
     if (timeUntilDeletion <= 0) return null;
-    
+
     const minutes = Math.floor(timeUntilDeletion / (1000 * 60));
     const seconds = Math.floor((timeUntilDeletion % (1000 * 60)) / 1000);
-    
+
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
@@ -178,42 +182,52 @@ const MyOrders: React.FC = () => {
       <div className="mb-6">
         <h3 className="font-light text-[42px] mb-[31px]">Мои заказы</h3>
         <ul className="flex flex-col">
-          {localOrders.map((order) => (
-            <li key={order.id} className="flex flex-col bg-white rounded-[8px] shadow-md mb-8 w-full">
+          {localOrders.map(order => (
+            <li
+              key={order.id}
+              className="flex flex-col bg-white rounded-[8px] shadow-md mb-8 w-full"
+            >
               <div className="flex items-center justify-between min-h-[60px] px-8 pt-6 pb-2">
                 <div className="flex items-center">
                   <p className="font-roboto text-[18px] mr-6">№ {order.id}</p>
                   <VerticalLine height={60} />
                   <div className="flex flex-col mx-6">
                     <p className="font-ysabeau font-semibold">
-                      Сформирован:{" "}
+                      Сформирован:{' '}
                       <span className="font-normal mb-[6px]">
                         {formatDate(order.createdAt)}
                       </span>
                     </p>
                     <p className="font-ysabeau font-semibold">
-                      Статус:{" "}
-                      <span className={`font-normal ${getStatusColor(order.status)}`}>
+                      Статус:{' '}
+                      <span
+                        className={`font-normal ${getStatusColor(order.status)}`}
+                      >
                         {getStatusText(order.status)}
                       </span>
-                      {order.status === 'cancelled' && getTimeUntilDeletion(order) && (
-                        <span className="font-normal text-red-600 ml-2">
-                          (удаление через {getTimeUntilDeletion(order)})
-                        </span>
-                      )}
+                      {order.status === 'cancelled' &&
+                        getTimeUntilDeletion(order) && (
+                          <span className="font-normal text-red-600 ml-2">
+                            (удаление через {getTimeUntilDeletion(order)})
+                          </span>
+                        )}
                     </p>
                   </div>
                   <VerticalLine height={60} />
                   <div className="flex flex-col ml-6">
                     <p className="font-ysabeau font-semibold">
-                      Товаров: <span className="font-medium mb-[6px]">{order.totalCount}</span>
+                      Товаров:{' '}
+                      <span className="font-medium mb-[6px]">
+                        {order.totalCount}
+                      </span>
                     </p>
                     <p className="font-ysabeau font-semibold">
                       На сумму:
                       <span className="font-medium font-roboto text-[24px]">
-                        {order.totalPrice.toLocaleString("ru-RU")}
+                        {order.totalPrice.toLocaleString('ru-RU')}
                         <span className="font-bold font-ysabeau text-[18px]">
-                          {" "}₽
+                          {' '}
+                          ₽
                         </span>
                       </span>
                     </p>
@@ -223,30 +237,39 @@ const MyOrders: React.FC = () => {
                   <span
                     className="transition-transform duration-200 cursor-pointer"
                     style={{
-                      transform: openOrderId === order.id ? "rotate(180deg)" : "rotate(0deg)",
+                      transform:
+                        openOrderId === order.id
+                          ? 'rotate(180deg)'
+                          : 'rotate(0deg)',
                     }}
-                    onClick={() => setOpenOrderId(openOrderId === order.id ? null : order.id)}
+                    onClick={() =>
+                      setOpenOrderId(openOrderId === order.id ? null : order.id)
+                    }
                   >
                     <KeyboardArrowDownIcon />
                   </span>
                   <p
                     className={`font-roboto ml-1 cursor-pointer select-none transition-colors duration-200 ${
-                      openOrderId === order.id ? "text-black" : "text-[#0000004D] hover:text-black"
+                      openOrderId === order.id
+                        ? 'text-black'
+                        : 'text-[#0000004D] hover:text-black'
                     }`}
-                    onClick={() => setOpenOrderId(openOrderId === order.id ? null : order.id)}
+                    onClick={() =>
+                      setOpenOrderId(openOrderId === order.id ? null : order.id)
+                    }
                   >
-                    {openOrderId === order.id ? "скрыть" : "подробнее"}
+                    {openOrderId === order.id ? 'скрыть' : 'подробнее'}
                   </p>
                 </div>
               </div>
-              
+
               {/* Список товаров с анимацией */}
               <AnimatePresence>
                 {openOrderId === order.id && (
                   <motion.div
                     className="w-full border-t border-[#e0e0e0] mt-2 pt-2 px-8 pb-4"
                     initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
+                    animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -254,7 +277,7 @@ const MyOrders: React.FC = () => {
                       <OrderItem
                         key={idx}
                         productId={item.productId}
-                        productName={item.productName || "Название товара"}
+                        productName={item.productName || 'Название товара'}
                         quantity={item.quantity}
                         price={item.price}
                         size={item.size}

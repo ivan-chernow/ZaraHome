@@ -100,4 +100,3 @@ export class ProductUploadResponseDto extends UploadResponseDto {
   })
   productName?: string;
 }
-

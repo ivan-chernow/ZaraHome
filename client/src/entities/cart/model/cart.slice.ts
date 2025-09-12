@@ -1,25 +1,24 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 interface CartState {
-	isOpenCart: boolean;
+  isOpenCart: boolean;
 }
 
 const initialState: CartState = {
-	isOpenCart: false,
+  isOpenCart: false,
 };
 
 export const cartSlice = createSlice({
-	name: 'cartModal',
-	initialState,
-	reducers: {
-		toggleCart: (state): void => {
-			state.isOpenCart = !state.isOpenCart;
-		},
-		closeCart: (state): void => {
-			state.isOpenCart = false;
-		},
-
-	}
+  name: 'cartModal',
+  initialState,
+  reducers: {
+    toggleCart: (state): void => {
+      state.isOpenCart = !state.isOpenCart;
+    },
+    closeCart: (state): void => {
+      state.isOpenCart = false;
+    },
+  },
 });
 
 // Экспортируйте все действия

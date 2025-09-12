@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Order } from './entity/order.entity';
 import { User } from '../users/user/entity/user.entity';
 import { OrderStatus } from '../shared/shared.interfaces';
@@ -19,17 +19,23 @@ export interface OrderListResponse {
 
 @Injectable()
 export class OrdersRepository {
+  private readonly orderRepository: Repository<Order>;
+  private readonly userRepository: Repository<User>;
+  private readonly cacheService: CacheService;
+
   constructor(
-    @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-    private cacheService: CacheService,
-  ) {}
+    @InjectRepository(Order) orderRepository: Repository<Order>,
+    @InjectRepository(User) userRepository: Repository<User>,
+    cacheService: CacheService
+  ) {
+    this.orderRepository = orderRepository;
+    this.userRepository = userRepository;
+    this.cacheService = cacheService;
+  }
 
   async findUserById(userId: number): Promise<User | null> {
     const cacheKey = `user:${userId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.userRepository.findOneBy({ id: userId }),
@@ -39,24 +45,29 @@ export class OrdersRepository {
 
   async findActiveOrderByUser(userId: number): Promise<Order | null> {
     const cacheKey = `active_order:${userId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.orderRepository.findOne({
-        where: { 
-          user: { id: userId },
-          status: OrderStatus.PENDING
-        },
-        order: { createdAt: 'DESC' },
-        relations: ['user']
-      }),
+      () =>
+        this.orderRepository.findOne({
+          where: {
+            user: { id: userId },
+            status: OrderStatus.PENDING,
+          },
+          order: { createdAt: 'DESC' },
+          relations: ['user'],
+        }),
       { ttl: CACHE_TTL.ORDERS, prefix: CACHE_PREFIXES.ORDERS }
     );
   }
 
-  async findOrdersByUser(userId: number, page: number = 1, limit: number = 20): Promise<OrderListResponse> {
+  async findOrdersByUser(
+    userId: number,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<OrderListResponse> {
     const cacheKey = `user_orders:${userId}:${page}:${limit}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getOrdersByUserPaginated(userId, page, limit),
@@ -64,28 +75,33 @@ export class OrdersRepository {
     );
   }
 
-  async findOrderByIdAndUser(orderId: number, userId: number): Promise<Order | null> {
+  async findOrderByIdAndUser(
+    orderId: number,
+    userId: number
+  ): Promise<Order | null> {
     const cacheKey = `order:${orderId}:${userId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.orderRepository.findOne({
-        where: { id: orderId, user: { id: userId } },
-        relations: ['user']
-      }),
+      () =>
+        this.orderRepository.findOne({
+          where: { id: orderId, user: { id: userId } },
+          relations: ['user'],
+        }),
       { ttl: CACHE_TTL.ORDERS, prefix: CACHE_PREFIXES.ORDERS }
     );
   }
 
   async findOrderById(orderId: number): Promise<Order | null> {
     const cacheKey = `order:${orderId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.orderRepository.findOne({
-        where: { id: orderId },
-        relations: ['user']
-      }),
+      () =>
+        this.orderRepository.findOne({
+          where: { id: orderId },
+          relations: ['user'],
+        }),
       { ttl: CACHE_TTL.ORDERS, prefix: CACHE_PREFIXES.ORDERS }
     );
   }
@@ -93,27 +109,27 @@ export class OrdersRepository {
   async createOrder(orderData: Partial<Order>): Promise<Order> {
     const order = this.orderRepository.create(orderData);
     const savedOrder = await this.orderRepository.save(order);
-    
+
     // Инвалидируем кеш
     if (orderData.user?.id) {
       await this.invalidateUserOrdersCache(orderData.user.id);
     }
-    
+
     return savedOrder;
   }
 
   async updateOrder(order: Order): Promise<Order> {
     const updatedOrder = await this.orderRepository.save(order);
-    
+
     // Инвалидируем кеш
     await this.invalidateOrderCache(updatedOrder);
-    
+
     return updatedOrder;
   }
 
   async updateOrderStatus(orderId: number, status: OrderStatus): Promise<void> {
     await this.orderRepository.update(orderId, { status });
-    
+
     // Инвалидируем кеш
     const order = await this.findOrderById(orderId);
     if (order) {
@@ -121,9 +137,13 @@ export class OrdersRepository {
     }
   }
 
-  async getOrdersByStatus(status: OrderStatus, page: number = 1, limit: number = 20): Promise<OrderListResponse> {
+  async getOrdersByStatus(
+    status: OrderStatus,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<OrderListResponse> {
     const cacheKey = `orders_by_status:${status}:${page}:${limit}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getOrdersByStatusPaginated(status, page, limit),
@@ -140,7 +160,7 @@ export class OrdersRepository {
     averageOrderValue: number;
   }> {
     const cacheKey = 'orders_statistics';
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.calculateOrdersStatistics(),
@@ -148,9 +168,13 @@ export class OrdersRepository {
     );
   }
 
-  async searchOrders(query: string, page: number = 1, limit: number = 20): Promise<OrderListResponse> {
+  async searchOrders(
+    query: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<OrderListResponse> {
     const cacheKey = `search_orders:${query}:${page}:${limit}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.searchOrdersPaginated(query, page, limit),
@@ -158,19 +182,21 @@ export class OrdersRepository {
     );
   }
 
-  private async getOrdersByUserPaginated(userId: number, page: number, limit: number): Promise<OrderListResponse> {
-    const queryBuilder = this.orderRepository.createQueryBuilder('order')
+  private async getOrdersByUserPaginated(
+    userId: number,
+    page: number,
+    limit: number
+  ): Promise<OrderListResponse> {
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
       .leftJoinAndSelect('order.user', 'user')
       .where('user.id = :userId', { userId })
       .orderBy('order.createdAt', 'DESC');
 
     const total = await queryBuilder.getCount();
     const offset = (page - 1) * limit;
-    
-    const orders = await queryBuilder
-      .skip(offset)
-      .take(limit)
-      .getMany();
+
+    const orders = await queryBuilder.skip(offset).take(limit).getMany();
 
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
@@ -183,23 +209,25 @@ export class OrdersRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
-  private async getOrdersByStatusPaginated(status: OrderStatus, page: number, limit: number): Promise<OrderListResponse> {
-    const queryBuilder = this.orderRepository.createQueryBuilder('order')
+  private async getOrdersByStatusPaginated(
+    status: OrderStatus,
+    page: number,
+    limit: number
+  ): Promise<OrderListResponse> {
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
       .leftJoinAndSelect('order.user', 'user')
       .where('order.status = :status', { status })
       .orderBy('order.createdAt', 'DESC');
 
     const total = await queryBuilder.getCount();
     const offset = (page - 1) * limit;
-    
-    const orders = await queryBuilder
-      .skip(offset)
-      .take(limit)
-      .getMany();
+
+    const orders = await queryBuilder.skip(offset).take(limit).getMany();
 
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
@@ -212,12 +240,17 @@ export class OrdersRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
-  private async searchOrdersPaginated(query: string, page: number, limit: number): Promise<OrderListResponse> {
-    const queryBuilder = this.orderRepository.createQueryBuilder('order')
+  private async searchOrdersPaginated(
+    query: string,
+    page: number,
+    limit: number
+  ): Promise<OrderListResponse> {
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
       .leftJoinAndSelect('order.user', 'user')
       .where(
         '(order.id::text ILIKE :query OR user.email ILIKE :query OR order.phone ILIKE :query OR order.address ILIKE :query)',
@@ -227,11 +260,8 @@ export class OrdersRepository {
 
     const total = await queryBuilder.getCount();
     const offset = (page - 1) * limit;
-    
-    const orders = await queryBuilder
-      .skip(offset)
-      .take(limit)
-      .getMany();
+
+    const orders = await queryBuilder.skip(offset).take(limit).getMany();
 
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
@@ -244,7 +274,7 @@ export class OrdersRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -256,7 +286,13 @@ export class OrdersRepository {
     totalRevenue: number;
     averageOrderValue: number;
   }> {
-    const [totalOrders, pendingOrders, deliveredOrders, cancelledOrders, revenueResult] = await Promise.all([
+    const [
+      totalOrders,
+      pendingOrders,
+      deliveredOrders,
+      cancelledOrders,
+      revenueResult,
+    ] = await Promise.all([
       this.orderRepository.count(),
       this.orderRepository.count({ where: { status: OrderStatus.PENDING } }),
       this.orderRepository.count({ where: { status: OrderStatus.DELIVERED } }),
@@ -265,7 +301,7 @@ export class OrdersRepository {
         .createQueryBuilder('order')
         .select('SUM(order.totalPrice)', 'total')
         .where('order.status = :status', { status: OrderStatus.DELIVERED })
-        .getRawOne()
+        .getRawOne(),
     ]);
 
     const totalRevenue = parseFloat(revenueResult?.total || '0');
@@ -277,24 +313,38 @@ export class OrdersRepository {
       deliveredOrders,
       cancelledOrders,
       totalRevenue,
-      averageOrderValue
+      averageOrderValue,
     };
   }
 
   private async invalidateOrderCache(order: Order): Promise<void> {
     await Promise.all([
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.ORDERS}:order:${order.id}`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.ORDERS}:user_orders:${order.user.id}`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.ORDERS}:active_order:${order.user.id}`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.ORDERS}:orders_by_status`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.STATS}:orders_statistics`)
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.ORDERS}:order:${order.id}`
+      ),
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.ORDERS}:user_orders:${order.user.id}`
+      ),
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.ORDERS}:active_order:${order.user.id}`
+      ),
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.ORDERS}:orders_by_status`
+      ),
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.STATS}:orders_statistics`
+      ),
     ]);
   }
 
   private async invalidateUserOrdersCache(userId: number): Promise<void> {
     await Promise.all([
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.ORDERS}:user_orders:${userId}`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.ORDERS}:active_order:${userId}`)
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.ORDERS}:user_orders:${userId}`
+      ),
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.ORDERS}:active_order:${userId}`
+      ),
     ]);
   }
 }

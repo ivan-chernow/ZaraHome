@@ -25,9 +25,9 @@ export const usePagination = <T>(
 ): UsePaginationReturn => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Получаем текущую страницу из URL
-  const urlPage = Number(searchParams.get("page")) || initialPage;
+  const urlPage = Number(searchParams.get('page')) || initialPage;
   const [currentPage, setCurrentPage] = useState(urlPage);
 
   // Синхронизируем состояние с URL
@@ -36,8 +36,8 @@ export const usePagination = <T>(
   }, [urlPage]);
 
   // Вычисляем общее количество страниц
-  const totalPages = useMemo(() => 
-    Math.ceil(totalItems / pageSize), 
+  const totalPages = useMemo(
+    () => Math.ceil(totalItems / pageSize),
     [totalItems, pageSize]
   );
 
@@ -52,9 +52,9 @@ export const usePagination = <T>(
   const updateURL = (page: number) => {
     const params = new URLSearchParams(searchParams);
     if (page === 1) {
-      params.delete("page");
+      params.delete('page');
     } else {
-      params.set("page", page.toString());
+      params.set('page', page.toString());
     }
     router.push(`?${params.toString()}`, { scroll: false });
   };
@@ -63,10 +63,10 @@ export const usePagination = <T>(
   const handlePageChange = (_: any, value: number) => {
     setCurrentPage(value);
     updateURL(value);
-    
+
     // Скроллим к началу списка
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -107,4 +107,4 @@ export const usePagination = <T>(
     hasNextPage,
     hasPrevPage,
   };
-}; 
+};

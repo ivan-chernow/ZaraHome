@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, LessThan, MoreThan } from 'typeorm';
+import { Repository, LessThan } from 'typeorm';
 import { Promocode } from './entity/promocode.entity';
 
 export interface PromocodeListResponse {
@@ -15,23 +15,27 @@ export interface PromocodeListResponse {
 
 @Injectable()
 export class PromocodesRepository {
+  private readonly promocodeRepository: Repository<Promocode>;
+
   constructor(
     @InjectRepository(Promocode)
-    private promocodeRepository: Repository<Promocode>,
-  ) {}
+    promocodeRepository: Repository<Promocode>
+  ) {
+    this.promocodeRepository = promocodeRepository;
+  }
 
   async findByCode(code: string): Promise<Promocode | null> {
     return this.promocodeRepository.findOne({
-      where: { code: code.toUpperCase() }
+      where: { code: code.toUpperCase() },
     });
   }
 
   async findActiveByCode(code: string): Promise<Promocode | null> {
     return this.promocodeRepository.findOne({
-      where: { 
+      where: {
         code: code.toUpperCase(),
-        isActive: true 
-      }
+        isActive: true,
+      },
     });
   }
 
@@ -39,8 +43,8 @@ export class PromocodesRepository {
     return this.promocodeRepository.find({
       where: { isActive: true },
       order: {
-        createdAt: 'DESC'
-      }
+        createdAt: 'DESC',
+      },
     });
   }
 
@@ -48,7 +52,8 @@ export class PromocodesRepository {
     page: number = 1,
     limit: number = 20
   ): Promise<PromocodeListResponse> {
-    const queryBuilder = this.promocodeRepository.createQueryBuilder('promocode')
+    const queryBuilder = this.promocodeRepository
+      .createQueryBuilder('promocode')
       .where('promocode.isActive = :isActive', { isActive: true })
       .orderBy('promocode.createdAt', 'DESC');
 
@@ -72,7 +77,7 @@ export class PromocodesRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -88,7 +93,8 @@ export class PromocodesRepository {
     page: number = 1,
     limit: number = 20
   ): Promise<PromocodeListResponse> {
-    const queryBuilder = this.promocodeRepository.createQueryBuilder('promocode')
+    const queryBuilder = this.promocodeRepository
+      .createQueryBuilder('promocode')
       .orderBy('promocode.createdAt', 'DESC');
 
     // Получаем общее количество
@@ -111,7 +117,7 @@ export class PromocodesRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -120,7 +126,8 @@ export class PromocodesRepository {
     page: number = 1,
     limit: number = 20
   ): Promise<PromocodeListResponse> {
-    const queryBuilder = this.promocodeRepository.createQueryBuilder('promocode')
+    const queryBuilder = this.promocodeRepository
+      .createQueryBuilder('promocode')
       .where(
         '(promocode.code ILIKE :query OR promocode.description ILIKE :query)',
         { query: `%${query}%` }
@@ -147,7 +154,7 @@ export class PromocodesRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -156,8 +163,14 @@ export class PromocodesRepository {
     return this.promocodeRepository.save(promocode);
   }
 
-  async updatePromocode(code: string, updates: Partial<Promocode>): Promise<Promocode> {
-    await this.promocodeRepository.update({ code: code.toUpperCase() }, updates);
+  async updatePromocode(
+    code: string,
+    updates: Partial<Promocode>
+  ): Promise<Promocode> {
+    await this.promocodeRepository.update(
+      { code: code.toUpperCase() },
+      updates
+    );
     return this.findByCode(code) as Promise<Promocode>;
   }
 
@@ -187,7 +200,12 @@ export class PromocodesRepository {
     totalDiscountApplied: number;
     averageDiscount: number;
   }> {
-    const [totalPromocodes, activePromocodes, totalUsage, totalDiscountApplied] = await Promise.all([
+    const [
+      totalPromocodes,
+      activePromocodes,
+      totalUsage,
+      totalDiscountApplied,
+    ] = await Promise.all([
       this.promocodeRepository.count(),
       this.promocodeRepository.count({ where: { isActive: true } }),
       // The original code had this line, but PromocodeUsageRepository was removed.
@@ -196,27 +214,28 @@ export class PromocodesRepository {
       // If usage tracking is truly removed, this will cause an error.
       // As per instructions, I'm not fixing this, but noting the potential issue.
       // For now, returning 0 for totalUsage as PromocodeUsageRepository is gone.
-      Promise.resolve(0), 
+      Promise.resolve(0),
       // This line will now cause an error as promocodeUsageRepository is not defined.
       // Keeping it as is to match the original file's structure, but it's broken.
       // If usage tracking is truly removed, this will cause an error.
       // As per instructions, I'm not fixing this, but noting the potential issue.
       // For now, returning 0 for totalDiscountApplied as PromocodeUsageRepository is gone.
-      Promise.resolve(0)
+      Promise.resolve(0),
     ]);
 
-    const averageDiscount = totalUsage > 0 ? totalDiscountApplied / totalUsage : 0;
+    const averageDiscount =
+      totalUsage > 0 ? totalDiscountApplied / totalUsage : 0;
 
     return {
       totalPromocodes,
       activePromocodes,
       totalUsage,
       totalDiscountApplied,
-      averageDiscount
+      averageDiscount,
     };
   }
 
-  async getPromocodeUsageStats(promocodeId: number): Promise<{
+  async getPromocodeUsageStats(_promocodeId: number): Promise<{
     totalUsage: number;
     totalDiscountApplied: number;
     averageOrderAmount: number;
@@ -231,7 +250,7 @@ export class PromocodesRepository {
       totalUsage: 0,
       totalDiscountApplied: 0,
       averageOrderAmount: 0,
-      usageByDate: []
+      usageByDate: [],
     };
   }
 
@@ -239,8 +258,8 @@ export class PromocodesRepository {
     return this.promocodeRepository.find({
       where: {
         expiresAt: LessThan(new Date()),
-        isActive: true
-      }
+        isActive: true,
+      },
     });
   }
 
@@ -259,8 +278,12 @@ export class PromocodesRepository {
     page: number = 1,
     limit: number = 20
   ): Promise<PromocodeListResponse> {
-    const queryBuilder = this.promocodeRepository.createQueryBuilder('promocode')
-      .where('promocode.discount BETWEEN :minDiscount AND :maxDiscount', { minDiscount, maxDiscount })
+    const queryBuilder = this.promocodeRepository
+      .createQueryBuilder('promocode')
+      .where('promocode.discount BETWEEN :minDiscount AND :maxDiscount', {
+        minDiscount,
+        maxDiscount,
+      })
       .andWhere('promocode.isActive = :isActive', { isActive: true })
       .orderBy('promocode.createdAt', 'DESC');
 
@@ -284,7 +307,7 @@ export class PromocodesRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -294,8 +317,12 @@ export class PromocodesRepository {
     page: number = 1,
     limit: number = 20
   ): Promise<PromocodeListResponse> {
-    const queryBuilder = this.promocodeRepository.createQueryBuilder('promocode')
-      .where('promocode.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
+    const queryBuilder = this.promocodeRepository
+      .createQueryBuilder('promocode')
+      .where('promocode.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
       .orderBy('promocode.createdAt', 'DESC');
 
     // Получаем общее количество
@@ -318,7 +345,7 @@ export class PromocodesRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 }

@@ -1,16 +1,12 @@
 // Централизованные интерфейсы для всего приложения
-import { CacheOptions } from './cache/cache.service';
 
 // ============================================================================
 // БАЗОВЫЕ ИНТЕРФЕЙСЫ
 // ============================================================================
 
 // Swagger декораторы
-export const ApiDefaultErrors = () => {
-  return (target: any) => {
-    // Декоратор для стандартных ошибок API
-    return target;
-  };
+export const ApiDefaultErrors = (): ClassDecorator => {
+  return target => target;
 };
 
 // Базовые исключения
@@ -72,7 +68,7 @@ export interface AuthenticatedRequest extends Request {
 
 export enum UserRole {
   USER = 'user',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 export enum OrderStatus {
@@ -80,7 +76,7 @@ export enum OrderStatus {
   PAID = 'paid',
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 // ============================================================================
@@ -160,13 +156,24 @@ export interface ICacheService {
 // ============================================================================
 
 export interface IImageOptimizationService {
-  processAndSave(buffer: Buffer, originalName: string, options?: any): Promise<{ mainPath: string; thumbnailPath?: string }>;
+  processAndSave(
+    buffer: Buffer,
+    originalName: string,
+    options?: ImageProcessingOptions
+  ): Promise<{ mainPath: string; thumbnailPath?: string }>;
   generateThumbnail(imagePath: string, size?: number): Promise<string>;
   validateImage(buffer: Buffer): Promise<void>;
   compressImage(imagePath: string, quality?: number): Promise<string>;
-  resizeImage(imagePath: string, width: number, height: number): Promise<string>;
-  convertFormat(imagePath: string, format: 'webp' | 'jpeg' | 'png'): Promise<string>;
-  getImageMetadata(imagePath: string): Promise<any>;
+  resizeImage(
+    imagePath: string,
+    width: number,
+    height: number
+  ): Promise<string>;
+  convertFormat(
+    imagePath: string,
+    format: 'webp' | 'jpeg' | 'png'
+  ): Promise<string>;
+  getImageMetadata(imagePath: string): Promise<Record<string, unknown>>;
   deleteImage(imagePath: string): Promise<void>;
   cleanupOldImages(maxAge?: number): Promise<number>;
 }
@@ -231,11 +238,19 @@ export interface IUtilityService {
 // ============================================================================
 
 export interface IMonitoringService {
-  recordMetric(name: string, value: number, tags?: Record<string, string>): void;
+  recordMetric(
+    name: string,
+    value: number,
+    tags?: Record<string, string>
+  ): void;
   incrementCounter(name: string, tags?: Record<string, string>): Promise<void>;
   decrementCounter(name: string, tags?: Record<string, string>): Promise<void>;
   setGauge(name: string, value: number, tags?: Record<string, string>): void;
-  recordHistogram(name: string, value: number, tags?: Record<string, string>): void;
+  recordHistogram(
+    name: string,
+    value: number,
+    tags?: Record<string, string>
+  ): void;
   getMetrics(): Promise<any>;
   getSystemStats(): Promise<any>;
 }
@@ -571,25 +586,50 @@ export interface IUserService {
 }
 
 export interface IDeliveryAddressService {
-  createAddress(userId: number, data: DeliveryAddressData): Promise<DeliveryAddress>;
+  createAddress(
+    userId: number,
+    data: DeliveryAddressData
+  ): Promise<DeliveryAddress>;
   getAddressById(id: number): Promise<DeliveryAddress>;
-  getUserAddresses(userId: number, filters?: AddressFilters): Promise<DeliveryAddressesResponse>;
-  updateAddress(id: number, data: Partial<DeliveryAddressData>): Promise<DeliveryAddress>;
+  getUserAddresses(
+    userId: number,
+    filters?: AddressFilters
+  ): Promise<DeliveryAddressesResponse>;
+  updateAddress(
+    id: number,
+    data: Partial<DeliveryAddressData>
+  ): Promise<DeliveryAddress>;
   deleteAddress(id: number): Promise<void>;
   setDefaultAddress(userId: number, addressId: number): Promise<void>;
-  bulkCreateAddresses(userId: number, addresses: DeliveryAddressData[]): Promise<BulkOperationResult>;
-  bulkUpdateAddresses(updates: Array<{ id: number; data: Partial<DeliveryAddressData> }>): Promise<BulkOperationResult>;
+  bulkCreateAddresses(
+    userId: number,
+    addresses: DeliveryAddressData[]
+  ): Promise<BulkOperationResult>;
+  bulkUpdateAddresses(
+    updates: Array<{ id: number; data: Partial<DeliveryAddressData> }>
+  ): Promise<BulkOperationResult>;
   bulkDeleteAddresses(ids: number[]): Promise<BulkOperationResult>;
 }
 
 export interface ICartService {
-  addToCart(userId: number, productId: number, quantity: number): Promise<CartItem>;
+  addToCart(
+    userId: number,
+    productId: number,
+    quantity: number
+  ): Promise<CartItem>;
   removeFromCart(userId: number, productId: number): Promise<void>;
-  updateQuantity(userId: number, productId: number, quantity: number): Promise<CartItem>;
+  updateQuantity(
+    userId: number,
+    productId: number,
+    quantity: number
+  ): Promise<CartItem>;
   getCart(userId: number): Promise<CartItemWithProduct[]>;
   clearCart(userId: number): Promise<void>;
   getCartItemCount(userId: number): Promise<number>;
-  addMultipleToCart(userId: number, items: Array<{ productId: number; quantity: number }>): Promise<CartItem[]>;
+  addMultipleToCart(
+    userId: number,
+    items: Array<{ productId: number; quantity: number }>
+  ): Promise<CartItem[]>;
   removeMultipleFromCart(userId: number, productIds: number[]): Promise<void>;
 }
 
@@ -600,8 +640,14 @@ export interface IFavoritesService {
   clearFavorites(userId: number): Promise<void>;
   isInFavorites(userId: number, productId: number): Promise<boolean>;
   getFavoritesCount(userId: number): Promise<number>;
-  addMultipleToFavorites(userId: number, productIds: number[]): Promise<FavoriteItem[]>;
-  removeMultipleFromFavorites(userId: number, productIds: number[]): Promise<void>;
+  addMultipleToFavorites(
+    userId: number,
+    productIds: number[]
+  ): Promise<FavoriteItem[]>;
+  removeMultipleFromFavorites(
+    userId: number,
+    productIds: number[]
+  ): Promise<void>;
 }
 
 export interface IProductService {
@@ -616,13 +662,21 @@ export interface IOrderService {
   createOrder(createOrderDto: any, userId: number): Promise<any>;
   getOrderById(orderId: number, userId: number): Promise<any>;
   getUserOrders(userId: number, page?: number, limit?: number): Promise<any>;
-  updateOrderStatus(orderId: number, status: OrderStatus, userId: number): Promise<any>;
+  updateOrderStatus(
+    orderId: number,
+    status: OrderStatus,
+    userId: number
+  ): Promise<any>;
   cancelOrder(orderId: number, userId: number): Promise<any>;
 }
 
 export interface IPromocodeService {
   create(code: string, discount: number, options?: any): Promise<any>;
-  validateAndApply(code: string, orderAmount: number, userId?: number): Promise<any>;
+  validateAndApply(
+    code: string,
+    orderAmount: number,
+    userId?: number
+  ): Promise<any>;
   getAllActive(page?: number, limit?: number): Promise<any>;
   getAll(page?: number, limit?: number): Promise<any>;
   searchPromocodes(query: string, page?: number, limit?: number): Promise<any>;
@@ -632,14 +686,17 @@ export interface IPromocodeService {
 }
 
 export interface IAuthService {
-  login(user: any, res?: any): Promise<{ accessToken: string; user: { id: number; email: string; role: string } }>;
+  login(
+    user: any,
+    res?: any
+  ): Promise<{
+    accessToken: string;
+    user: { id: number; email: string; role: string };
+  }>;
   validateUser(email: string, password: string): Promise<any>;
 }
 
-export interface IImageOptimizationService {
-  processAndSave(buffer: Buffer, originalName?: string, options?: ImageProcessingOptions): Promise<any>;
-  getImageMetadata(imagePath: string): Promise<any>;
-}
+// Упрощённая сигнатура для внутреннего использования (совпадает по имени — удаляем дубликаты)
 
 export interface ImageProcessingOptions {
   width?: number;
@@ -677,12 +734,8 @@ export interface HealthCheck {
   details?: any;
 }
 
-export interface IAdminService {
-  // Пустой интерфейс для совместимости
-}
-
 // ============================================================================
 // ЭКСПОРТ ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ
 // ============================================================================
 
-export * from './cache/cache.service';
+// export * from './cache/cache.service';

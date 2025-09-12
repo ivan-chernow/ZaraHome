@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { RefObject, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useClickOutside } from "@/shared/lib/hooks/useClickOutside";
-import { closeCart } from "@/entities/cart/model/cart.slice";
-import { Fade } from "@mui/material";
-import { createPortal } from "react-dom";
-import { selectCartItems } from "@/entities/cart/model/cartItems.slice";
-import CartItem from "./cartItem";
-import CartEmpty from "./cartEmpty";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import { useRouter } from "next/navigation";
+import React, { RefObject, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useClickOutside } from '@/shared/lib/hooks/useClickOutside';
+import { closeCart } from '@/entities/cart/model/cart.slice';
+import { Fade } from '@mui/material';
+import { createPortal } from 'react-dom';
+import { selectCartItems } from '@/entities/cart/model/cartItems.slice';
+import CartItem from './cartItem';
+import CartEmpty from './cartEmpty';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import { useRouter } from 'next/navigation';
 
 interface CartDetailsProps {
   cartButtonRef: RefObject<HTMLDivElement | null>;
@@ -43,8 +43,8 @@ const CartDetails: React.FC<CartDetailsProps> = ({ cartButtonRef }) => {
 
     calculatePosition();
 
-    window.addEventListener("resize", calculatePosition);
-    return () => window.removeEventListener("resize", calculatePosition);
+    window.addEventListener('resize', calculatePosition);
+    return () => window.removeEventListener('resize', calculatePosition);
   }, [cartButtonRef]);
 
   const cartContent = (
@@ -56,8 +56,8 @@ const CartDetails: React.FC<CartDetailsProps> = ({ cartButtonRef }) => {
           top: `${position.top}px`,
           left: `${position.left}px`,
           boxShadow:
-            "0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 1.5px 8px 0 rgba(60,60,60,0.10)",
-          backdropFilter: "blur(2px)",
+            '0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 1.5px 8px 0 rgba(60,60,60,0.10)',
+          backdropFilter: 'blur(2px)',
         }}
       >
         {cartItems.length === 0 ? (
@@ -68,7 +68,9 @@ const CartDetails: React.FC<CartDetailsProps> = ({ cartButtonRef }) => {
           <>
             <ul className="w-full flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
               {cartItems.map((item, idx) => (
-                <React.Fragment key={`${item.id}-${item.size ?? 'nosize'}-${item.color ?? 'nocolor'}-${idx}`}>
+                <React.Fragment
+                  key={`${item.id}-${item.size ?? 'nosize'}-${item.color ?? 'nocolor'}-${idx}`}
+                >
                   <CartItem item={item} />
                   {idx !== cartItems.length - 1 && (
                     <HorizontalLine width="100%" />
@@ -82,7 +84,7 @@ const CartDetails: React.FC<CartDetailsProps> = ({ cartButtonRef }) => {
               aria-label="Перейти к оформлению"
               onClick={() => {
                 dispatch(closeCart());
-                router.push("/cart");
+                router.push('/cart');
               }}
             >
               ПЕРЕЙТИ К ОФОРМЛЕНИЮ

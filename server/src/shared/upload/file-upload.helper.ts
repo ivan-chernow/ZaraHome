@@ -18,7 +18,13 @@ const defaultOptions: Required<ImagesInterceptorOptions> = {
   maxCount: 10,
   maxSizeMB: 10,
   allowedExt: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-  allowedMime: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+  allowedMime: [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+  ],
   generateUniqueNames: true,
 };
 
@@ -26,9 +32,13 @@ const defaultOptions: Required<ImagesInterceptorOptions> = {
 const generateUniqueFileName = (originalName: string): string => {
   const timestamp = Date.now();
   const randomId = uuidv4().replace(/-/g, '').substring(0, 8);
-  const hash = crypto.createHash('md5').update(`${originalName}${timestamp}${randomId}`).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash('md5')
+    .update(`${originalName}${timestamp}${randomId}`)
+    .digest('hex')
+    .substring(0, 8);
   const ext = originalName.split('.').pop()?.toLowerCase() || 'jpg';
-  
+
   return `${timestamp}-${randomId}-${hash}.${ext}`;
 };
 
@@ -38,17 +48,17 @@ const validateMimeType = (mimetype: string, allowedMime: string[]): boolean => {
 };
 
 // Функция для валидации расширений файлов
-const validateFileExtension = (filename: string, allowedExt: string[]): boolean => {
+const validateFileExtension = (
+  filename: string,
+  allowedExt: string[]
+): boolean => {
   const ext = filename.split('.').pop()?.toLowerCase();
   return ext ? allowedExt.includes(ext) : false;
 };
 
-// Функция для валидации размера файла
-const validateFileSize = (size: number, maxSizeBytes: number): boolean => {
-  return size <= maxSizeBytes;
-};
-
-export const ImagesUploadInterceptor = (options: ImagesInterceptorOptions = {}) => {
+export const ImagesUploadInterceptor = (
+  options: ImagesInterceptorOptions = {}
+) => {
   const {
     fieldName,
     maxCount,
@@ -100,7 +110,7 @@ export const ImagesUploadInterceptor = (options: ImagesInterceptorOptions = {}) 
 
       cb(null, true);
     },
-    limits: { 
+    limits: {
       fileSize: maxSizeBytes,
       files: maxCount,
     },
@@ -108,12 +118,21 @@ export const ImagesUploadInterceptor = (options: ImagesInterceptorOptions = {}) 
 };
 
 // Дополнительная функция для валидации загруженных файлов
-export const validateUploadedFiles = (files: Express.Multer.File[], options: ImagesInterceptorOptions = {}) => {
+export const validateUploadedFiles = (
+  files: Express.Multer.File[],
+  options: ImagesInterceptorOptions = {}
+) => {
   const {
     maxCount = 10,
     maxSizeMB = 10,
     allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+    allowedMime = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+    ],
   } = options;
 
   const maxSizeBytes = maxSizeMB * 1024 * 1024;
@@ -124,11 +143,13 @@ export const validateUploadedFiles = (files: Express.Multer.File[], options: Ima
   }
 
   if (files.length > maxCount) {
-    throw new BadRequestException(`Максимальное количество файлов: ${maxCount}`);
+    throw new BadRequestException(
+      `Максимальное количество файлов: ${maxCount}`
+    );
   }
 
   // Проверяем каждый файл
-  files.forEach((file, index) => {
+  files.forEach((file, _index) => {
     // Проверяем размер файла
     if (file.size > maxSizeBytes) {
       throw new BadRequestException(
@@ -158,5 +179,3 @@ export const validateUploadedFiles = (files: Express.Multer.File[], options: Ima
 
   return files;
 };
-
-

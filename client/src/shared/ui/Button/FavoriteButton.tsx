@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import React, { useCallback, useMemo } from "react";
-import Image from "next/image";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
+import React, { useCallback, useMemo } from 'react';
+import Image from 'next/image';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
 import {
   useAddToFavoritesMutation,
   useRemoveFromFavoritesMutation,
-} from "@/entities/favorite/api/favorites.api";
+} from '@/entities/favorite/api/favorites.api';
 import {
   removeFavorite,
   setFavorites,
   addFavorite,
-} from "@/entities/favorite/model/favorites.slice";
-import { getLocalStorage, setLocalStorage } from "@/shared/lib/storage";
+} from '@/entities/favorite/model/favorites.slice';
+import { getLocalStorage, setLocalStorage } from '@/shared/lib/storage';
 
 interface FavoriteButtonProps {
   productId: number;
   className?: string;
-  size?: "small" | "medium" | "large";
+  size?: 'small' | 'medium' | 'large';
 }
 
 // Константы для размеров
 const SIZE_CONFIG = {
-  small: { button: "w-8 h-8", icon: 16 },
-  medium: { button: "w-10 h-10", icon: 18 },
-  large: { button: "w-14 h-14", icon: 22 },
+  small: { button: 'w-8 h-8', icon: 16 },
+  medium: { button: 'w-10 h-10', icon: 18 },
+  large: { button: 'w-14 h-14', icon: 22 },
 } as const;
 
 // Хук для работы с избранным
@@ -53,7 +53,7 @@ const useFavorites = (productId: number) => {
         await removeFromFavorites(productId).unwrap();
         dispatch(removeFavorite(productId));
         // Синхронизируем локально для мгновенного восстановления после перезагрузки
-        const key = userId ? `favorites:${userId}` : "favorites";
+        const key = userId ? `favorites:${userId}` : 'favorites';
         const favorites = getLocalStorage(key, []);
         const updated = Array.isArray(favorites)
           ? favorites.filter((id: number) => id !== productId)
@@ -62,7 +62,7 @@ const useFavorites = (productId: number) => {
       } else {
         await addToFavorites(productId).unwrap();
         dispatch(addFavorite(productId));
-        const key = userId ? `favorites:${userId}` : "favorites";
+        const key = userId ? `favorites:${userId}` : 'favorites';
         const favorites = getLocalStorage(key, []);
         const updated = Array.isArray(favorites)
           ? Array.from(new Set([...(favorites as number[]), productId]))
@@ -70,7 +70,7 @@ const useFavorites = (productId: number) => {
         setLocalStorage(key, updated);
       }
     } catch (error) {
-      console.error("Ошибка при работе с избранным:", error);
+      console.error('Ошибка при работе с избранным:', error);
     }
   }, [
     isFavorite,
@@ -82,12 +82,12 @@ const useFavorites = (productId: number) => {
   ]);
 
   const handleGuestToggle = useCallback(() => {
-    const favorites = getLocalStorage("favorites", []);
+    const favorites = getLocalStorage('favorites', []);
     const updatedFavorites = isFavorite
       ? favorites.filter((id: number) => id !== productId)
       : [...favorites, productId];
 
-    setLocalStorage("favorites", updatedFavorites);
+    setLocalStorage('favorites', updatedFavorites);
     dispatch(setFavorites(updatedFavorites));
   }, [isFavorite, productId, dispatch]);
 
@@ -111,35 +111,35 @@ const FavoriteIcon: React.FC<{ size: number }> = React.memo(({ size }) => (
   />
 ));
 
-FavoriteIcon.displayName = "FavoriteIcon";
+FavoriteIcon.displayName = 'FavoriteIcon';
 
 const FavoriteButton: React.FC<FavoriteButtonProps> = React.memo(
-  ({ productId, className = "", size = "large" }) => {
+  ({ productId, className = '', size = 'large' }) => {
     const { isFavorite, handleToggle } = useFavorites(productId);
 
     const sizeConfig = useMemo(() => SIZE_CONFIG[size], [size]);
 
     const buttonClasses = useMemo(() => {
       const baseClasses = [
-        "cursor-pointer",
-        "transition-all",
-        "duration-300",
-        "flex",
-        "items-center",
-        "justify-center",
-        "rounded-lg",
-        "border-2",
-        "border-transparent",
-        "active:scale-95",
+        'cursor-pointer',
+        'transition-all',
+        'duration-300',
+        'flex',
+        'items-center',
+        'justify-center',
+        'rounded-lg',
+        'border-2',
+        'border-transparent',
+        'active:scale-95',
         sizeConfig.button,
         className,
       ];
 
       const stateClasses = isFavorite
-        ? ["bg-red-500", "hover:bg-red-600", "text-white"]
-        : ["bg-black", "hover:bg-black/80", "text-white"]; // тёмный фон вместо светлого
+        ? ['bg-red-500', 'hover:bg-red-600', 'text-white']
+        : ['bg-black', 'hover:bg-black/80', 'text-white']; // тёмный фон вместо светлого
 
-      return [...baseClasses, ...stateClasses].join(" ");
+      return [...baseClasses, ...stateClasses].join(' ');
     }, [isFavorite, sizeConfig.button, className]);
 
     const handleClick = useCallback(
@@ -156,9 +156,9 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = React.memo(
         onClick={handleClick}
         className={buttonClasses}
         aria-label={
-          isFavorite ? "Удалить из избранного" : "Добавить в избранное"
+          isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'
         }
-        title={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+        title={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
       >
         <FavoriteIcon size={sizeConfig.icon} />
       </button>
@@ -166,6 +166,6 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = React.memo(
   }
 );
 
-FavoriteButton.displayName = "FavoriteButton";
+FavoriteButton.displayName = 'FavoriteButton';
 
 export default FavoriteButton;

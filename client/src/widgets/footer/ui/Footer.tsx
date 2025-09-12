@@ -1,19 +1,19 @@
-"use client";
-import React from "react";
-import Logo from "@/shared/ui/Logo";
-import VerticalLine from "@/shared/ui/VerticalLine";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import Container from "@mui/material/Container";
-import { useRouter } from "next/navigation";
-import { catalog } from "public/assets/data/catalog";
-import Link from "next/link";
-import slugify from "slugify";
+'use client';
+import React from 'react';
+import Logo from '@/shared/ui/Logo';
+import VerticalLine from '@/shared/ui/VerticalLine';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import Container from '@mui/material/Container';
+import { useRouter } from 'next/navigation';
+import { catalog } from 'public/assets/data/catalog';
+import Link from 'next/link';
+import slugify from 'slugify';
 
 const Footer: React.FC = () => {
   const router = useRouter();
 
   const customSlugify = (text: string) =>
-    slugify(text.replace("й", "y"), { lower: true, strict: true });
+    slugify(text.replace('й', 'y'), { lower: true, strict: true });
 
   return (
     <footer id="footer" data-section="footer" className="pb-[55px] mt-auto ">
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
             <h2 className="text-[18px] font-semibold mb-[25px] ">Магазин</h2>
             <div className="flex items-center justify-between">
               <ul className="space-y-[10px] mr-[50px]">
-                {catalog.slice(0, 4).map((item) => (
+                {catalog.slice(0, 4).map(item => (
                   <li key={item.category}>
                     <Link
                       href={`/products/category/${customSlugify(item.link)}`}
@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
                 ))}
               </ul>
               <ul className="space-y-[10px]">
-                {catalog.slice(4, 8).map((item) => (
+                {catalog.slice(4, 8).map(item => (
                   <li key={item.category}>
                     <Link
                       href={`/products/category/${customSlugify(item.link)}`}
@@ -54,27 +54,27 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          <VerticalLine height={"100%"} />
+          <VerticalLine height={'100%'} />
 
           <div className="flex-1 max-w-[280px] px-[20px]">
             <h2 className="text-[18px] font-semibold mb-[25px]">Помощь</h2>
             <ul className="space-y-[10px]">
               <li
                 className="text-[#00000080] hover:text-black cursor-pointer transition-colors"
-                onClick={() => router.push("info")}
+                onClick={() => router.push('info')}
               >
                 Информация о сроках доставки
               </li>
               <li
                 className="text-[#00000080] hover:text-black cursor-pointer transition-colors"
-                onClick={() => router.push("agreement")}
+                onClick={() => router.push('agreement')}
               >
                 Пользовательское соглашение
               </li>
             </ul>
           </div>
 
-          <VerticalLine height={"100%"} />
+          <VerticalLine height={'100%'} />
 
           <div className="flex-1 max-w-[250px]">
             <h2 className="text-[18px] font-semibold mb-[25px]">Контакты</h2>

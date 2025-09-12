@@ -1,23 +1,25 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ProductColors {
-    [productId: number]: string;
+  [productId: number]: string;
 }
 
 const initialState: { activeColors: ProductColors } = {
-    activeColors: {},
-}   
+  activeColors: {},
+};
 
 const productCardSlice = createSlice({
-    name: 'productCard',
-    initialState,
-    reducers: {
-        setActiveColor: (state, action: PayloadAction<{ productId: number; color: string }>) => {
-            state.activeColors[action.payload.productId] = action.payload.color;
-        },
+  name: 'productCard',
+  initialState,
+  reducers: {
+    setActiveColor: (
+      state,
+      action: PayloadAction<{ productId: number; color: string }>
+    ) => {
+      state.activeColors[action.payload.productId] = action.payload.color;
     },
+  },
 });
 
 export const { setActiveColor } = productCardSlice.actions;
 export default productCardSlice.reducer;
-

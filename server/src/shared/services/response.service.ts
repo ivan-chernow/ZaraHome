@@ -7,7 +7,7 @@ export class ResponseService {
     return {
       success: true,
       data,
-      message
+      message,
     };
   }
 
@@ -15,7 +15,7 @@ export class ResponseService {
     return {
       success: false,
       message,
-      error
+      error,
     };
   }
 }

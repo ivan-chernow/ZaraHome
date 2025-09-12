@@ -18,8 +18,8 @@ export const APP_CONSTANTS = {
       PROMOCODES: 'promocodes',
       SEARCH_RESULTS: 'search',
       USER_STATS: 'user_stats',
-      USER_ADDRESSES: 'user_addresses'
-    }
+      USER_ADDRESSES: 'user_addresses',
+    },
   },
 
   // Настройки изображений
@@ -51,7 +51,7 @@ export const APP_CONSTANTS = {
       'application/pdf',
       'text/plain',
       'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ],
     CHUNK_SIZE: 1024 * 1024, // 1MB
     RETRY_ATTEMPTS: 3,
@@ -424,11 +424,14 @@ export const APP_CONSTANTS = {
 
 // Типы для констант
 export type CacheTTL = typeof APP_CONSTANTS.CACHE.DEFAULT_TTL;
-export type ImageFormat = typeof APP_CONSTANTS.IMAGES.SUPPORTED_FORMATS[number];
-export type MimeType = typeof APP_CONSTANTS.UPLOAD.ALLOWED_MIME_TYPES[number];
+export type ImageFormat =
+  (typeof APP_CONSTANTS.IMAGES.SUPPORTED_FORMATS)[number];
+export type MimeType = (typeof APP_CONSTANTS.UPLOAD.ALLOWED_MIME_TYPES)[number];
 export type LogLevel = typeof APP_CONSTANTS.LOGGING.LOG_LEVEL;
-export type HttpStatus = typeof APP_CONSTANTS.HTTP_STATUS[keyof typeof APP_CONSTANTS.HTTP_STATUS];
-export type Currency = typeof APP_CONSTANTS.UNITS.CURRENCY[keyof typeof APP_CONSTANTS.UNITS.CURRENCY];
+export type HttpStatus =
+  (typeof APP_CONSTANTS.HTTP_STATUS)[keyof typeof APP_CONSTANTS.HTTP_STATUS];
+export type Currency =
+  (typeof APP_CONSTANTS.UNITS.CURRENCY)[keyof typeof APP_CONSTANTS.UNITS.CURRENCY];
 
 // Экспорт для обратной совместимости
 export const SHARED_CONSTANTS = APP_CONSTANTS;

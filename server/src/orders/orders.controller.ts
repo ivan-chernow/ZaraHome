@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Put, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+  Query,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -7,7 +17,14 @@ import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { ResponseService } from 'src/shared/services/response.service';
 import { AuthenticatedRequest } from 'src/shared/shared.interfaces';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ApiDefaultErrors } from 'src/shared/shared.interfaces';
 import { OrderStatus } from 'src/shared/shared.interfaces';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -20,31 +37,57 @@ import { UserRole } from 'src/shared/shared.interfaces';
 @ApiBearerAuth()
 @ApiDefaultErrors()
 export class OrdersController {
-  constructor(
-    private readonly ordersService: OrdersService,
-    private readonly responseService: ResponseService,
-  ) {}
+  private readonly ordersService: OrdersService;
+  private readonly responseService: ResponseService;
+
+  constructor(ordersService: OrdersService, responseService: ResponseService) {
+    this.ordersService = ordersService;
+    this.responseService = responseService;
+  }
 
   @Post()
   @ApiOperation({ summary: 'Создать заказ' })
   @ApiOkResponse({ description: 'Заказ успешно создан' })
-  async createOrder(@Body() createOrderDto: CreateOrderDto, @Request() req: AuthenticatedRequest) {
-    const order = await this.ordersService.createOrder(createOrderDto, req.user.id);
+  async createOrder(
+    @Body() createOrderDto: CreateOrderDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    const order = await this.ordersService.createOrder(
+      createOrderDto,
+      req.user.id
+    );
     return this.responseService.success(order, 'Заказ успешно создан');
   }
 
   @Get('my')
   @ApiOperation({ summary: 'Получить заказы текущего пользователя' })
   @ApiOkResponse({ description: 'Заказы пользователя загружены' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов на странице' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов на странице',
+  })
   async getUserOrders(
     @Request() req: AuthenticatedRequest,
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ) {
-    const orders = await this.ordersService.getUserOrders(req.user.id, page || 1, limit || 20);
-    return this.responseService.success(orders, 'Заказы пользователя загружены');
+    const orders = await this.ordersService.getUserOrders(
+      req.user.id,
+      page || 1,
+      limit || 20
+    );
+    return this.responseService.success(
+      orders,
+      'Заказы пользователя загружены'
+    );
   }
 
   @Get('active')
@@ -59,7 +102,10 @@ export class OrdersController {
   @ApiOperation({ summary: 'Получить заказ по id' })
   @ApiOkResponse({ description: 'Заказ найден' })
   @ApiParam({ name: 'id', type: Number, description: 'ID заказа' })
-  async getOrderById(@Param() params: OrderIdDto, @Request() req: AuthenticatedRequest) {
+  async getOrderById(
+    @Param() params: OrderIdDto,
+    @Request() req: AuthenticatedRequest
+  ) {
     const order = await this.ordersService.getOrderById(params.id, req.user.id);
     return this.responseService.success(order, 'Заказ найден');
   }
@@ -73,7 +119,11 @@ export class OrdersController {
     @Body() body: UpdateOrderStatusDto,
     @Request() req: AuthenticatedRequest
   ) {
-    const order = await this.ordersService.updateOrderStatus(params.id, body.status, req.user.id);
+    const order = await this.ordersService.updateOrderStatus(
+      params.id,
+      body.status,
+      req.user.id
+    );
     return this.responseService.success(order, 'Статус заказа обновлен');
   }
 
@@ -81,7 +131,10 @@ export class OrdersController {
   @ApiOperation({ summary: 'Отменить заказ' })
   @ApiOkResponse({ description: 'Заказ отменен' })
   @ApiParam({ name: 'id', type: Number, description: 'ID заказа' })
-  async cancelOrder(@Param() params: OrderIdDto, @Request() req: AuthenticatedRequest) {
+  async cancelOrder(
+    @Param() params: OrderIdDto,
+    @Request() req: AuthenticatedRequest
+  ) {
     const order = await this.ordersService.cancelOrder(params.id, req.user.id);
     return this.responseService.success(order, 'Заказ отменен');
   }
@@ -95,7 +148,11 @@ export class OrdersController {
     @Body() updateOrderDto: UpdateOrderDto,
     @Request() req: AuthenticatedRequest
   ) {
-    const order = await this.ordersService.updateOrder(params.id, updateOrderDto, req.user.id);
+    const order = await this.ordersService.updateOrder(
+      params.id,
+      updateOrderDto,
+      req.user.id
+    );
     return this.responseService.success(order, 'Заказ обновлен');
   }
 
@@ -105,13 +162,27 @@ export class OrdersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Получить все заказы (только для админа)' })
   @ApiOkResponse({ description: 'Все заказы загружены' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов на странице' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов на странице',
+  })
   async getAllOrders(
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ) {
-    const orders = await this.ordersService.getOrdersByStatus(OrderStatus.PENDING, page || 1, limit || 20);
+    const orders = await this.ordersService.getOrdersByStatus(
+      OrderStatus.PENDING,
+      page || 1,
+      limit || 20
+    );
     return this.responseService.success(orders, 'Все заказы загружены');
   }
 
@@ -121,15 +192,32 @@ export class OrdersController {
   @ApiOperation({ summary: 'Получить заказы по статусу (только для админа)' })
   @ApiOkResponse({ description: 'Заказы по статусу загружены' })
   @ApiParam({ name: 'status', enum: OrderStatus, description: 'Статус заказа' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов на странице' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов на странице',
+  })
   async getOrdersByStatus(
     @Param('status') status: OrderStatus,
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ) {
-    const orders = await this.ordersService.getOrdersByStatus(status, page || 1, limit || 20);
-    return this.responseService.success(orders, `Заказы со статусом "${status}" загружены`);
+    const orders = await this.ordersService.getOrdersByStatus(
+      status,
+      page || 1,
+      limit || 20
+    );
+    return this.responseService.success(
+      orders,
+      `Заказы со статусом "${status}" загружены`
+    );
   }
 
   @Get('admin/statistics')
@@ -139,7 +227,10 @@ export class OrdersController {
   @ApiOkResponse({ description: 'Статистика заказов загружена' })
   async getOrdersStatistics() {
     const statistics = await this.ordersService.getOrdersStatistics();
-    return this.responseService.success(statistics, 'Статистика заказов загружена');
+    return this.responseService.success(
+      statistics,
+      'Статистика заказов загружена'
+    );
   }
 
   @Get('admin/search')
@@ -147,15 +238,34 @@ export class OrdersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Поиск заказов (только для админа)' })
   @ApiOkResponse({ description: 'Поиск завершен' })
-  @ApiQuery({ name: 'q', required: true, type: String, description: 'Поисковый запрос' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество результатов' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    type: String,
+    description: 'Поисковый запрос',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество результатов',
+  })
   async searchOrders(
     @Query('q') query: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ) {
-    const orders = await this.ordersService.searchOrders(query, page || 1, limit || 20);
+    const orders = await this.ordersService.searchOrders(
+      query,
+      page || 1,
+      limit || 20
+    );
     return this.responseService.success(orders, 'Поиск завершен');
   }
 }

@@ -1,8 +1,8 @@
-"use client";
-import { LinearProgress } from "@mui/material";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+'use client';
+import { LinearProgress } from '@mui/material';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const NavigationProgress: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,7 @@ const NavigationProgress: React.FC = () => {
       setProgress(0);
       // Начинаем с 0% и постепенно увеличиваем до 90%
       timer = setInterval(() => {
-        setProgress((oldProgress) => {
+        setProgress(oldProgress => {
           if (oldProgress >= 90) {
             clearInterval(timer);
             return 90;
@@ -41,7 +41,7 @@ const NavigationProgress: React.FC = () => {
     // Отслеживаем клики по ссылкам
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest("a");
+      const link = target.closest('a');
       if (link && link.href.startsWith(window.location.origin)) {
         handleStart();
       }
@@ -52,11 +52,11 @@ const NavigationProgress: React.FC = () => {
     const handlePopState = () => handleStart();
 
     // Отслеживаем все события навигации
-    window.addEventListener("beforeunload", handleStart);
-    window.addEventListener("load", handleComplete);
-    document.addEventListener("click", handleClick);
-    window.addEventListener("pushState", handlePushState);
-    window.addEventListener("popstate", handlePopState);
+    window.addEventListener('beforeunload', handleStart);
+    window.addEventListener('load', handleComplete);
+    document.addEventListener('click', handleClick);
+    window.addEventListener('pushState', handlePushState);
+    window.addEventListener('popstate', handlePopState);
 
     // Перехватываем все переходы
     const originalPush = router.push;
@@ -66,11 +66,11 @@ const NavigationProgress: React.FC = () => {
     };
 
     return () => {
-      window.removeEventListener("beforeunload", handleStart);
-      window.removeEventListener("load", handleComplete);
-      document.removeEventListener("click", handleClick);
-      window.removeEventListener("pushState", handlePushState);
-      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener('beforeunload', handleStart);
+      window.removeEventListener('load', handleComplete);
+      document.removeEventListener('click', handleClick);
+      window.removeEventListener('pushState', handlePushState);
+      window.removeEventListener('popstate', handlePopState);
       if (timer) clearInterval(timer);
     };
   }, [router]);
@@ -92,20 +92,20 @@ const NavigationProgress: React.FC = () => {
       variant="determinate"
       value={progress}
       sx={{
-        position: "fixed",
+        position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 9999,
         height: 4,
-        backgroundColor: "rgba(25, 118, 210, 0.1)",
-        "& .MuiLinearProgress-bar": {
-          backgroundColor: "#1976d2",
-          transition: "transform 0.2s linear",
+        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+        '& .MuiLinearProgress-bar': {
+          backgroundColor: '#1976d2',
+          transition: 'transform 0.2s linear',
         },
       }}
     />
   );
-}
+};
 
 export default NavigationProgress;

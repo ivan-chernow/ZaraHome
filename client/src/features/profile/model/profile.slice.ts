@@ -1,8 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { profileApi } from '@/entities/user/api/profile.api';
-import { ProfileDto, ChangeDeliveryAddressDto } from '@/entities/user/model/profile.types';
+import {
+  ProfileDto,
+  ChangeDeliveryAddressDto,
+} from '@/entities/user/model/profile.types';
 
-type ProfileView = 'my-orders' | 'delivery-address' | 'change-password' | 'change-email';
+type ProfileView =
+  | 'my-orders'
+  | 'delivery-address'
+  | 'change-password'
+  | 'change-email';
 
 interface ProfileState {
   activeView: ProfileView;

@@ -1,38 +1,44 @@
-import { IsString, IsOptional, IsNumber, IsPositive, IsBoolean, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsPositive,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SHARED_CONSTANTS } from '../shared.constants';
 
 export class CacheSetDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ключ кеша',
     example: 'user:123:profile',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @MaxLength(255)
   key: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Значение для кеширования',
-    example: { id: 123, name: 'John Doe' }
+    example: { id: 123, name: 'John Doe' },
   })
-  value: any;
+  value: unknown;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Префикс ключа',
     example: 'user',
-    maxLength: 50
+    maxLength: 50,
   })
   @IsOptional()
   @IsString()
   @MaxLength(50)
   prefix?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Время жизни в секундах',
     example: 3600,
     minimum: SHARED_CONSTANTS.CACHE.MIN_TTL,
-    maximum: SHARED_CONSTANTS.CACHE.MAX_TTL
+    maximum: SHARED_CONSTANTS.CACHE.MAX_TTL,
   })
   @IsOptional()
   @IsNumber()
@@ -41,19 +47,19 @@ export class CacheSetDto {
 }
 
 export class CacheGetDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ключ кеша',
     example: 'user:123:profile',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @MaxLength(255)
   key: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Префикс ключа',
     example: 'user',
-    maxLength: 50
+    maxLength: 50,
   })
   @IsOptional()
   @IsString()
@@ -62,19 +68,19 @@ export class CacheGetDto {
 }
 
 export class CacheDeleteDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ключ кеша для удаления',
     example: 'user:123:profile',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @MaxLength(255)
   key: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Префикс ключа',
     example: 'user',
-    maxLength: 50
+    maxLength: 50,
   })
   @IsOptional()
   @IsString()
@@ -83,10 +89,10 @@ export class CacheDeleteDto {
 }
 
 export class CacheDeleteByPrefixDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Префикс для удаления ключей',
     example: 'user:123',
-    maxLength: 100
+    maxLength: 100,
   })
   @IsString()
   @MaxLength(100)
@@ -94,29 +100,29 @@ export class CacheDeleteByPrefixDto {
 }
 
 export class CacheIncrementDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ключ счетчика',
     example: 'user:123:visits',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @MaxLength(255)
   key: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Префикс ключа',
     example: 'user',
-    maxLength: 50
+    maxLength: 50,
   })
   @IsOptional()
   @IsString()
   @MaxLength(50)
   prefix?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Значение для увеличения',
     example: 1,
-    default: 1
+    default: 1,
   })
   @IsOptional()
   @IsNumber()
@@ -125,100 +131,100 @@ export class CacheIncrementDto {
 }
 
 export class CacheResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Успешность операции',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Сообщение об операции',
-    example: 'Кеш успешно обновлен'
+    example: 'Кеш успешно обновлен',
   })
   message?: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Данные ответа'
+  @ApiPropertyOptional({
+    description: 'Данные ответа',
   })
-  data?: any;
+  data?: unknown;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Время выполнения операции в миллисекундах',
-    example: 15
+    example: 15,
   })
   executionTime: number;
 }
 
 export class CacheStatsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Общее количество ключей',
-    example: 1250
+    example: 1250,
   })
   totalKeys: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Процент попаданий в кеш',
-    example: 0.85
+    example: 0.85,
   })
   hitRate: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Процент промахов кеша',
-    example: 0.15
+    example: 0.15,
   })
   missRate: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Использование памяти в байтах',
-    example: 1048576
+    example: 1048576,
   })
   memoryUsage: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Среднее время жизни ключей в секундах',
-    example: 1800
+    example: 1800,
   })
   averageTTL: number;
 
-  @ApiPropertyOptional({ 
-    description: 'Самый старый ключ'
+  @ApiPropertyOptional({
+    description: 'Самый старый ключ',
   })
   oldestKey?: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Самый новый ключ'
+  @ApiPropertyOptional({
+    description: 'Самый новый ключ',
   })
   newestKey?: string;
 }
 
 export class CacheHealthDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Статус кеша',
     example: 'healthy',
-    enum: ['healthy', 'unhealthy', 'degraded']
+    enum: ['healthy', 'unhealthy', 'degraded'],
   })
   status: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Время последней проверки',
-    example: '2024-01-01T00:00:00.000Z'
+    example: '2024-01-01T00:00:00.000Z',
   })
   lastCheck: Date;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Время отклика в миллисекундах',
-    example: 5
+    example: 5,
   })
   responseTime: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Доступность кеша',
-    example: true
+    example: true,
   })
   isAvailable: boolean;
 
-  @ApiPropertyOptional({ 
-    description: 'Детали состояния'
+  @ApiPropertyOptional({
+    description: 'Детали состояния',
   })
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }

@@ -105,18 +105,24 @@ export const useModal = (options: ModalOptions = {}) => {
   }, [state.isOpen, openModal, closeModal]);
 
   // Обработка клика по overlay
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (closeOnOverlayClick && e.target === e.currentTarget) {
-      closeModal();
-    }
-  }, [closeOnOverlayClick, closeModal]);
+  const handleOverlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (closeOnOverlayClick && e.target === e.currentTarget) {
+        closeModal();
+      }
+    },
+    [closeOnOverlayClick, closeModal]
+  );
 
   // Обработка нажатия клавиш
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (closeOnEscape && e.key === 'Escape' && state.isOpen) {
-      closeModal();
-    }
-  }, [closeOnEscape, state.isOpen, closeModal]);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (closeOnEscape && e.key === 'Escape' && state.isOpen) {
+        closeModal();
+      }
+    },
+    [closeOnEscape, state.isOpen, closeModal]
+  );
 
   // Подписка на события клавиатуры
   useEffect(() => {
@@ -156,49 +162,55 @@ export const useModal = (options: ModalOptions = {}) => {
  * @param options - опции для всех модальных окон
  * @returns объект с методами управления модальными окнами
  */
-export const useMultipleModals = (
+export const useMultipleModals = () =>
   // modalIds: string[],
   // options: ModalOptions = {}
-) => {
-  const [openModals, setOpenModals] = useState<Set<string>>(new Set());
+  {
+    const [openModals, setOpenModals] = useState<Set<string>>(new Set());
 
-  const openModal = useCallback((modalId: string) => {
-    setOpenModals(prev => new Set([...prev, modalId]));
-  }, []);
+    const openModal = useCallback((modalId: string) => {
+      setOpenModals(prev => new Set([...prev, modalId]));
+    }, []);
 
-  const closeModal = useCallback((modalId: string) => {
-    setOpenModals(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(modalId);
-      return newSet;
-    });
-  }, []);
+    const closeModal = useCallback((modalId: string) => {
+      setOpenModals(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(modalId);
+        return newSet;
+      });
+    }, []);
 
-  const closeAllModals = useCallback(() => {
-    setOpenModals(new Set());
-  }, []);
+    const closeAllModals = useCallback(() => {
+      setOpenModals(new Set());
+    }, []);
 
-  const isModalOpen = useCallback((modalId: string) => {
-    return openModals.has(modalId);
-  }, [openModals]);
+    const isModalOpen = useCallback(
+      (modalId: string) => {
+        return openModals.has(modalId);
+      },
+      [openModals]
+    );
 
-  const toggleModal = useCallback((modalId: string) => {
-    if (isModalOpen(modalId)) {
-      closeModal(modalId);
-    } else {
-      openModal(modalId);
-    }
-  }, [isModalOpen, openModal, closeModal]);
+    const toggleModal = useCallback(
+      (modalId: string) => {
+        if (isModalOpen(modalId)) {
+          closeModal(modalId);
+        } else {
+          openModal(modalId);
+        }
+      },
+      [isModalOpen, openModal, closeModal]
+    );
 
-  return {
-    openModals: Array.from(openModals),
-    openModal,
-    closeModal,
-    closeAllModals,
-    isModalOpen,
-    toggleModal,
+    return {
+      openModals: Array.from(openModals),
+      openModal,
+      closeModal,
+      closeAllModals,
+      isModalOpen,
+      toggleModal,
+    };
   };
-};
 
 /**
  * Хук для анимации модального окна

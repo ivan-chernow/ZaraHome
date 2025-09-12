@@ -1,5 +1,15 @@
-import { IsString, IsNumber, IsBoolean, IsArray, IsOptional, IsPositive, IsDateString, Min, Max } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsArray,
+  IsOptional,
+  IsPositive,
+  IsDateString,
+  Min,
+  Max,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -11,13 +21,23 @@ export class CreateProductDto {
   @IsString()
   name_ru: string;
 
-  @ApiProperty({ type: [String], required: false, example: ['url1.jpg', 'url2.jpg'], description: 'Ссылки на изображения (может отсутствовать при загрузке файлов)' })
+  @ApiProperty({
+    type: [String],
+    required: false,
+    example: ['url1.jpg', 'url2.jpg'],
+    description:
+      'Ссылки на изображения (может отсутствовать при загрузке файлов)',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   img?: string[];
 
-  @ApiProperty({ type: [String], example: ['black', 'white'], description: 'Цвета товара' })
+  @ApiProperty({
+    type: [String],
+    example: ['black', 'white'],
+    description: 'Цвета товара',
+  })
   @IsArray()
   @IsString({ each: true })
   @Transform(({ value }) => {
@@ -32,7 +52,15 @@ export class CreateProductDto {
   })
   colors: string[];
 
-  @ApiProperty({ type: 'array', items: { type: 'object', properties: { size: { type: 'string' }, price: { type: 'number' } } }, example: [{ size: 'M', price: 1000 }], description: 'Размеры и цены' })
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: { size: { type: 'string' }, price: { type: 'number' } },
+    },
+    example: [{ size: 'M', price: 1000 }],
+    description: 'Размеры и цены',
+  })
   @IsArray()
   @Transform(({ value }) => {
     if (typeof value === 'string') {
@@ -64,7 +92,11 @@ export class CreateProductDto {
   })
   isNew: boolean;
 
-  @ApiProperty({ example: 10, required: false, description: 'Скидка в % (0-100)' })
+  @ApiProperty({
+    example: 10,
+    required: false,
+    description: 'Скидка в % (0-100)',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -116,4 +148,4 @@ export class CreateProductDto {
     return value;
   })
   typeId?: number;
-} 
+}

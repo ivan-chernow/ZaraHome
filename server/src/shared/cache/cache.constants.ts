@@ -4,11 +4,11 @@ export const CACHE_TTL = {
   CATALOG: 3600, // 1 час
   CATEGORIES: 7200, // 2 часа
   PRODUCTS: 1800, // 30 минут
-  
+
   // Изображения (изменяются при обновлении продукта)
   IMAGES: 86400, // 1 день
   THUMBNAILS: 86400, // 1 день
-  
+
   // Пользовательские данные (изменяются часто)
   USER_CART: 1800, // 30 минут
   USER_FAVORITES: 3600, // 1 час
@@ -16,15 +16,15 @@ export const CACHE_TTL = {
   USER: 1800, // 30 минут
   USER_ADDRESSES: 600, // 10 минут
   ORDERS: 1800, // 30 минут
-  
+
   // Справочники (изменяются редко)
   PROMOCODES: 900, // 15 минут
   DELIVERY_OPTIONS: 7200, // 2 часа
-  
+
   // Временные данные
   SESSION: 1800, // 30 минут
   RATE_LIMIT: 60, // 1 минута
-  
+
   // Поиск и статистика
   SEARCH: 900, // 15 минут
   SEARCH_RESULTS: 300, // 5 минут
@@ -56,23 +56,23 @@ export const CACHE_KEYS = {
   CATEGORY_BY_ID: 'by-id',
   SUB_CATEGORIES: 'sub-categories',
   TYPES: 'types',
-  
+
   // Продукты
   ALL_PRODUCTS: 'all',
   PRODUCT_BY_ID: 'by-id',
   NEW_PRODUCTS: 'new',
   DISCOUNTED_PRODUCTS: 'discounted',
   PRODUCTS_BY_CATEGORY: 'by-category',
-  
+
   // Изображения
   PRODUCT_IMAGES: 'product',
   THUMBNAIL: 'thumb',
-  
+
   // Пользователи
   USER_CART: 'user',
   USER_FAVORITES: 'user',
   USER_PROFILE: 'user',
-  
+
   // Справочники
   ACTIVE_PROMOCODES: 'active',
   DELIVERY_OPTIONS: 'options',

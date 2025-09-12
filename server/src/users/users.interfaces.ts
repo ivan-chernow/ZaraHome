@@ -1,6 +1,6 @@
 import { User } from './user/entity/user.entity';
 import { DeliveryAddress } from './user/entity/delivery-address.entity';
-import { CreateUserDto, UpdateUserDto, SearchUsersDto } from './user/dto';
+import { CreateUserDto, UpdateUserDto } from './user/dto';
 
 // Интерфейс для ответа с пагинацией
 export interface PaginatedResponse<T> {
@@ -96,8 +96,17 @@ export interface IUserService {
   updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User>;
   deleteUser(id: number): Promise<void>;
   getUserProfile(userId: number): Promise<User>;
-  changePassword(userId: number, currentPassword: string, newPassword: string): Promise<{ message: string }>;
-  changeEmail(userId: number, currentEmail: string, newEmail: string, password: string): Promise<{ message: string }>;
+  changePassword(
+    userId: number,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ message: string }>;
+  changeEmail(
+    userId: number,
+    currentEmail: string,
+    newEmail: string,
+    password: string
+  ): Promise<{ message: string }>;
   getUserStatistics(): Promise<UserStatistics>;
   searchUsers(filters: UserSearchFilters): Promise<UserSearchResponse>;
   updateUserStatus(userId: number, status: string): Promise<User>;
@@ -109,10 +118,20 @@ export interface IUserService {
 
 // Интерфейс для сервиса адресов доставки
 export interface IDeliveryAddressService {
-  createAddress(userId: number, addressData: Partial<DeliveryAddress>): Promise<DeliveryAddress>;
-  findAllByUser(userId: number, filters?: AddressFilters): Promise<DeliveryAddress[]>;
+  createAddress(
+    userId: number,
+    addressData: Partial<DeliveryAddress>
+  ): Promise<DeliveryAddress>;
+  findAllByUser(
+    userId: number,
+    filters?: AddressFilters
+  ): Promise<DeliveryAddress[]>;
   findOne(id: number, userId: number): Promise<DeliveryAddress | null>;
-  updateAddress(id: number, userId: number, addressData: Partial<DeliveryAddress>): Promise<DeliveryAddress>;
+  updateAddress(
+    id: number,
+    userId: number,
+    addressData: Partial<DeliveryAddress>
+  ): Promise<DeliveryAddress>;
   deleteAddress(id: number, userId: number): Promise<void>;
   setDefaultAddress(id: number, userId: number): Promise<void>;
   getDefaultAddress(userId: number): Promise<DeliveryAddress | null>;

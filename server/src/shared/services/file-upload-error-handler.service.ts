@@ -1,6 +1,4 @@
-import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
-import { join } from 'path';
-import * as fs from 'fs/promises';
+import { Injectable, Logger } from '@nestjs/common';
 import { ImageOptimizationService } from './image-optimization.service';
 
 export interface UploadError {
@@ -21,7 +19,7 @@ export class FileUploadErrorHandlerService {
   private readonly logger = new Logger(FileUploadErrorHandlerService.name);
 
   constructor(
-    private readonly imageOptimizationService: ImageOptimizationService,
+    private readonly imageOptimizationService: ImageOptimizationService
   ) {}
 
   /**
@@ -37,20 +35,25 @@ export class FileUploadErrorHandlerService {
     for (const file of files) {
       try {
         this.logger.log(`Начинаем обработку файла: ${file.originalname}`);
-        
+
         const filePath = await uploadFunction(file);
         uploadedFiles.push(filePath);
-        
+
         results.push({
           success: true,
           filePath,
           originalName: file.originalname,
         });
 
-        this.logger.log(`Файл успешно обработан: ${file.originalname} -> ${filePath}`);
+        this.logger.log(
+          `Файл успешно обработан: ${file.originalname} -> ${filePath}`
+        );
       } catch (error) {
-        this.logger.error(`Ошибка обработки файла ${file.originalname}:`, error.message);
-        
+        this.logger.error(
+          `Ошибка обработки файла ${file.originalname}:`,
+          error.message
+        );
+
         // Graceful fallback - продолжаем обработку других файлов
         results.push({
           success: false,
@@ -81,18 +84,21 @@ export class FileUploadErrorHandlerService {
       for (const file of files) {
         try {
           this.logger.log(`Обработка файла: ${file.originalname}`);
-          
+
           const filePath = await uploadFunction(file);
           uploadedFiles.push(filePath);
-          
+
           results.push({
             success: true,
             filePath,
             originalName: file.originalname,
           });
         } catch (error) {
-          this.logger.error(`Ошибка обработки файла ${file.originalname}:`, error.message);
-          
+          this.logger.error(
+            `Ошибка обработки файла ${file.originalname}:`,
+            error.message
+          );
+
           results.push({
             success: false,
             error: error.message,
@@ -107,13 +113,15 @@ export class FileUploadErrorHandlerService {
 
       if (successRate < criticalErrorThreshold) {
         // Критическая ошибка - удаляем все загруженные файлы
-        this.logger.warn(`Критическая ошибка: только ${Math.round(successRate * 100)}% файлов обработано успешно`);
+        this.logger.warn(
+          `Критическая ошибка: только ${Math.round(successRate * 100)}% файлов обработано успешно`
+        );
         await this.cleanupPartialUploads(uploadedFiles);
-        
+
         return {
           success: false,
           results,
-          error: `Критическая ошибка загрузки. Успешно обработано только ${successCount} из ${files.length} файлов.`
+          error: `Критическая ошибка загрузки. Успешно обработано только ${successCount} из ${files.length} файлов.`,
         };
       }
 
@@ -125,11 +133,11 @@ export class FileUploadErrorHandlerService {
       // Общая ошибка - удаляем все файлы
       this.logger.error('Общая ошибка при загрузке файлов:', error.message);
       await this.cleanupPartialUploads(uploadedFiles);
-      
+
       return {
         success: false,
         results,
-        error: `Общая ошибка загрузки: ${error.message}`
+        error: `Общая ошибка загрузки: ${error.message}`,
       };
     }
   }
@@ -144,7 +152,7 @@ export class FileUploadErrorHandlerService {
 
     this.logger.log(`Начинаем очистку ${filePaths.length} неполных файлов`);
 
-    const cleanupPromises = filePaths.map(async (filePath) => {
+    const cleanupPromises = filePaths.map(async filePath => {
       try {
         await this.imageOptimizationService.deleteImage(filePath);
         this.logger.log(`Удален неполный файл: ${filePath}`);
@@ -160,19 +168,28 @@ export class FileUploadErrorHandlerService {
   /**
    * Валидация файла с graceful fallback
    */
-  async validateFileWithFallback(file: Express.Multer.File): Promise<{ valid: boolean; error?: string }> {
+  async validateFileWithFallback(
+    file: Express.Multer.File
+  ): Promise<{ valid: boolean; error?: string }> {
     try {
       // Проверяем размер файла
       if (file.size === 0) {
         return { valid: false, error: 'Файл пустой' };
       }
 
-      if (file.size > 10 * 1024 * 1024) { // 10MB
+      if (file.size > 10 * 1024 * 1024) {
+        // 10MB
         return { valid: false, error: 'Файл слишком большой (максимум 10MB)' };
       }
 
       // Проверяем MIME тип
-      const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const allowedMimeTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+      ];
       if (!allowedMimeTypes.includes(file.mimetype)) {
         return { valid: false, error: 'Неподдерживаемый тип файла' };
       }
@@ -186,7 +203,10 @@ export class FileUploadErrorHandlerService {
 
       return { valid: true };
     } catch (error) {
-      this.logger.error(`Ошибка валидации файла ${file.originalname}:`, error.message);
+      this.logger.error(
+        `Ошибка валидации файла ${file.originalname}:`,
+        error.message
+      );
       return { valid: false, error: 'Ошибка валидации файла' };
     }
   }
@@ -203,10 +223,12 @@ export class FileUploadErrorHandlerService {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        this.logger.log(`Попытка ${attempt}/${maxRetries} обработки файла: ${file.originalname}`);
-        
+        this.logger.log(
+          `Попытка ${attempt}/${maxRetries} обработки файла: ${file.originalname}`
+        );
+
         const filePath = await processFunction(file);
-        
+
         return {
           success: true,
           filePath,
@@ -214,11 +236,16 @@ export class FileUploadErrorHandlerService {
         };
       } catch (error) {
         lastError = error as Error;
-        this.logger.warn(`Попытка ${attempt} не удалась для файла ${file.originalname}:`, error.message);
-        
+        this.logger.warn(
+          `Попытка ${attempt} не удалась для файла ${file.originalname}:`,
+          error.message
+        );
+
         if (attempt < maxRetries) {
           // Ждем перед следующей попыткой (экспоненциальная задержка)
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.pow(2, attempt) * 1000)
+          );
         }
       }
     }
@@ -244,7 +271,10 @@ export class FileUploadErrorHandlerService {
     const successful = results.filter(r => r.success).length;
     const failed = total - successful;
     const successRate = total > 0 ? successful / total : 0;
-    const errors = results.filter(r => !r.success).map(r => r.error).filter((error): error is string => Boolean(error));
+    const errors = results
+      .filter(r => !r.success)
+      .map(r => r.error)
+      .filter((error): error is string => Boolean(error));
 
     return {
       total,

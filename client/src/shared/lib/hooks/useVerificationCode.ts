@@ -29,7 +29,10 @@ export const useVerificationCode = (length: number = 6) => {
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === 'Backspace' && !code[index] && index > 0) {
       codeRefs.current[index - 1]?.focus();
     }
@@ -41,6 +44,6 @@ export const useVerificationCode = (length: number = 6) => {
     codeRefs,
     handleInputChange,
     handlePaste,
-    handleKeyDown
+    handleKeyDown,
   };
-}; 
+};

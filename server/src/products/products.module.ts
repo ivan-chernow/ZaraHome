@@ -14,9 +14,16 @@ import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product, Category, SubCategory, Type, Cart, Favorite]), 
+    TypeOrmModule.forFeature([
+      Product,
+      Category,
+      SubCategory,
+      Type,
+      Cart,
+      Favorite,
+    ]),
     SharedModule,
-    AppCacheModule
+    AppCacheModule,
   ],
   providers: [ProductsService, ProductsRepository],
   controllers: [ProductsController],

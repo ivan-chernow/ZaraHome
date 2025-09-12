@@ -1,7 +1,3 @@
-/**
- * Константы для Email модуля
- */
-
 export const EMAIL_CONSTANTS = {
   // Retry настройки
   MAX_RETRY_ATTEMPTS: 3,
@@ -21,7 +17,8 @@ export const EMAIL_CONSTANTS = {
     INVALID_SUBJECT: 'Тема письма не может быть пустой',
     INVALID_TEMPLATE: 'Неверный шаблон письма',
     TEMPLATE_NOT_FOUND: 'Шаблон не найден',
-    MISSING_REQUIRED_FIELD: (field: string) => `Отсутствует обязательное поле: ${field}`,
+    MISSING_REQUIRED_FIELD: (field: string) =>
+      `Отсутствует обязательное поле: ${field}`,
     SEND_FAILED: 'Ошибка при отправке письма: ',
     RATE_LIMIT_EXCEEDED: 'Превышен лимит отправки писем. Попробуйте позже',
     SERVICE_NOT_CONFIGURED: 'Email сервис не настроен',
@@ -49,9 +46,6 @@ export const EMAIL_CONSTANTS = {
   },
 } as const;
 
-/**
- * Типы для Email модуля
- */
 export const EMAIL_TYPES = {
   // Статусы отправки
   SEND_STATUS: {

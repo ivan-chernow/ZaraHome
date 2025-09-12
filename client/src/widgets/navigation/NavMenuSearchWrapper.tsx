@@ -1,11 +1,11 @@
-"use client";
-import React, { useState, useMemo, useEffect } from "react";
-import SearchInput from "../../features/search/ui/SearchInput";
-import SearchResults from "../search/SearchResults";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import type { Product } from "@/entities/product/api/products.api";
-import useDebounce from "@/shared/lib/hooks/useDebounce";
+'use client';
+import React, { useState, useMemo, useEffect } from 'react';
+import SearchInput from '../../features/search/ui/SearchInput';
+import SearchResults from '../search/SearchResults';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import type { Product } from '@/entities/product/api/products.api';
+import useDebounce from '@/shared/lib/hooks/useDebounce';
 
 interface NavMenuSearchWrapperProps {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ const NavMenuSearchWrapper: React.FC<NavMenuSearchWrapperProps> = ({
   children,
   alwaysShowChildren = false,
 }) => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const debouncedSearchValue = useDebounce(searchValue, 500);
   const { data: categories, isLoading } = useGetCatalogQuery();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -28,13 +28,13 @@ const NavMenuSearchWrapper: React.FC<NavMenuSearchWrapperProps> = ({
   useEffect(() => {
     if (debouncedSearchValue.trim()) {
       const lowercasedValue = debouncedSearchValue.toLowerCase();
-      const results = allProducts.filter((product) => {
-        const nameRuWords = product.name_ru.toLowerCase().split(" ");
-        const nameEngWords = product.name_eng.toLowerCase().split(" ");
+      const results = allProducts.filter(product => {
+        const nameRuWords = product.name_ru.toLowerCase().split(' ');
+        const nameEngWords = product.name_eng.toLowerCase().split(' ');
 
         return (
-          nameRuWords.some((word) => word.startsWith(lowercasedValue)) ||
-          nameEngWords.some((word) => word.startsWith(lowercasedValue))
+          nameRuWords.some(word => word.startsWith(lowercasedValue)) ||
+          nameEngWords.some(word => word.startsWith(lowercasedValue))
         );
       });
       setFilteredProducts(results);

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -10,13 +14,20 @@ import { UserRole } from 'src/shared/shared.interfaces';
 
 @Injectable()
 export class RegistrationService {
+  private readonly userRepository: Repository<User>;
+  private readonly verificationRepository: Repository<EmailVerification>;
+  private readonly emailService: EmailService;
+
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(User) userRepository: Repository<User>,
     @InjectRepository(EmailVerification)
-    private readonly verificationRepository: Repository<EmailVerification>,
-    private readonly emailService: EmailService,
-  ) {}
+    verificationRepository: Repository<EmailVerification>,
+    emailService: EmailService
+  ) {
+    this.userRepository = userRepository;
+    this.verificationRepository = verificationRepository;
+    this.emailService = emailService;
+  }
 
   private generateSixDigitCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -31,10 +42,10 @@ export class RegistrationService {
   }
 
   private async checkExistingUser(email: string): Promise<void> {
-    const existingUser = await this.userRepository.findOne({ 
-      where: { email, isEmailVerified: true } 
+    const existingUser = await this.userRepository.findOne({
+      where: { email, isEmailVerified: true },
     });
-    
+
     if (existingUser) {
       throw new ConflictException('Пользователь с таким email уже существует');
     }
@@ -43,11 +54,12 @@ export class RegistrationService {
   private async checkRateLimit(email: string): Promise<void> {
     const lastVerification = await this.verificationRepository.findOne({
       where: { email },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
 
     if (lastVerification) {
-      const timeSinceLastAttempt = Date.now() - lastVerification.createdAt.getTime();
+      const timeSinceLastAttempt =
+        Date.now() - lastVerification.createdAt.getTime();
       const minutesSinceLastAttempt = timeSinceLastAttempt / (1000 * 60);
 
       if (minutesSinceLastAttempt < 5) {
@@ -64,53 +76,56 @@ export class RegistrationService {
     await this.checkRateLimit(email);
 
     await this.verificationRepository.delete({ email });
-    
+
     const code = this.generateSixDigitCode();
     const token = this.generateSessionToken();
     const expiresAt = this.calculateExpirationTime(5);
     const createdAt = new Date();
-    
-    await this.verificationRepository.save({ 
-      email, 
-      code, 
-      token, 
-      expiresAt, 
-      createdAt 
+
+    await this.verificationRepository.save({
+      email,
+      code,
+      token,
+      expiresAt,
+      createdAt,
     });
-    
+
     await this.emailService.sendVerificationCodeEmail(email, code);
   }
 
   async verifyByCode(email: string, code: string): Promise<string> {
-    const verification = await this.verificationRepository.findOne({ 
-      where: { email, code } 
+    const verification = await this.verificationRepository.findOne({
+      where: { email, code },
     });
-    
+
     if (!verification || verification.expiresAt < new Date()) {
       throw new BadRequestException('Неверный или просроченный код');
     }
 
     verification.isVerified = true;
     await this.verificationRepository.save(verification);
-    
+
     return verification.token;
   }
 
-  async completeRegistration(sessionToken: string, password: string): Promise<User> {
-    const verification = await this.verificationRepository.findOne({ 
-      where: { token: sessionToken, isVerified: true } 
+  async completeRegistration(
+    sessionToken: string,
+    password: string
+  ): Promise<User> {
+    const verification = await this.verificationRepository.findOne({
+      where: { token: sessionToken, isVerified: true },
     });
-    
+
     if (!verification) {
       throw new BadRequestException('Неверный или просроченный токен сессии');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    let user = await this.userRepository.findOne({ 
-      where: { email: verification.email } 
+
+    let user = await this.userRepository.findOne({
+      where: { email: verification.email },
     });
-    
+
     if (!user) {
       user = this.userRepository.create({
         email: verification.email,
@@ -122,11 +137,11 @@ export class RegistrationService {
       user.password = hashedPassword;
       user.isEmailVerified = true;
     }
-    
+
     await this.userRepository.save(user);
     await this.verificationRepository.remove(verification);
     await this.emailService.sendWelcomeUser(user.email);
-    
+
     return user;
   }
 }

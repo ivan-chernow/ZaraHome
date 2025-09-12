@@ -1,13 +1,22 @@
-import { IsString, IsOptional, IsNumber, IsPositive, IsBoolean, MaxLength, MinLength, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsPositive,
+  IsBoolean,
+  MaxLength,
+  MinLength,
+  IsArray,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SHARED_CONSTANTS } from '../shared.constants';
 
 export class GenerateRandomStringDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Длина генерируемой строки',
     example: 16,
     minimum: 1,
-    maximum: 1000
+    maximum: 1000,
   })
   @IsNumber()
   @IsPositive()
@@ -15,28 +24,28 @@ export class GenerateRandomStringDto {
   @MaxLength(1000)
   length: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Использовать только буквы и цифры',
     example: true,
-    default: true
+    default: true,
   })
   @IsOptional()
   @IsBoolean()
   alphanumericOnly?: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Использовать специальные символы',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
   includeSpecialChars?: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Использовать заглавные буквы',
     example: true,
-    default: true
+    default: true,
   })
   @IsOptional()
   @IsBoolean()
@@ -44,28 +53,28 @@ export class GenerateRandomStringDto {
 }
 
 export class HashStringDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Строка для хеширования',
     example: 'mySecretPassword123',
-    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH
+    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH,
   })
   @IsString()
   @MaxLength(SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH)
   value: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Алгоритм хеширования',
     example: 'sha256',
     enum: ['md5', 'sha1', 'sha256', 'sha512'],
-    default: 'sha256'
+    default: 'sha256',
   })
   @IsOptional()
   @IsString()
   algorithm?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Соль для хеширования',
-    example: 'randomSalt123'
+    example: 'randomSalt123',
   })
   @IsOptional()
   @IsString()
@@ -73,23 +82,23 @@ export class HashStringDto {
 }
 
 export class CompareHashDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Исходное значение',
-    example: 'mySecretPassword123'
+    example: 'mySecretPassword123',
   })
   @IsString()
   originalValue: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Хеш для сравнения',
-    example: 'a1b2c3d4e5f6...'
+    example: 'a1b2c3d4e5f6...',
   })
   @IsString()
   hash: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Алгоритм хеширования',
-    example: 'sha256'
+    example: 'sha256',
   })
   @IsOptional()
   @IsString()
@@ -97,28 +106,28 @@ export class CompareHashDto {
 }
 
 export class FormatBytesDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество байт для форматирования',
-    example: 1048576
+    example: 1048576,
   })
   @IsNumber()
   @IsPositive()
   bytes: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Количество знаков после запятой',
     example: 2,
-    default: 2
+    default: 2,
   })
   @IsOptional()
   @IsNumber()
   @IsPositive()
   decimals?: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Использовать бинарные префиксы (KiB, MiB)',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -126,28 +135,28 @@ export class FormatBytesDto {
 }
 
 export class FormatDurationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Длительность в миллисекундах',
-    example: 3661000
+    example: 3661000,
   })
   @IsNumber()
   @IsPositive()
   milliseconds: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Формат вывода',
     example: 'human',
     enum: ['short', 'long', 'human'],
-    default: 'human'
+    default: 'human',
   })
   @IsOptional()
   @IsString()
   format?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Показывать нулевые значения',
     example: false,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -155,11 +164,11 @@ export class FormatDurationDto {
 }
 
 export class SleepDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Время ожидания в миллисекундах',
     example: 1000,
     minimum: 1,
-    maximum: 60000
+    maximum: 60000,
   })
   @IsNumber()
   @IsPositive()
@@ -169,18 +178,18 @@ export class SleepDto {
 }
 
 export class RetryDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Функция для повторного выполнения',
-    example: 'async function() { return await apiCall(); }'
+    example: 'async function() { return await apiCall(); }',
   })
   @IsString()
   functionName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество попыток',
     example: 3,
     minimum: 1,
-    maximum: 10
+    maximum: 10,
   })
   @IsNumber()
   @IsPositive()
@@ -188,11 +197,11 @@ export class RetryDto {
   @MaxLength(10)
   attempts: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Задержка между попытками в миллисекундах',
     example: 1000,
     minimum: 100,
-    maximum: 30000
+    maximum: 30000,
   })
   @IsNumber()
   @IsPositive()
@@ -200,18 +209,18 @@ export class RetryDto {
   @MaxLength(30000)
   delay: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Увеличивать задержку экспоненциально',
     example: true,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
   exponential?: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Максимальная задержка в миллисекундах',
-    example: 10000
+    example: 10000,
   })
   @IsOptional()
   @IsNumber()
@@ -220,38 +229,38 @@ export class RetryDto {
 }
 
 export class UtilityResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Успешность операции',
-    example: true
+    example: true,
   })
   success: boolean;
 
-  @ApiPropertyOptional({ 
-    description: 'Результат операции'
+  @ApiPropertyOptional({
+    description: 'Результат операции',
   })
   result?: any;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Сообщение об операции',
-    example: 'Строка успешно сгенерирована'
+    example: 'Строка успешно сгенерирована',
   })
   message?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Время выполнения операции в миллисекундах',
-    example: 5
+    example: 5,
   })
   executionTime: number;
 
-  @ApiPropertyOptional({ 
-    description: 'Дополнительные метаданные'
+  @ApiPropertyOptional({
+    description: 'Дополнительные метаданные',
   })
   metadata?: Record<string, any>;
 }
 
 export class BulkUtilityDto {
-  @ApiProperty({ 
-    description: 'Массив операций для выполнения'
+  @ApiProperty({
+    description: 'Массив операций для выполнения',
   })
   @IsArray()
   operations: {
@@ -260,19 +269,19 @@ export class BulkUtilityDto {
     options?: Record<string, any>;
   }[];
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Выполнять операции параллельно',
     example: true,
-    default: false
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
   parallel?: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Максимальное количество параллельных операций',
     example: 5,
-    default: 3
+    default: 3,
   })
   @IsOptional()
   @IsNumber()
@@ -281,37 +290,37 @@ export class BulkUtilityDto {
 }
 
 export class BulkUtilityResultDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Общий результат операций',
-    example: true
+    example: true,
   })
   overallSuccess: boolean;
 
-  @ApiProperty({ 
-    description: 'Результаты каждой операции'
+  @ApiProperty({
+    description: 'Результаты каждой операции',
   })
   results: UtilityResponseDto[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество успешных операций',
-    example: 8
+    example: 8,
   })
   successCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество неуспешных операций',
-    example: 2
+    example: 2,
   })
   failureCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Общее время выполнения в миллисекундах',
-    example: 150
+    example: 150,
   })
   totalExecutionTime: number;
 
-  @ApiPropertyOptional({ 
-    description: 'Детали выполнения'
+  @ApiPropertyOptional({
+    description: 'Детали выполнения',
   })
   details?: Record<string, any>;
 }

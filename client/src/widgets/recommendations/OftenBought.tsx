@@ -1,9 +1,9 @@
-import React, { useMemo } from "react";
-import Container from "@mui/material/Container";
-import ProductCard from "@/entities/product/ui/ProductCard";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import CircularProgress from "@mui/material/CircularProgress";
+import React, { useMemo } from 'react';
+import Container from '@mui/material/Container';
+import ProductCard from '@/entities/product/ui/ProductCard';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const OftenBought: React.FC = () => {
   const { data: categories, isLoading, error } = useGetCatalogQuery();
@@ -41,7 +41,7 @@ const OftenBought: React.FC = () => {
           Часто с этим товаром покупают
         </h2>
         <ul className="flex  items-center justify-center mb-[60px]">
-          {randomProducts.map((product) => (
+          {randomProducts.map(product => (
             <ProductCard
               key={product.id}
               product={product}

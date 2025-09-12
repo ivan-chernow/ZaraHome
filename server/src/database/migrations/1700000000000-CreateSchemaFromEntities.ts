@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateSchemaFromEntities1700000000000 implements MigrationInterface {
+export class CreateSchemaFromEntities1700000000000
+  implements MigrationInterface
+{
   name = 'CreateSchemaFromEntities1700000000000';
 
   async up(queryRunner: QueryRunner): Promise<void> {
@@ -8,7 +10,7 @@ export class CreateSchemaFromEntities1700000000000 implements MigrationInterface
     await queryRunner.query(`
       CREATE TYPE "public"."user_role_enum" AS ENUM('USER', 'ADMIN')
     `);
-    
+
     await queryRunner.query(`
       CREATE TYPE "public"."order_status_enum" AS ENUM('PENDING', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED')
     `);
@@ -234,13 +236,27 @@ export class CreateSchemaFromEntities1700000000000 implements MigrationInterface
     `);
 
     // Создаём индексы для производительности
-    await queryRunner.query(`CREATE INDEX "IDX_users_email" ON "users" ("email")`);
-    await queryRunner.query(`CREATE INDEX "IDX_products_category" ON "products" ("category_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_products_sub_category" ON "products" ("sub_category_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_orders_user_status" ON "orders" ("user_id", "status")`);
-    await queryRunner.query(`CREATE INDEX "IDX_cart_user_product" ON "cart" ("user_id", "product_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_favorites_user_product" ON "favorites" ("user_id", "product_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_promocodes_code" ON "promocodes" ("code")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_users_email" ON "users" ("email")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_products_category" ON "products" ("category_id")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_products_sub_category" ON "products" ("sub_category_id")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_orders_user_status" ON "orders" ("user_id", "status")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_cart_user_product" ON "cart" ("user_id", "product_id")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_favorites_user_product" ON "favorites" ("user_id", "product_id")`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_promocodes_code" ON "promocodes" ("code")`
+    );
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
@@ -254,18 +270,42 @@ export class CreateSchemaFromEntities1700000000000 implements MigrationInterface
     await queryRunner.query(`DROP INDEX "IDX_promocodes_code"`);
 
     // Удаляем внешние ключи
-    await queryRunner.query(`ALTER TABLE "delivery_addresses" DROP CONSTRAINT "FK_delivery_addresses_user"`);
-    await queryRunner.query(`ALTER TABLE "refresh_tokens" DROP CONSTRAINT "FK_refresh_tokens_user"`);
-    await queryRunner.query(`ALTER TABLE "favorites" DROP CONSTRAINT "FK_favorites_product"`);
-    await queryRunner.query(`ALTER TABLE "favorites" DROP CONSTRAINT "FK_favorites_user"`);
-    await queryRunner.query(`ALTER TABLE "cart" DROP CONSTRAINT "FK_cart_product"`);
-    await queryRunner.query(`ALTER TABLE "cart" DROP CONSTRAINT "FK_cart_user"`);
-    await queryRunner.query(`ALTER TABLE "orders" DROP CONSTRAINT "FK_orders_user"`);
-    await queryRunner.query(`ALTER TABLE "products" DROP CONSTRAINT "FK_products_type"`);
-    await queryRunner.query(`ALTER TABLE "products" DROP CONSTRAINT "FK_products_sub_category"`);
-    await queryRunner.query(`ALTER TABLE "products" DROP CONSTRAINT "FK_products_category"`);
-    await queryRunner.query(`ALTER TABLE "types" DROP CONSTRAINT "FK_types_sub_category"`);
-    await queryRunner.query(`ALTER TABLE "sub_categories" DROP CONSTRAINT "FK_sub_categories_category"`);
+    await queryRunner.query(
+      `ALTER TABLE "delivery_addresses" DROP CONSTRAINT "FK_delivery_addresses_user"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "refresh_tokens" DROP CONSTRAINT "FK_refresh_tokens_user"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "favorites" DROP CONSTRAINT "FK_favorites_product"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "favorites" DROP CONSTRAINT "FK_favorites_user"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "cart" DROP CONSTRAINT "FK_cart_product"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "cart" DROP CONSTRAINT "FK_cart_user"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "orders" DROP CONSTRAINT "FK_orders_user"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "products" DROP CONSTRAINT "FK_products_type"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "products" DROP CONSTRAINT "FK_products_sub_category"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "products" DROP CONSTRAINT "FK_products_category"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "types" DROP CONSTRAINT "FK_types_sub_category"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "sub_categories" DROP CONSTRAINT "FK_sub_categories_category"`
+    );
 
     // Удаляем таблицы в обратном порядке
     await queryRunner.query(`DROP TABLE "delivery_addresses"`);

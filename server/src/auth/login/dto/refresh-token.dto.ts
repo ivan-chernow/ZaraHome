@@ -6,5 +6,3 @@ export class RefreshTokenDto {
   @IsNotEmpty({ message: 'Refresh token не может быть пустым' })
   refreshToken?: string;
 }
-
-

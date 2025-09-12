@@ -1,5 +1,5 @@
-import { Container } from "@mui/material";
-import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
+import { Container } from '@mui/material';
+import NavMenuSearchWrapper from './NavMenuSearchWrapper';
 
 const NavMenuOpenInformation = () => {
   return (

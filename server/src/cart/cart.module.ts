@@ -15,7 +15,7 @@ import { AppCacheModule } from '../shared/cache/cache.module';
     UsersModule,
     ProductsModule,
     SharedModule,
-    AppCacheModule
+    AppCacheModule,
   ],
   providers: [CartService, CartRepository],
   controllers: [CartController],

@@ -1,6 +1,5 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @import './normalize.css';
-
 
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
@@ -17,24 +16,24 @@ input[type='number']::-webkit-inner-spin-button {
   opacity: 1 !important;
 }
 body {
-    background: white;
-    font-size: 16px;
-    font-weight: 400;
-    color: black;
-    scroll-behavior: smooth;
-    font-family: var(--font-ysabeau);
+  background: white;
+  font-size: 16px;
+  font-weight: 400;
+  color: black;
+  scroll-behavior: smooth;
+  font-family: var(--font-ysabeau);
 }
 
 .font-inter {
-    font-family: var(--font-inter);
+  font-family: var(--font-inter);
 }
 
 .font-roboto {
-    font-family: var(--font-roboto);
+  font-family: var(--font-roboto);
 }
 
 .font-ysabeau {
-    font-family: var(--font-ysabeau);
+  font-family: var(--font-ysabeau);
 }
 
 /* Hide scrollbars visually but keep scrolling */
@@ -43,7 +42,7 @@ body {
 }
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none;    /* Firefox */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Minimal Scrollbar Styles */
@@ -82,7 +81,3 @@ body {
 html {
   scroll-behavior: smooth;
 }
-
-
-
-

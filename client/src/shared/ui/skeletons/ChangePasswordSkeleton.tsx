@@ -6,7 +6,7 @@ const ChangePasswordSkeleton: React.FC = () => {
       <div className="max-w-[1200px] mx-auto p-6">
         <div className="flex flex-col items-center">
           <div className="h-[42px] bg-gray-200 rounded w-[300px] mb-[37px]"></div>
-          
+
           {/* Секция смены пароля */}
           <div className="flex items-center mb-[28px]">
             <div className="h-[20px] bg-gray-200 rounded w-[180px] mr-[5px]"></div>

@@ -1,17 +1,17 @@
-import React from "react";
-import Container from "@mui/material/Container";
+import React from 'react';
+import Container from '@mui/material/Container';
 import {
   toggleAllProducts,
   toggleDiscounts,
   toggleNewProducts,
   toggleInformation,
-} from "@/widgets/nav-menu/model/navMenu.slice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
-import NavMenuOpenAllProducts from "@/widgets/navigation/NavMenuOpenAllProducts";
-import NavMenuOpenDiscounts from "@/widgets/navigation/NavMenuOpenDiscounts";
-import NavMenuOpenNewProducts from "@/widgets/navigation/NavMenuOpenNewProducts";
-import NavMenuOpenInformation from "@/widgets/navigation/NavMenuOpenInformation";
+} from '@/widgets/nav-menu/model/navMenu.slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
+import NavMenuOpenAllProducts from '@/widgets/navigation/NavMenuOpenAllProducts';
+import NavMenuOpenDiscounts from '@/widgets/navigation/NavMenuOpenDiscounts';
+import NavMenuOpenNewProducts from '@/widgets/navigation/NavMenuOpenNewProducts';
+import NavMenuOpenInformation from '@/widgets/navigation/NavMenuOpenInformation';
 
 const NavMenu = () => {
   const dispatch = useDispatch();

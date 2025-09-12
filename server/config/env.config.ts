@@ -1,4 +1,4 @@
-import { registerAs } from '@nestjs/config';
+import { registerAs, ConfigService } from '@nestjs/config';
 
 export const appConfig = registerAs('app', () => ({
   nodeEnv: process.env.NODE_ENV,
@@ -27,7 +27,9 @@ export const jwtConfig = registerAs('jwt', () => ({
 
 export const emailConfig = registerAs('email', () => ({
   host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT, 10) : undefined,
+  port: process.env.EMAIL_PORT
+    ? parseInt(process.env.EMAIL_PORT, 10)
+    : undefined,
   user: process.env.EMAIL_USER,
   pass: process.env.EMAIL_PASS,
   from: process.env.EMAIL_FROM,
@@ -35,28 +37,38 @@ export const emailConfig = registerAs('email', () => ({
 }));
 
 export const fileUploadConfig = registerAs('fileUpload', () => ({
-  maxFileSize: process.env.MAX_FILE_SIZE ? parseInt(process.env.MAX_FILE_SIZE, 10) : undefined,
+  maxFileSize: process.env.MAX_FILE_SIZE
+    ? parseInt(process.env.MAX_FILE_SIZE, 10)
+    : undefined,
   allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
   uploadPath: process.env.UPLOAD_PATH,
 }));
 
 export const cacheConfig = registerAs('cache', () => ({
   ttl: process.env.CACHE_TTL ? parseInt(process.env.CACHE_TTL, 10) : undefined,
-  maxKeys: process.env.CACHE_MAX_KEYS ? parseInt(process.env.CACHE_MAX_KEYS, 10) : undefined,
+  maxKeys: process.env.CACHE_MAX_KEYS
+    ? parseInt(process.env.CACHE_MAX_KEYS, 10)
+    : undefined,
 }));
 
 export const rateLimitConfig = registerAs('rateLimit', () => ({
-  ttl: process.env.RATE_LIMIT_TTL ? parseInt(process.env.RATE_LIMIT_TTL, 10) : undefined,
-  maxRequests: process.env.RATE_LIMIT_MAX ? parseInt(process.env.RATE_LIMIT_MAX, 10) : undefined,
+  ttl: process.env.RATE_LIMIT_TTL
+    ? parseInt(process.env.RATE_LIMIT_TTL, 10)
+    : undefined,
+  maxRequests: process.env.RATE_LIMIT_MAX
+    ? parseInt(process.env.RATE_LIMIT_MAX, 10)
+    : undefined,
 }));
 
 export const corsConfig = registerAs('cors', () => ({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000'],
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',')
+    : ['http://localhost:3000'],
   credentials: process.env.CORS_CREDENTIALS === 'true',
 }));
 
 // Функции-помощники для создания конфигурации модулей
-export const getDatabaseConfig = (configService: any) => ({
+export const getDatabaseConfig = (configService: ConfigService) => ({
   type: 'postgres' as const,
   host: configService.get('database.host'),
   port: configService.get('database.port'),
@@ -68,14 +80,14 @@ export const getDatabaseConfig = (configService: any) => ({
   entities: configService.get('database.entities'),
 });
 
-export const getJwtConfig = (configService: any) => ({
+export const getJwtConfig = (configService: ConfigService) => ({
   secret: configService.get('jwt.secret'),
   signOptions: {
     expiresIn: configService.get('jwt.accessExpiresIn'),
   },
 });
 
-export const getRateLimitConfig = (configService: any) => ({
+export const getRateLimitConfig = (configService: ConfigService) => ({
   throttlers: [
     {
       ttl: configService.get('rateLimit.ttl'),
@@ -83,4 +95,3 @@ export const getRateLimitConfig = (configService: any) => ({
     },
   ],
 });
-

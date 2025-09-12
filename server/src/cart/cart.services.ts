@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { UserService } from '../users/user/user.service';
 import { ProductsService } from '../products/products.service';
@@ -9,12 +13,22 @@ import { CART_CONSTANTS } from './cart.constants';
 
 @Injectable()
 export class CartService {
+  private readonly cartRepository: CartRepository;
+  private readonly userService: UserService;
+  private readonly productService: ProductsService;
+  private readonly cacheService: CacheService;
+
   constructor(
-    private readonly cartRepository: CartRepository,
-    private readonly userService: UserService,
-    private readonly productService: ProductsService,
-    private readonly cacheService: CacheService,
-  ) {}
+    cartRepository: CartRepository,
+    userService: UserService,
+    productService: ProductsService,
+    cacheService: CacheService
+  ) {
+    this.cartRepository = cartRepository;
+    this.userService = userService;
+    this.productService = productService;
+    this.cacheService = cacheService;
+  }
 
   /**
    * Добавить товар в корзину
@@ -28,7 +42,7 @@ export class CartService {
     // Проверяем существование пользователя и продукта параллельно
     const [user, product] = await Promise.all([
       this.userService.findOne(userId),
-      this.productService.findOne(productId)
+      this.productService.findOne(productId),
     ]);
 
     if (!user) {
@@ -40,27 +54,30 @@ export class CartService {
     }
 
     // Проверяем, есть ли уже в корзине
-    const existingCart = await this.cartRepository.findByUserAndProduct(userId, productId);
+    const existingCart = await this.cartRepository.findByUserAndProduct(
+      userId,
+      productId
+    );
     if (existingCart) {
       return {
         id: existingCart.id,
         userId: existingCart.user.id,
         productId: existingCart.product.id,
-        createdAt: existingCart.createdAt
+        createdAt: existingCart.createdAt,
       };
     }
 
     // Создаем новую запись в корзине
     const newCart = await this.cartRepository.create(user, product);
-    
+
     // Инвалидируем кеш корзины пользователя
     await this.invalidateUserCartCache(userId);
-    
+
     return {
       id: newCart.id,
       userId: newCart.user.id,
       productId: newCart.product.id,
-      createdAt: newCart.createdAt
+      createdAt: newCart.createdAt,
     };
   }
 
@@ -72,13 +89,16 @@ export class CartService {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
     }
 
-    const cartItem = await this.cartRepository.findByUserAndProduct(userId, productId);
+    const cartItem = await this.cartRepository.findByUserAndProduct(
+      userId,
+      productId
+    );
     if (!cartItem) {
       throw new NotFoundException(CART_CONSTANTS.ERRORS.CART_ITEM_NOT_FOUND);
     }
 
     await this.cartRepository.removeByUserAndProduct(userId, productId);
-    
+
     // Инвалидируем кеш корзины пользователя
     await this.invalidateUserCartCache(userId);
   }
@@ -92,14 +112,16 @@ export class CartService {
     }
 
     const cacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART(userId);
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       async () => {
-        const cartItems = await this.cartRepository.findByUserWithProductDetails(userId);
+        const cartItems =
+          await this.cartRepository.findByUserWithProductDetails(userId);
         // Фильтруем битые элементы без продукта или пользователя (могли быть удалены)
         const safeItems = (cartItems ?? []).filter(
-          (item) => item && item.product && item.product.id && item.user && item.user.id,
+          item =>
+            item && item.product && item.product.id && item.user && item.user.id
         );
 
         return safeItems.map(item => ({
@@ -120,13 +142,13 @@ export class CartService {
             discount: item.product.discount,
             isAvailable: item.product.isAvailable,
             createdAt: item.product.createdAt,
-            updatedAt: item.product.updatedAt
-          }
+            updatedAt: item.product.updatedAt,
+          },
         }));
       },
-      { 
-        ttl: CACHE_TTL.USER_CART, 
-        prefix: CACHE_PREFIXES.USER_CART 
+      {
+        ttl: CACHE_TTL.USER_CART,
+        prefix: CACHE_PREFIXES.USER_CART,
       }
     );
   }
@@ -145,7 +167,7 @@ export class CartService {
     }
 
     await this.cartRepository.removeByUser(userId);
-    
+
     // Инвалидируем кеш корзины пользователя
     await this.invalidateUserCartCache(userId);
   }
@@ -153,7 +175,10 @@ export class CartService {
   /**
    * Получить статус товаров в корзине (batch операция)
    */
-  async getCartStatus(userId: number, productIds: number[]): Promise<Record<number, boolean>> {
+  async getCartStatus(
+    userId: number,
+    productIds: number[]
+  ): Promise<Record<number, boolean>> {
     if (!userId) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_USER_ID);
     }
@@ -163,17 +188,22 @@ export class CartService {
     }
 
     // Валидация productIds
-    const validProductIds = productIds.filter(id => Number.isInteger(id) && id > 0);
+    const validProductIds = productIds.filter(
+      id => Number.isInteger(id) && id > 0
+    );
     if (validProductIds.length === 0) {
       return {};
     }
 
     // Удаляем дубликаты
     const uniqueProductIds = [...new Set(validProductIds)];
-    
-    const cartItems = await this.cartRepository.findByUserAndProducts(userId, uniqueProductIds);
+
+    const cartItems = await this.cartRepository.findByUserAndProducts(
+      userId,
+      uniqueProductIds
+    );
     const cartProductIds = new Set(cartItems.map(item => item.product.id));
-    
+
     return uniqueProductIds.reduce<Record<number, boolean>>((acc, id) => {
       acc[id] = cartProductIds.has(id);
       return acc;
@@ -183,14 +213,19 @@ export class CartService {
   /**
    * Добавить несколько товаров в корзину (batch операция)
    */
-  async addMultipleToCart(userId: number, productIds: number[]): Promise<CartItem[]> {
+  async addMultipleToCart(
+    userId: number,
+    productIds: number[]
+  ): Promise<CartItem[]> {
     if (!userId || !productIds || productIds.length === 0) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_PRODUCT_IDS);
     }
 
     // Валидация и дедупликация
-    const validProductIds = [...new Set(productIds.filter(id => Number.isInteger(id) && id > 0))];
-    
+    const validProductIds = [
+      ...new Set(productIds.filter(id => Number.isInteger(id) && id > 0)),
+    ];
+
     if (validProductIds.length === 0) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.NO_VALID_PRODUCTS);
     }
@@ -213,21 +248,25 @@ export class CartService {
 
     // Получаем существующие товары в корзине
     const existingCartItems = await this.cartRepository.findByUserAndProducts(
-      userId, 
+      userId,
       existingProducts.map(p => p!.id)
     );
-    const existingProductIds = new Set(existingCartItems.map(item => item.product.id));
+    const existingProductIds = new Set(
+      existingCartItems.map(item => item.product.id)
+    );
 
     // Добавляем только новые товары
-    const newProducts = existingProducts.filter(product => product && !existingProductIds.has(product.id));
-    
+    const newProducts = existingProducts.filter(
+      product => product && !existingProductIds.has(product.id)
+    );
+
     if (newProducts.length === 0) {
       // Все товары уже в корзине
       return existingCartItems.map(item => ({
         id: item.id,
         userId: item.user.id,
         productId: item.product.id,
-        createdAt: item.createdAt
+        createdAt: item.createdAt,
       }));
     }
 
@@ -245,26 +284,34 @@ export class CartService {
       id: item.id,
       userId: item.user.id,
       productId: item.product.id,
-      createdAt: item.createdAt
+      createdAt: item.createdAt,
     }));
   }
 
   /**
    * Удалить несколько товаров из корзины (batch операция)
    */
-  async removeMultipleFromCart(userId: number, productIds: number[]): Promise<void> {
+  async removeMultipleFromCart(
+    userId: number,
+    productIds: number[]
+  ): Promise<void> {
     if (!userId || !productIds || productIds.length === 0) {
       throw new BadRequestException(CART_CONSTANTS.ERRORS.INVALID_PRODUCT_IDS);
     }
 
-    const validProductIds = [...new Set(productIds.filter(id => Number.isInteger(id) && id > 0))];
-    
+    const validProductIds = [
+      ...new Set(productIds.filter(id => Number.isInteger(id) && id > 0)),
+    ];
+
     if (validProductIds.length === 0) {
       return; // Нет валидных ID для удаления
     }
 
-    await this.cartRepository.removeMultipleByUserAndProducts(userId, validProductIds);
-    
+    await this.cartRepository.removeMultipleByUserAndProducts(
+      userId,
+      validProductIds
+    );
+
     // Инвалидируем кеш корзины пользователя
     await this.invalidateUserCartCache(userId);
   }
@@ -278,15 +325,15 @@ export class CartService {
     }
 
     const cacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART_COUNT(userId);
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       async () => {
         return this.cartRepository.countByUser(userId);
       },
-      { 
-        ttl: CACHE_TTL.USER_CART, 
-        prefix: CACHE_PREFIXES.USER_CART 
+      {
+        ttl: CACHE_TTL.USER_CART,
+        prefix: CACHE_PREFIXES.USER_CART,
       }
     );
   }
@@ -297,10 +344,10 @@ export class CartService {
   private async invalidateUserCartCache(userId: number): Promise<void> {
     const cartCacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART(userId);
     const countCacheKey = CART_CONSTANTS.CACHE_KEYS.USER_CART_COUNT(userId);
-    
+
     await Promise.all([
       this.cacheService.delete(cartCacheKey, CACHE_PREFIXES.USER_CART),
-      this.cacheService.delete(countCacheKey, CACHE_PREFIXES.USER_CART)
+      this.cacheService.delete(countCacheKey, CACHE_PREFIXES.USER_CART),
     ]);
   }
 }

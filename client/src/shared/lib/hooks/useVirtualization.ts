@@ -30,7 +30,7 @@ export const useVirtualization = <T>(
   options: UseVirtualizationOptions
 ): VirtualizationResult => {
   const { itemHeight, containerHeight, overscan = 5 } = options;
-  
+
   const [scrollOffset, setScrollOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +59,10 @@ export const useVirtualization = <T>(
   }, [scrollOffset, itemHeight, containerHeight, overscan, items.length]);
 
   // Общий размер всех элементов
-  const totalSize = useMemo(() => items.length * itemHeight, [items.length, itemHeight]);
+  const totalSize = useMemo(
+    () => items.length * itemHeight,
+    [items.length, itemHeight]
+  );
 
   // Обработчик скролла
   const handleScroll = useCallback((e: Event) => {
@@ -77,14 +80,17 @@ export const useVirtualization = <T>(
   }, [handleScroll]);
 
   // Функция для прокрутки к определенному индексу
-  const scrollToIndex = useCallback((index: number) => {
-    const container = containerRef.current;
-    if (!container) return;
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    const offset = index * itemHeight;
-    container.scrollTop = offset;
-    setScrollOffset(offset);
-  }, [itemHeight]);
+      const offset = index * itemHeight;
+      container.scrollTop = offset;
+      setScrollOffset(offset);
+    },
+    [itemHeight]
+  );
 
   // Функция для прокрутки к определенному смещению
   const scrollToOffset = useCallback((offset: number) => {
@@ -117,7 +123,7 @@ export const useDynamicVirtualization = <T>(
   }
 ) => {
   const { containerHeight, overscan = 5, getItemHeight } = options;
-  
+
   const [scrollOffset, setScrollOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemHeights = useRef<number[]>([]);
@@ -131,22 +137,31 @@ export const useDynamicVirtualization = <T>(
   const itemPositions = useMemo(() => {
     const positions: number[] = [];
     let currentPosition = 0;
-    
+
     for (let i = 0; i < items.length; i++) {
       positions[i] = currentPosition;
       currentPosition += itemHeights.current[i] || 0;
     }
-    
+
     return positions;
   }, [items.length]);
 
   // Вычисляем видимые элементы
   const virtualItems = useMemo(() => {
-    const startIndex = itemPositions.findIndex(pos => pos + (itemHeights.current[itemPositions.indexOf(pos)] || 0) > scrollOffset);
-    const endIndex = itemPositions.findIndex(pos => pos > scrollOffset + containerHeight);
-    
+    const startIndex = itemPositions.findIndex(
+      pos =>
+        pos + (itemHeights.current[itemPositions.indexOf(pos)] || 0) >
+        scrollOffset
+    );
+    const endIndex = itemPositions.findIndex(
+      pos => pos > scrollOffset + containerHeight
+    );
+
     const visibleStartIndex = Math.max(0, startIndex - overscan);
-    const visibleEndIndex = Math.min(endIndex === -1 ? items.length - 1 : endIndex + overscan, items.length - 1);
+    const visibleEndIndex = Math.min(
+      endIndex === -1 ? items.length - 1 : endIndex + overscan,
+      items.length - 1
+    );
 
     const result = [];
     for (let i = visibleStartIndex; i <= visibleEndIndex; i++) {
@@ -164,7 +179,10 @@ export const useDynamicVirtualization = <T>(
 
   // Общий размер
   const totalSize = useMemo(() => {
-    return itemPositions[items.length - 1] + (itemHeights.current[items.length - 1] || 0);
+    return (
+      itemPositions[items.length - 1] +
+      (itemHeights.current[items.length - 1] || 0)
+    );
   }, [itemPositions, items.length]);
 
   // Обработчик скролла
@@ -183,14 +201,17 @@ export const useDynamicVirtualization = <T>(
   }, [handleScroll]);
 
   // Функция для прокрутки к определенному индексу
-  const scrollToIndex = useCallback((index: number) => {
-    const container = containerRef.current;
-    if (!container) return;
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    const offset = itemPositions[index] || 0;
-    container.scrollTop = offset;
-    setScrollOffset(offset);
-  }, [itemPositions]);
+      const offset = itemPositions[index] || 0;
+      container.scrollTop = offset;
+      setScrollOffset(offset);
+    },
+    [itemPositions]
+  );
 
   // Функция для прокрутки к определенному смещению
   const scrollToOffset = useCallback((offset: number) => {

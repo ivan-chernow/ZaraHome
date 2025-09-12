@@ -1,16 +1,16 @@
-"use client";
-import React, { use, useEffect, useMemo, useRef } from "react";
-import ProductCard from "@/entities/product/ui/ProductCard";
-import HomeIcon from "@/shared/ui/HomeIcon";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getProductsByCategory } from "@/entities/category/lib/catalog.utils";
-import Skeleton from "@mui/material/Skeleton";
-import slugify from "slugify";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import { useRouter, useSearchParams } from "next/navigation";
-import PaginationBlock from "@/shared/ui/pagination/PaginationBlock";
-import { usePagination } from "@/shared/lib/hooks/usePagination";
-import { useSorting } from "@/shared/lib/hooks/useSorting";
+'use client';
+import React, { use, useEffect, useMemo, useRef } from 'react';
+import ProductCard from '@/entities/product/ui/ProductCard';
+import HomeIcon from '@/shared/ui/HomeIcon';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getProductsByCategory } from '@/entities/category/lib/catalog.utils';
+import Skeleton from '@mui/material/Skeleton';
+import slugify from 'slugify';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import { useRouter, useSearchParams } from 'next/navigation';
+import PaginationBlock from '@/shared/ui/pagination/PaginationBlock';
+import { usePagination } from '@/shared/lib/hooks/usePagination';
+import { useSorting } from '@/shared/lib/hooks/useSorting';
 
 const PAGE_SIZE = 12;
 
@@ -18,7 +18,7 @@ const ProductCardSkeleton = () => (
   <li className="w-[300px] h-[497px] mr-[-1px] bg-white relative group overflow-hidden rounded-xl shadow animate-pulse flex flex-col">
     <div
       className="mb-[18px] relative overflow-hidden"
-      style={{ width: "auto", height: 326 }}
+      style={{ width: 'auto', height: 326 }}
     >
       <Skeleton
         variant="rectangular"
@@ -76,25 +76,25 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
     if (prevCategory.current && prevCategory.current !== categorySlug) {
       // Сбрасываем страницу в URL
       const params = new URLSearchParams(searchParams);
-      params.delete("page");
+      params.delete('page');
       router.push(`?${params.toString()}`, { scroll: false });
     }
     prevCategory.current = categorySlug;
   }, [categorySlug, router, searchParams]);
 
   const customSlugify = (text: string) =>
-    slugify(text.replace("й", "y"), { lower: true, strict: true });
+    slugify(text.replace('й', 'y'), { lower: true, strict: true });
 
   // Получаем базовые продукты
   const baseProducts = useMemo(() => {
     if (!categories) return [];
-    if (categorySlug === "novinki") {
-      return getAllProducts(categories).filter((p) => p.isNew);
-    } else if (categorySlug === "skidki") {
-      return getAllProducts(categories).filter((p) => Number(p.discount) > 0);
+    if (categorySlug === 'novinki') {
+      return getAllProducts(categories).filter(p => p.isNew);
+    } else if (categorySlug === 'skidki') {
+      return getAllProducts(categories).filter(p => Number(p.discount) > 0);
     } else {
       const currentCategory = categories.find(
-        (cat) => customSlugify(cat.name) === categorySlug
+        cat => customSlugify(cat.name) === categorySlug
       );
       return getProductsByCategory(currentCategory);
     }
@@ -124,7 +124,7 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
   const categoryName = useMemo(() => {
     if (!categories) return decodeURIComponent(categorySlug);
     const found = categories.find(
-      (cat) => customSlugify(cat.name) === categorySlug
+      cat => customSlugify(cat.name) === categorySlug
     );
     return found ? found.name : decodeURIComponent(categorySlug);
   }, [categories, categorySlug]);
@@ -141,7 +141,7 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
     <div className="flex flex-col flex-1 pl-0">
       <div className="flex items-center mb-[39px]">
         <HomeIcon />
-        <span className="mx-[6px] text-[#0000004D]">{" > "}</span>
+        <span className="mx-[6px] text-[#0000004D]">{' > '}</span>
         <span className="text-[#00000099] text-[14px] underline font-medium">
           {isLoading ? (
             <Skeleton variant="text" width={180} height={24} />
@@ -180,9 +180,9 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
             <>
               <button
                 className={`flex items-center mr-[12px] cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
-                  sortType === "price"
-                    ? "text-blue-600 font-semibold underline"
-                    : ""
+                  sortType === 'price'
+                    ? 'text-blue-600 font-semibold underline'
+                    : ''
                 }`}
                 onClick={handleSortByPrice}
               >
@@ -198,9 +198,9 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
               </button>
               <button
                 className={`flex items-center cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
-                  sortType === "date"
-                    ? "text-blue-600 font-semibold underline"
-                    : ""
+                  sortType === 'date'
+                    ? 'text-blue-600 font-semibold underline'
+                    : ''
                 }`}
                 onClick={handleSortByDate}
               >
@@ -228,7 +228,7 @@ const Page = ({ params }: { params: Promise<{ category: string }> }) => {
           </ul>
         ) : paginatedProducts && paginatedProducts.length > 0 ? (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
-            {paginatedProducts.map((product) => (
+            {paginatedProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </ul>

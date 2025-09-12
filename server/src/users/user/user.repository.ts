@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InternalServerException } from 'src/shared/shared.interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { DeliveryAddress } from './entity/delivery-address.entity';
 import { CacheService } from 'src/shared/cache/cache.service';
 import { CACHE_TTL, CACHE_PREFIXES } from 'src/shared/cache/cache.constants';
-import { UserSearchFilters, UserStatistics, PaginatedResponse } from '../users.interfaces';
+import {
+  UserSearchFilters,
+  UserStatistics,
+  PaginatedResponse,
+} from '../users.interfaces';
 
 @Injectable()
 export class UserRepository {
@@ -15,53 +19,56 @@ export class UserRepository {
     private userRepository: Repository<User>,
     @InjectRepository(DeliveryAddress)
     private addressRepository: Repository<DeliveryAddress>,
-    private cacheService: CacheService,
+    private cacheService: CacheService
   ) {}
 
   async findUserById(userId: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'email', 'role', 'isEmailVerified'],
-      relations: ['deliveryAddresses']
+      relations: ['deliveryAddresses'],
     });
   }
 
   async findUserByIdWithPassword(userId: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'password', 'updatedAt']
+      select: ['id', 'password', 'updatedAt'],
     });
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { email },
-      select: ['id', 'updatedAt']
+      select: ['id', 'updatedAt'],
     });
   }
 
   async findUserByIdWithAddresses(userId: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id: userId },
-      relations: ['deliveryAddresses']
+      relations: ['deliveryAddresses'],
     });
   }
 
   async findUserByIdBasic(userId: number): Promise<User | null> {
     const cacheKey = `user:${userId}:basic`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.userRepository.findOne({
-      where: { id: userId }
-      }),
+      () =>
+        this.userRepository.findOne({
+          where: { id: userId },
+        }),
       { ttl: CACHE_TTL.USER_PROFILE, prefix: CACHE_PREFIXES.USER }
     );
   }
 
-  async findAllUsers(filters?: UserSearchFilters): Promise<PaginatedResponse<User>> {
+  async findAllUsers(
+    filters?: UserSearchFilters
+  ): Promise<PaginatedResponse<User>> {
     const cacheKey = `users:${JSON.stringify(filters)}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getUsersWithFilters(filters),
@@ -69,9 +76,11 @@ export class UserRepository {
     );
   }
 
-  async searchUsers(filters: UserSearchFilters): Promise<PaginatedResponse<User>> {
+  async searchUsers(
+    filters: UserSearchFilters
+  ): Promise<PaginatedResponse<User>> {
     const cacheKey = `users_search:${JSON.stringify(filters)}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getUsersWithFilters(filters),
@@ -81,7 +90,7 @@ export class UserRepository {
 
   async getUserStatistics(): Promise<UserStatistics> {
     const cacheKey = 'users_statistics';
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.calculateUserStatistics(),
@@ -89,9 +98,13 @@ export class UserRepository {
     );
   }
 
-  async findUsersByRole(role: string, page: number = 1, limit: number = 20): Promise<PaginatedResponse<User>> {
+  async findUsersByRole(
+    role: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<PaginatedResponse<User>> {
     const cacheKey = `users_by_role:${role}:${page}:${limit}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getUsersByRolePaginated(role, page, limit),
@@ -99,9 +112,13 @@ export class UserRepository {
     );
   }
 
-  async findUsersByStatus(status: string, page: number = 1, limit: number = 20): Promise<PaginatedResponse<User>> {
+  async findUsersByStatus(
+    status: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<PaginatedResponse<User>> {
     const cacheKey = `users_by_status:${status}:${page}:${limit}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getUsersByStatusPaginated(status, page, limit),
@@ -109,9 +126,13 @@ export class UserRepository {
     );
   }
 
-  async findUsersByEmailVerification(isVerified: boolean, page: number = 1, limit: number = 20): Promise<PaginatedResponse<User>> {
+  async findUsersByEmailVerification(
+    isVerified: boolean,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<PaginatedResponse<User>> {
     const cacheKey = `users_by_verification:${isVerified}:${page}:${limit}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.getUsersByEmailVerificationPaginated(isVerified, page, limit),
@@ -120,43 +141,49 @@ export class UserRepository {
   }
 
   // Приватные методы для реализации пагинации и фильтрации
-  private async getUsersWithFilters(filters?: UserSearchFilters): Promise<PaginatedResponse<User>> {
+  private async getUsersWithFilters(
+    filters?: UserSearchFilters
+  ): Promise<PaginatedResponse<User>> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
-    
+
     if (filters?.query) {
       queryBuilder.where(
         '(user.email ILIKE :query OR user.firstName ILIKE :query OR user.lastName ILIKE :query)',
         { query: `%${filters.query}%` }
       );
     }
-    
+
     if (filters?.role) {
       queryBuilder.andWhere('user.role = :role', { role: filters.role });
     }
-    
+
     if (filters?.status) {
-      queryBuilder.andWhere('user.status = :status', { status: filters.status });
+      queryBuilder.andWhere('user.status = :status', {
+        status: filters.status,
+      });
     }
-    
+
     if (filters?.isEmailVerified !== undefined) {
-      queryBuilder.andWhere('user.isEmailVerified = :isEmailVerified', { isEmailVerified: filters.isEmailVerified });
+      queryBuilder.andWhere('user.isEmailVerified = :isEmailVerified', {
+        isEmailVerified: filters.isEmailVerified,
+      });
     }
-    
+
     const sortBy = filters?.sortBy || 'createdAt';
     const sortOrder = filters?.sortOrder || 'DESC';
     queryBuilder.orderBy(`user.${sortBy}`, sortOrder);
-    
+
     const page = filters?.page || 1;
     const limit = filters?.limit || 20;
     const offset = (page - 1) * limit;
-    
+
     const total = await queryBuilder.getCount();
     const users = await queryBuilder.skip(offset).take(limit).getMany();
-    
+
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;
-    
+
     return {
       data: users,
       total,
@@ -164,24 +191,29 @@ export class UserRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
-  private async getUsersByRolePaginated(role: string, page: number, limit: number): Promise<PaginatedResponse<User>> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+  private async getUsersByRolePaginated(
+    role: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResponse<User>> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.role = :role', { role })
       .orderBy('user.createdAt', 'DESC');
-    
+
     const total = await queryBuilder.getCount();
     const offset = (page - 1) * limit;
-    
+
     const users = await queryBuilder.skip(offset).take(limit).getMany();
-    
+
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;
-    
+
     return {
       data: users,
       total,
@@ -189,24 +221,29 @@ export class UserRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
-  private async getUsersByStatusPaginated(status: string, page: number, limit: number): Promise<PaginatedResponse<User>> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+  private async getUsersByStatusPaginated(
+    status: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResponse<User>> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.status = :status', { status })
       .orderBy('user.createdAt', 'DESC');
-    
+
     const total = await queryBuilder.getCount();
     const offset = (page - 1) * limit;
-    
+
     const users = await queryBuilder.skip(offset).take(limit).getMany();
-    
+
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;
-    
+
     return {
       data: users,
       total,
@@ -214,24 +251,29 @@ export class UserRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
-  private async getUsersByEmailVerificationPaginated(isVerified: boolean, page: number, limit: number): Promise<PaginatedResponse<User>> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+  private async getUsersByEmailVerificationPaginated(
+    isVerified: boolean,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResponse<User>> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.isEmailVerified = :isVerified', { isVerified })
       .orderBy('user.createdAt', 'DESC');
-    
+
     const total = await queryBuilder.getCount();
     const offset = (page - 1) * limit;
-    
+
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;
-    
+
     const users = await queryBuilder.skip(offset).take(limit).getMany();
-    
+
     return {
       data: users,
       total,
@@ -239,7 +281,7 @@ export class UserRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -255,7 +297,7 @@ export class UserRepository {
       usersByRole,
       usersByStatus,
       newUsersThisMonth,
-      newUsersThisWeek
+      newUsersThisWeek,
     ] = await Promise.all([
       this.userRepository.count(),
       this.userRepository.count({ where: { status: 'active' } }),
@@ -267,7 +309,7 @@ export class UserRepository {
       this.getUsersByRoleCount(),
       this.getUsersByStatusCount(),
       this.getNewUsersCount('month'),
-      this.getNewUsersCount('week')
+      this.getNewUsersCount('week'),
     ]);
 
     return {
@@ -281,7 +323,7 @@ export class UserRepository {
       usersByRole,
       usersByStatus,
       newUsersThisMonth,
-      newUsersThisWeek
+      newUsersThisWeek,
     };
   }
 
@@ -293,10 +335,13 @@ export class UserRepository {
       .groupBy('user.role')
       .getRawMany();
 
-    return result.reduce((acc, item) => {
-      acc[item.role] = parseInt(item.count);
-      return acc;
-    }, {} as Record<string, number>);
+    return result.reduce(
+      (acc, item) => {
+        acc[item.role] = parseInt(item.count);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   private async getUsersByStatusCount(): Promise<Record<string, number>> {
@@ -307,10 +352,13 @@ export class UserRepository {
       .groupBy('user.status')
       .getRawMany();
 
-    return result.reduce((acc, item) => {
-      acc[item.status] = parseInt(item.count);
-      return acc;
-    }, {} as Record<string, number>);
+    return result.reduce(
+      (acc, item) => {
+        acc[item.status] = parseInt(item.count);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   private async getNewUsersCount(period: 'month' | 'week'): Promise<number> {
@@ -332,45 +380,53 @@ export class UserRepository {
 
   async findAddressById(addressId: number): Promise<DeliveryAddress | null> {
     const cacheKey = `address:${addressId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.addressRepository.findOne({
-      where: { id: addressId },
-      relations: ['user']
-      }),
+      () =>
+        this.addressRepository.findOne({
+          where: { id: addressId },
+          relations: ['user'],
+        }),
       { ttl: CACHE_TTL.USER_ADDRESSES, prefix: CACHE_PREFIXES.USER }
     );
   }
 
   async findAddressesByUser(userId: number): Promise<DeliveryAddress[]> {
     const cacheKey = `user_addresses:${userId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.addressRepository.find({
-        where: { userId },
-        order: { createdAt: 'ASC' }
-      }),
+      () =>
+        this.addressRepository.find({
+          where: { userId },
+          order: { createdAt: 'ASC' },
+        }),
       { ttl: CACHE_TTL.USER_ADDRESSES, prefix: CACHE_PREFIXES.USER }
     );
   }
 
-  async findDefaultAddressByUser(userId: number): Promise<DeliveryAddress | null> {
+  async findDefaultAddressByUser(
+    userId: number
+  ): Promise<DeliveryAddress | null> {
     const cacheKey = `user_default_address:${userId}`;
-    
+
     return this.cacheService.getOrSet(
       cacheKey,
-      () => this.addressRepository.findOne({
-        where: { userId }
-      }),
+      () =>
+        this.addressRepository.findOne({
+          where: { userId },
+        }),
       { ttl: CACHE_TTL.USER_ADDRESSES, prefix: CACHE_PREFIXES.USER }
     );
   }
 
-  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+  async updateUserPassword(
+    userId: number,
+    hashedPassword: string
+  ): Promise<void> {
     await this.userRepository.update(userId, {
-      password: hashedPassword
+      password: hashedPassword,
     });
     await this.invalidateUserCache(userId);
   }
@@ -378,7 +434,7 @@ export class UserRepository {
   async updateUserEmail(userId: number, newEmail: string): Promise<void> {
     await this.userRepository.update(userId, {
       email: newEmail,
-      isEmailVerified: true
+      isEmailVerified: true,
     });
     await this.invalidateUserCache(userId);
   }
@@ -386,7 +442,9 @@ export class UserRepository {
   async updateAddress(addressId: number, addressData: any): Promise<void> {
     await this.addressRepository.update(addressId, addressData);
     // Получаем userId для инвалидации кеша
-    const address = await this.addressRepository.findOne({ where: { id: addressId } });
+    const address = await this.addressRepository.findOne({
+      where: { id: addressId },
+    });
     if (address) {
       await this.invalidateAddressCache(address.userId);
     }
@@ -395,7 +453,9 @@ export class UserRepository {
   async createAddress(addressData: any): Promise<DeliveryAddress> {
     const result = await this.addressRepository.insert(addressData);
     const id = result.identifiers[0].id;
-    const savedAddress = await this.addressRepository.findOne({ where: { id } });
+    const savedAddress = await this.addressRepository.findOne({
+      where: { id },
+    });
     if (!savedAddress) {
       // Непредвиденная ситуация при вставке адреса
       throw new InternalServerException('Не удалось создать адрес доставки');
@@ -414,15 +474,21 @@ export class UserRepository {
     await Promise.all([
       this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.USER}:user:${userId}`),
       this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.USER}:users`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.STATS}:users_statistics`)
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.STATS}:users_statistics`
+      ),
     ]);
   }
 
   private async invalidateAddressCache(userId: number): Promise<void> {
     await Promise.all([
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.USER}:user_addresses:${userId}`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.USER}:user_default_address:${userId}`),
-      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.USER}:address`)
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.USER}:user_addresses:${userId}`
+      ),
+      this.cacheService.deleteByPrefix(
+        `${CACHE_PREFIXES.USER}:user_default_address:${userId}`
+      ),
+      this.cacheService.deleteByPrefix(`${CACHE_PREFIXES.USER}:address`),
     ]);
   }
 }

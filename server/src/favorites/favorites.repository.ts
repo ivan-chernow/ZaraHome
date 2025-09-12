@@ -7,14 +7,19 @@ import { Product } from '../products/entity/products.entity';
 
 @Injectable()
 export class FavoritesRepository {
+  private readonly favoriteRepository: Repository<Favorite>;
+  private readonly userRepository: Repository<User>;
+  private readonly productRepository: Repository<Product>;
+
   constructor(
-    @InjectRepository(Favorite)
-    private readonly favoriteRepository: Repository<Favorite>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
-  ) {}
+    @InjectRepository(Favorite) favoriteRepository: Repository<Favorite>,
+    @InjectRepository(User) userRepository: Repository<User>,
+    @InjectRepository(Product) productRepository: Repository<Product>
+  ) {
+    this.favoriteRepository = favoriteRepository;
+    this.userRepository = userRepository;
+    this.productRepository = productRepository;
+  }
 
   /**
    * Найти пользователя по ID
@@ -33,9 +38,12 @@ export class FavoritesRepository {
   /**
    * Найти избранное по пользователю и продукту
    */
-  async findFavoriteByUserAndProduct(userId: number, productId: number): Promise<Favorite | null> {
-    return this.favoriteRepository.findOne({ 
-      where: { user: { id: userId }, product: { id: productId } } 
+  async findFavoriteByUserAndProduct(
+    userId: number,
+    productId: number
+  ): Promise<Favorite | null> {
+    return this.favoriteRepository.findOne({
+      where: { user: { id: userId }, product: { id: productId } },
     });
   }
 
@@ -52,18 +60,23 @@ export class FavoritesRepository {
   /**
    * Найти избранное пользователя с полными деталями продукта
    */
-  async findFavoritesByUserWithProductDetails(userId: number): Promise<Favorite[]> {
+  async findFavoritesByUserWithProductDetails(
+    userId: number
+  ): Promise<Favorite[]> {
     return this.favoriteRepository.find({
       where: { user: { id: userId } },
       relations: ['product'],
-      order: { id: 'DESC' } // Сортировка по дате добавления (новые сначала)
+      order: { id: 'DESC' }, // Сортировка по дате добавления (новые сначала)
     });
   }
 
   /**
    * Найти избранное пользователя по списку ID продуктов
    */
-  async findFavoritesByUserAndProducts(userId: number, productIds: number[]): Promise<Favorite[]> {
+  async findFavoritesByUserAndProducts(
+    userId: number,
+    productIds: number[]
+  ): Promise<Favorite[]> {
     if (!productIds || productIds.length === 0) {
       return [];
     }
@@ -81,7 +94,7 @@ export class FavoritesRepository {
    */
   async countByUser(userId: number): Promise<number> {
     return this.favoriteRepository.count({
-      where: { user: { id: userId } }
+      where: { user: { id: userId } },
     });
   }
 
@@ -96,10 +109,14 @@ export class FavoritesRepository {
   /**
    * Создать несколько записей в избранном (batch операция)
    */
-  async createMultiple(favoriteItems: Array<{ user: User; product: Product }>): Promise<Favorite[]> {
+  async createMultiple(
+    favoriteItems: Array<{ user: User; product: Product }>
+  ): Promise<Favorite[]> {
     if (!favoriteItems || favoriteItems.length === 0) return [];
 
-    const favorites = favoriteItems.map(item => this.favoriteRepository.create(item));
+    const favorites = favoriteItems.map(item =>
+      this.favoriteRepository.create(item)
+    );
     return this.favoriteRepository.save(favorites);
   }
 
@@ -113,10 +130,16 @@ export class FavoritesRepository {
   /**
    * Удалить несколько записей из избранного (batch операция)
    */
-  async removeMultipleByUserAndProducts(userId: number, productIds: number[]): Promise<void> {
+  async removeMultipleByUserAndProducts(
+    userId: number,
+    productIds: number[]
+  ): Promise<void> {
     if (!productIds || productIds.length === 0) return;
 
-    const favorites = await this.findFavoritesByUserAndProducts(userId, productIds);
+    const favorites = await this.findFavoritesByUserAndProducts(
+      userId,
+      productIds
+    );
     if (favorites.length > 0) {
       await this.favoriteRepository.remove(favorites);
     }
@@ -135,9 +158,12 @@ export class FavoritesRepository {
   /**
    * Проверить, есть ли товар в избранном пользователя
    */
-  async existsByUserAndProduct(userId: number, productId: number): Promise<boolean> {
+  async existsByUserAndProduct(
+    userId: number,
+    productId: number
+  ): Promise<boolean> {
     const count = await this.favoriteRepository.count({
-      where: { user: { id: userId }, product: { id: productId } }
+      where: { user: { id: userId }, product: { id: productId } },
     });
     return count > 0;
   }
@@ -145,13 +171,15 @@ export class FavoritesRepository {
   /**
    * Получить статистику избранного пользователя
    */
-  async getFavoritesStats(userId: number): Promise<{ totalItems: number; totalProducts: number }> {
+  async getFavoritesStats(
+    userId: number
+  ): Promise<{ totalItems: number; totalProducts: number }> {
     const [totalItems, totalProducts] = await Promise.all([
       this.countByUser(userId),
       this.favoriteRepository
         .createQueryBuilder('favorite')
         .where('favorite.user.id = :userId', { userId })
-        .getCount()
+        .getCount(),
     ]);
 
     return { totalItems, totalProducts };

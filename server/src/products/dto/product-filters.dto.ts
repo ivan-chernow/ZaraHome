@@ -1,4 +1,12 @@
-import { IsOptional, IsNumber, IsBoolean, IsString, Min, Max, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsString,
+  Min,
+  Max,
+  IsEnum,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { PRODUCTS_CONSTANTS } from '../products.constants';
@@ -8,7 +16,7 @@ export class ProductFiltersDto {
     description: 'Номер страницы',
     example: 1,
     required: false,
-    minimum: 1
+    minimum: 1,
   })
   @IsOptional()
   @Type(() => Number)
@@ -21,19 +29,23 @@ export class ProductFiltersDto {
     example: 20,
     required: false,
     minimum: 1,
-    maximum: 100
+    maximum: 100,
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Лимит должен быть числом' })
-  @Min(PRODUCTS_CONSTANTS.MIN_PAGE_SIZE, { message: `Минимум ${PRODUCTS_CONSTANTS.MIN_PAGE_SIZE} элементов` })
-  @Max(PRODUCTS_CONSTANTS.MAX_PAGE_SIZE, { message: `Максимум ${PRODUCTS_CONSTANTS.MAX_PAGE_SIZE} элементов` })
+  @Min(PRODUCTS_CONSTANTS.MIN_PAGE_SIZE, {
+    message: `Минимум ${PRODUCTS_CONSTANTS.MIN_PAGE_SIZE} элементов`,
+  })
+  @Max(PRODUCTS_CONSTANTS.MAX_PAGE_SIZE, {
+    message: `Максимум ${PRODUCTS_CONSTANTS.MAX_PAGE_SIZE} элементов`,
+  })
   limit?: number;
 
   @ApiProperty({
     description: 'ID категории',
     example: 1,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Number)
@@ -44,7 +56,7 @@ export class ProductFiltersDto {
   @ApiProperty({
     description: 'ID подкатегории',
     example: 1,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Number)
@@ -55,7 +67,7 @@ export class ProductFiltersDto {
   @ApiProperty({
     description: 'ID типа',
     example: 1,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Number)
@@ -67,32 +79,40 @@ export class ProductFiltersDto {
     description: 'Минимальная цена',
     example: 1000,
     required: false,
-    minimum: 0
+    minimum: 0,
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Минимальная цена должна быть числом' })
-  @Min(PRODUCTS_CONSTANTS.MIN_PRICE, { message: 'Минимальная цена не может быть отрицательной' })
-  @Max(PRODUCTS_CONSTANTS.MAX_PRICE, { message: 'Минимальная цена слишком высокая' })
+  @Min(PRODUCTS_CONSTANTS.MIN_PRICE, {
+    message: 'Минимальная цена не может быть отрицательной',
+  })
+  @Max(PRODUCTS_CONSTANTS.MAX_PRICE, {
+    message: 'Минимальная цена слишком высокая',
+  })
   minPrice?: number;
 
   @ApiProperty({
     description: 'Максимальная цена',
     example: 5000,
     required: false,
-    minimum: 0
+    minimum: 0,
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Максимальная цена должна быть числом' })
-  @Min(PRODUCTS_CONSTANTS.MIN_PRICE, { message: 'Максимальная цена не может быть отрицательной' })
-  @Max(PRODUCTS_CONSTANTS.MAX_PRICE, { message: 'Максимальная цена слишком высокая' })
+  @Min(PRODUCTS_CONSTANTS.MIN_PRICE, {
+    message: 'Максимальная цена не может быть отрицательной',
+  })
+  @Max(PRODUCTS_CONSTANTS.MAX_PRICE, {
+    message: 'Максимальная цена слишком высокая',
+  })
   maxPrice?: number;
 
   @ApiProperty({
     description: 'Только новые продукты',
     example: true,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -106,7 +126,7 @@ export class ProductFiltersDto {
   @ApiProperty({
     description: 'Только продукты со скидкой',
     example: true,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -120,7 +140,7 @@ export class ProductFiltersDto {
   @ApiProperty({
     description: 'Только доступные продукты',
     example: true,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Transform(({ value }) => {
@@ -136,31 +156,39 @@ export class ProductFiltersDto {
     example: 'платье',
     required: false,
     minLength: 2,
-    maxLength: 100
+    maxLength: 100,
   })
   @IsOptional()
   @IsString({ message: 'Поисковый запрос должен быть строкой' })
-  @Min(PRODUCTS_CONSTANTS.MIN_SEARCH_LENGTH, { message: `Поисковый запрос должен содержать минимум ${PRODUCTS_CONSTANTS.MIN_SEARCH_LENGTH} символа` })
-  @Max(PRODUCTS_CONSTANTS.MAX_SEARCH_LENGTH, { message: `Поисковый запрос слишком длинный` })
+  @Min(PRODUCTS_CONSTANTS.MIN_SEARCH_LENGTH, {
+    message: `Поисковый запрос должен содержать минимум ${PRODUCTS_CONSTANTS.MIN_SEARCH_LENGTH} символа`,
+  })
+  @Max(PRODUCTS_CONSTANTS.MAX_SEARCH_LENGTH, {
+    message: `Поисковый запрос слишком длинный`,
+  })
   search?: string;
 
   @ApiProperty({
     description: 'Поле для сортировки',
     example: 'price',
     required: false,
-    enum: Object.values(PRODUCTS_CONSTANTS.SORT_FIELDS)
+    enum: Object.values(PRODUCTS_CONSTANTS.SORT_FIELDS),
   })
   @IsOptional()
-  @IsEnum(Object.values(PRODUCTS_CONSTANTS.SORT_FIELDS), { message: 'Неверное поле для сортировки' })
+  @IsEnum(Object.values(PRODUCTS_CONSTANTS.SORT_FIELDS), {
+    message: 'Неверное поле для сортировки',
+  })
   sortField?: 'price' | 'createdAt' | 'name_ru' | 'discount';
 
   @ApiProperty({
     description: 'Порядок сортировки',
     example: 'DESC',
     required: false,
-    enum: Object.values(PRODUCTS_CONSTANTS.SORT_ORDERS)
+    enum: Object.values(PRODUCTS_CONSTANTS.SORT_ORDERS),
   })
   @IsOptional()
-  @IsEnum(Object.values(PRODUCTS_CONSTANTS.SORT_ORDERS), { message: 'Неверный порядок сортировки' })
+  @IsEnum(Object.values(PRODUCTS_CONSTANTS.SORT_ORDERS), {
+    message: 'Неверный порядок сортировки',
+  })
   sortOrder?: 'ASC' | 'DESC';
 }

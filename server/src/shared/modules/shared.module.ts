@@ -16,12 +16,12 @@ import { RateLimitGuard } from '../guards/rate-limit.guard';
     ResponseService,
     FileUploadErrorHandlerService,
     UploadMonitoringService,
-    
+
     // Новые сервисы
     ValidationService,
     UtilityService,
     MonitoringService,
-    
+
     // Guards
     RateLimitGuard,
   ],
@@ -31,12 +31,12 @@ import { RateLimitGuard } from '../guards/rate-limit.guard';
     ResponseService,
     FileUploadErrorHandlerService,
     UploadMonitoringService,
-    
+
     // Новые сервисы
     ValidationService,
     UtilityService,
     MonitoringService,
-    
+
     // Guards
     RateLimitGuard,
   ],

@@ -1,8 +1,8 @@
-import React from "react";
-import type { Product } from "@/entities/product/api/products.api";
-import SearchResultProductCard from "../../entities/product/ui/SearchResultProductCard";
-import PaginationBlock from "../../shared/ui/pagination/PaginationBlock";
-import { usePagination } from "@/shared/lib/hooks/usePagination";
+import React from 'react';
+import type { Product } from '@/entities/product/api/products.api';
+import SearchResultProductCard from '../../entities/product/ui/SearchResultProductCard';
+import PaginationBlock from '../../shared/ui/pagination/PaginationBlock';
+import { usePagination } from '@/shared/lib/hooks/usePagination';
 
 interface SearchResultsProps {
   products: Product[];
@@ -49,7 +49,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     <div className="py-[50px]">
       {/* Сетка товаров */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full mb-8">
-        {paginatedProducts.map((product) => (
+        {paginatedProducts.map(product => (
           <SearchResultProductCard
             key={product.id}
             product={product}

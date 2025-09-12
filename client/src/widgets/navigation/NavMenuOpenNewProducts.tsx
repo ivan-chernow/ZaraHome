@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import type { Product } from "@/entities/product/api/products.api";
-import NavMenuProductCard from "./NavMenuProductCard";
-import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
-import NavMenuGridSkeleton from "../../shared/ui/skeletons/NavMenuGridSkeleton";
+import { useMemo } from 'react';
+import { Container } from '@mui/material';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import type { Product } from '@/entities/product/api/products.api';
+import NavMenuProductCard from './NavMenuProductCard';
+import NavMenuSearchWrapper from './NavMenuSearchWrapper';
+import NavMenuGridSkeleton from '../../shared/ui/skeletons/NavMenuGridSkeleton';
 
 const NavMenuOpenNewProducts = () => {
   const { data: categories, isLoading } = useGetCatalogQuery();
@@ -15,7 +15,7 @@ const NavMenuOpenNewProducts = () => {
   const latestNewProducts: Product[] = useMemo(() => {
     if (!categories) return [];
     const allNewProducts = getAllProducts(categories)
-      .filter((p) => p.isNew)
+      .filter(p => p.isNew)
       .sort(
         (a, b) =>
           new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
@@ -41,7 +41,7 @@ const NavMenuOpenNewProducts = () => {
               <NavMenuGridSkeleton items={4} />
             ) : (
               <div className="grid grid-cols-4 gap-6 w-full py-8">
-                {latestNewProducts.map((product) => (
+                {latestNewProducts.map(product => (
                   <NavMenuProductCard key={product.id} product={product} />
                 ))}
               </div>

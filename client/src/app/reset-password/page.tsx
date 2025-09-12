@@ -1,12 +1,18 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { Container, TextField, Alert } from '@mui/material';
 import MainLayout from '@/widgets/layout/MainLayout';
-import { useResetPasswordMutation, useVerifyResetTokenMutation } from '@/features/auth/api/auth.api';
+import {
+  useResetPasswordMutation,
+  useVerifyResetTokenMutation,
+} from '@/features/auth/api/auth.api';
 import { useForm } from 'react-hook-form';
-import { getRepeatPasswordValidation, getPasswordValidation } from '@/shared/lib/validation';
+import {
+  getRepeatPasswordValidation,
+  getPasswordValidation,
+} from '@/shared/lib/validation';
 import MainButton from '@/shared/ui/Button/MainButton';
 import { useRouter } from 'next/navigation';
 import { closeModalAuth } from '@/features/auth/model/auth.slice';
@@ -31,7 +37,10 @@ const ResetPasswordPage: React.FC = () => {
   const [error, setError] = useState<string>('');
 
   const [verifyToken] = useVerifyResetTokenMutation();
-  const [resetPassword, { isLoading: isLoadingResetPassword, isSuccess: isSuccessResetPassword }] = useResetPasswordMutation();
+  const [
+    resetPassword,
+    { isLoading: isLoadingResetPassword, isSuccess: isSuccessResetPassword },
+  ] = useResetPasswordMutation();
 
   const {
     register,
@@ -43,8 +52,8 @@ const ResetPasswordPage: React.FC = () => {
     mode: 'onChange',
     defaultValues: {
       password: '',
-      repeatPassword: ''
-    }
+      repeatPassword: '',
+    },
   });
 
   const password = watch('password');
@@ -65,7 +74,10 @@ const ResetPasswordPage: React.FC = () => {
         setIsTokenVerified(true);
       } catch (err) {
         const error = err as ErrorResponse;
-        setError(error.data?.message || 'Ссылка для сброса пароля недействительна или истекла');
+        setError(
+          error.data?.message ||
+            'Ссылка для сброса пароля недействительна или истекла'
+        );
       }
     };
 
@@ -89,7 +101,15 @@ const ResetPasswordPage: React.FC = () => {
   if (!token) {
     return (
       <MainLayout>
-        <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Container
+          maxWidth="sm"
+          sx={{
+            mt: 4,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           <Alert severity="error">Неверная ссылка для сброса пароля</Alert>
         </Container>
       </MainLayout>
@@ -118,17 +138,22 @@ const ResetPasswordPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <Container maxWidth="sm" sx={{ 
-        mt: 4,
-        minHeight: 'calc(100vh - 200px)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
+      <Container
+        maxWidth="sm"
+        sx={{
+          mt: 4,
+          minHeight: 'calc(100vh - 200px)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         {!isSuccessResetPassword ? (
           <div className="flex flex-col items-center w-full">
-            <h1 className="text-2xl font-medium mb-6">Создание нового пароля</h1>
+            <h1 className="text-2xl font-medium mb-6">
+              Создание нового пароля
+            </h1>
             <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md">
               <div className="flex flex-col gap-4">
                 <TextField
@@ -142,7 +167,10 @@ const ResetPasswordPage: React.FC = () => {
                 <TextField
                   label="Повторите пароль"
                   type="password"
-                  {...register('repeatPassword', getRepeatPasswordValidation(getValues))}
+                  {...register(
+                    'repeatPassword',
+                    getRepeatPasswordValidation(getValues)
+                  )}
                   error={!!errors.repeatPassword}
                   helperText={errors.repeatPassword?.message}
                   fullWidth
@@ -150,7 +178,14 @@ const ResetPasswordPage: React.FC = () => {
                 <MainButton
                   text="Сохранить новый пароль"
                   type="submit"
-                  disabled={isLoadingResetPassword || isSuccessResetPassword || !password || !repeatPassword || !!errors.password || !!errors.repeatPassword}
+                  disabled={
+                    isLoadingResetPassword ||
+                    isSuccessResetPassword ||
+                    !password ||
+                    !repeatPassword ||
+                    !!errors.password ||
+                    !!errors.repeatPassword
+                  }
                   onClick={handleSubmit(onSubmit)}
                 />
               </div>
@@ -158,8 +193,12 @@ const ResetPasswordPage: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center text-center">
-            <h1 className="text-2xl font-medium mb-6">Пароль успешно изменен</h1>
-            <p className="text-sm text-gray-500">Вы будете перенаправлены на главную страницу через 5 секунд</p>
+            <h1 className="text-2xl font-medium mb-6">
+              Пароль успешно изменен
+            </h1>
+            <p className="text-sm text-gray-500">
+              Вы будете перенаправлены на главную страницу через 5 секунд
+            </p>
           </div>
         )}
       </Container>
@@ -167,4 +206,4 @@ const ResetPasswordPage: React.FC = () => {
   );
 };
 
-export default ResetPasswordPage; 
+export default ResetPasswordPage;

@@ -1,10 +1,10 @@
-import React from "react";
-import Container from "@mui/material/Container";
-import HelpElement from "@/shared/ui/HelpElement";
+import React from 'react';
+import Container from '@mui/material/Container';
+import HelpElement from '@/shared/ui/HelpElement';
 
 interface HelpProps {
   title: string;
-  style?: React.CSSProperties["justifyContent"];
+  style?: React.CSSProperties['justifyContent'];
 }
 
 const Help: React.FC<HelpProps> = ({ title, style }) => {

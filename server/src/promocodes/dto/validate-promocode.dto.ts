@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ValidatePromocodeDto {
   @ApiProperty({
     description: 'Код промокода',
-    example: 'SUMMER15'
+    example: 'SUMMER15',
   })
   @IsString({ message: 'Код промокода должен быть строкой' })
   code: string;
@@ -13,7 +13,7 @@ export class ValidatePromocodeDto {
   @ApiProperty({
     description: 'Сумма заказа',
     example: 5000,
-    minimum: 0
+    minimum: 0,
   })
   @Type(() => Number)
   @IsNumber({}, { message: 'Сумма заказа должна быть числом' })
@@ -23,7 +23,7 @@ export class ValidatePromocodeDto {
   @ApiProperty({
     description: 'ID пользователя (опционально)',
     example: 1,
-    required: false
+    required: false,
   })
   @IsOptional()
   @Type(() => Number)

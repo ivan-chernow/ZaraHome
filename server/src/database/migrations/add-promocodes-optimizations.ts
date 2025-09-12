@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddPromocodesOptimizations1700000000004 implements MigrationInterface {
+export class AddPromocodesOptimizations1700000000004
+  implements MigrationInterface
+{
   name = 'AddPromocodesOptimizations1700000000004';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

@@ -58,48 +58,54 @@ export const useForm = <T extends Record<string, any>>(
   const validateTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Валидация формы
-  const validateForm = useCallback((values: T) => {
-    if (!validate) return {};
+  const validateForm = useCallback(
+    (values: T) => {
+      if (!validate) return {};
 
-    // Дебаунсинг валидации
-    if (validateTimeoutRef.current) {
-      clearTimeout(validateTimeoutRef.current);
-    }
+      // Дебаунсинг валидации
+      if (validateTimeoutRef.current) {
+        clearTimeout(validateTimeoutRef.current);
+      }
 
-    return new Promise<Partial<Record<keyof T, string>>>((resolve) => {
-      validateTimeoutRef.current = setTimeout(() => {
-        const errors = validate(values);
-        resolve(errors);
-      }, 300);
-    });
-  }, [validate]);
+      return new Promise<Partial<Record<keyof T, string>>>(resolve => {
+        validateTimeoutRef.current = setTimeout(() => {
+          const errors = validate(values);
+          resolve(errors);
+        }, 300);
+      });
+    },
+    [validate]
+  );
 
   // Обновление поля
-  const setFieldValue = useCallback((field: keyof T, value: any) => {
-    setState(prevState => {
-      const newValues = { ...prevState.values, [field]: value };
-      const newDirty = { ...prevState.dirty, [field]: true };
-      const isDirty = Object.values(newDirty).some(Boolean);
+  const setFieldValue = useCallback(
+    (field: keyof T, value: any) => {
+      setState(prevState => {
+        const newValues = { ...prevState.values, [field]: value };
+        const newDirty = { ...prevState.dirty, [field]: true };
+        const isDirty = Object.values(newDirty).some(Boolean);
 
-      return {
-        ...prevState,
-        values: newValues,
-        dirty: newDirty,
-        isDirty,
-      };
-    });
-
-    // Валидация при изменении
-    if (validateOnChange) {
-      validateForm({ ...state.values, [field]: value }).then(errors => {
-        setState(prevState => ({
+        return {
           ...prevState,
-          errors,
-          isValid: Object.keys(errors).length === 0,
-        }));
+          values: newValues,
+          dirty: newDirty,
+          isDirty,
+        };
       });
-    }
-  }, [state.values, validateOnChange, validateForm]);
+
+      // Валидация при изменении
+      if (validateOnChange) {
+        validateForm({ ...state.values, [field]: value }).then(errors => {
+          setState(prevState => ({
+            ...prevState,
+            errors,
+            isValid: Object.keys(errors).length === 0,
+          }));
+        });
+      }
+    },
+    [state.values, validateOnChange, validateForm]
+  );
 
   // Установка ошибки поля
   const setFieldError = useCallback((field: keyof T, error: string) => {
@@ -111,23 +117,26 @@ export const useForm = <T extends Record<string, any>>(
   }, []);
 
   // Отметка поля как "тронутого"
-  const setFieldTouched = useCallback((field: keyof T, touched: boolean = true) => {
-    setState(prevState => ({
-      ...prevState,
-      touched: { ...prevState.touched, [field]: touched },
-    }));
+  const setFieldTouched = useCallback(
+    (field: keyof T, touched: boolean = true) => {
+      setState(prevState => ({
+        ...prevState,
+        touched: { ...prevState.touched, [field]: touched },
+      }));
 
-    // Валидация при потере фокуса
-    if (validateOnBlur && touched) {
-      validateForm(state.values).then(errors => {
-        setState(prevState => ({
-          ...prevState,
-          errors,
-          isValid: Object.keys(errors).length === 0,
-        }));
-      });
-    }
-  }, [state.values, validateOnBlur, validateForm]);
+      // Валидация при потере фокуса
+      if (validateOnBlur && touched) {
+        validateForm(state.values).then(errors => {
+          setState(prevState => ({
+            ...prevState,
+            errors,
+            isValid: Object.keys(errors).length === 0,
+          }));
+        });
+      }
+    },
+    [state.values, validateOnBlur, validateForm]
+  );
 
   // Сброс формы
   const resetForm = useCallback(() => {
@@ -143,35 +152,38 @@ export const useForm = <T extends Record<string, any>>(
   }, [initialValues]);
 
   // Отправка формы
-  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    setState(prevState => ({ ...prevState, isSubmitting: true }));
-
-    try {
-      // Валидация перед отправкой
-      if (validate) {
-        const errors = await validateForm(state.values);
-        if (Object.keys(errors).length > 0) {
-          setState(prevState => ({
-            ...prevState,
-            errors,
-            isValid: false,
-            isSubmitting: false,
-          }));
-          return;
-        }
+  const handleSubmit = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) {
+        e.preventDefault();
       }
 
-      await onSubmit(state.values);
-    } catch {
-      // Error handling without console logging
-    } finally {
-      setState(prevState => ({ ...prevState, isSubmitting: false }));
-    }
-  }, [state.values, validate, validateForm, onSubmit]);
+      setState(prevState => ({ ...prevState, isSubmitting: true }));
+
+      try {
+        // Валидация перед отправкой
+        if (validate) {
+          const errors = await validateForm(state.values);
+          if (Object.keys(errors).length > 0) {
+            setState(prevState => ({
+              ...prevState,
+              errors,
+              isValid: false,
+              isSubmitting: false,
+            }));
+            return;
+          }
+        }
+
+        await onSubmit(state.values);
+      } catch {
+        // Error handling without console logging
+      } finally {
+        setState(prevState => ({ ...prevState, isSubmitting: false }));
+      }
+    },
+    [state.values, validate, validateForm, onSubmit]
+  );
 
   // Очистка таймаута при размонтировании
   useEffect(() => {
@@ -213,17 +225,26 @@ export const useFormField = <T extends Record<string, any>, K extends keyof T>(
   const touched = form.touched[field] || false;
   const dirty = form.dirty[field] || false;
 
-  const setValue = useCallback((newValue: T[K]) => {
-    form.setFieldValue(field, newValue);
-  }, [form, field]);
+  const setValue = useCallback(
+    (newValue: T[K]) => {
+      form.setFieldValue(field, newValue);
+    },
+    [form, field]
+  );
 
-  const setError = useCallback((newError: string) => {
-    form.setFieldError(field, newError);
-  }, [form, field]);
+  const setError = useCallback(
+    (newError: string) => {
+      form.setFieldError(field, newError);
+    },
+    [form, field]
+  );
 
-  const setTouched = useCallback((newTouched: boolean = true) => {
-    form.setFieldTouched(field, newTouched);
-  }, [form, field]);
+  const setTouched = useCallback(
+    (newTouched: boolean = true) => {
+      form.setFieldTouched(field, newTouched);
+    },
+    [form, field]
+  );
 
   return {
     value,
@@ -242,10 +263,7 @@ export const useFormField = <T extends Record<string, any>, K extends keyof T>(
  * @param delay - задержка в миллисекундах
  * @returns дебаунсированное значение
  */
-export const useFormFieldDebounce = <T>(
-  value: T,
-  delay: number = 300
-): T => {
+export const useFormFieldDebounce = <T>(value: T, delay: number = 300): T => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
   const timeoutRef = useRef<NodeJS.Timeout>();
 

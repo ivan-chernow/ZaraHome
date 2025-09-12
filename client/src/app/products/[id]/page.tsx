@@ -1,37 +1,47 @@
-"use client";
-import React, { use, useEffect, useMemo, useState, useCallback } from "react";
-import FavoriteButton from "@/shared/ui/Button/FavoriteButton";
-import VerticalLine from "@/shared/ui/VerticalLine";
-import Image from "next/image";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import OftenBought from "@/widgets/recommendations/OftenBought";
-import WhyUs from "@/widgets/why-us/ui/WhyUs";
-import Help from "@/widgets/help/ui/Help";
+'use client';
+import React, { use, useEffect, useMemo, useState, useCallback } from 'react';
+import FavoriteButton from '@/shared/ui/Button/FavoriteButton';
+import VerticalLine from '@/shared/ui/VerticalLine';
+import Image from 'next/image';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import OftenBought from '@/widgets/recommendations/OftenBought';
+import WhyUs from '@/widgets/why-us/ui/WhyUs';
+import Help from '@/widgets/help/ui/Help';
 import {
   FormControl,
   MenuItem,
   Select,
   SelectChangeEvent,
   Container,
-} from "@mui/material";
-import Color from "@/shared/ui/Color";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
-import { setActiveColor } from "@/entities/favorite/model/productCard.slice";
-import HomeIcon from "@/shared/ui/HomeIcon";
-import MainButton from "@/shared/ui/Button/MainButton";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
+} from '@mui/material';
+import Color from '@/shared/ui/Color';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
+import { setActiveColor } from '@/entities/favorite/model/productCard.slice';
+import HomeIcon from '@/shared/ui/HomeIcon';
+import MainButton from '@/shared/ui/Button/MainButton';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
 import {
   findProductPathById,
   customSlugify,
-} from "@/entities/category/lib/catalog.utils";
-import SliderSwiper from "@/shared/ui/SliderSwiper";
-import Link from "next/link";
-import Skeleton from "@mui/material/Skeleton";
-import { expandCategory, expandSubCategory } from "@/entities/category/model/catalog.slice";
-import { useAddToCartMutation, useRemoveFromCartMutation } from "@/entities/cart/api/cart.api";
-import { addCartItem, removeCartItem, setCartItems } from "@/entities/cart/model/cartItems.slice";
-import { getLocalStorage, setLocalStorage } from "@/shared/lib/storage";
+} from '@/entities/category/lib/catalog.utils';
+import SliderSwiper from '@/shared/ui/SliderSwiper';
+import Link from 'next/link';
+import Skeleton from '@mui/material/Skeleton';
+import {
+  expandCategory,
+  expandSubCategory,
+} from '@/entities/category/model/catalog.slice';
+import {
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+} from '@/entities/cart/api/cart.api';
+import {
+  addCartItem,
+  removeCartItem,
+  setCartItems,
+} from '@/entities/cart/model/cartItems.slice';
+import { getLocalStorage, setLocalStorage } from '@/shared/lib/storage';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -44,16 +54,18 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
   const activeColors = useSelector(
     (state: RootState) => state.productCard.activeColors
   );
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
   const cartItems = useSelector((state: RootState) => state.cartItems.items);
 
-  console.log("Resolved params:", resolvedParams);
-  console.log("Categories data:", categories);
-  console.log("Product ID being searched:", resolvedParams.id);
+  console.log('Resolved params:', resolvedParams);
+  console.log('Categories data:', categories);
+  console.log('Product ID being searched:', resolvedParams.id);
 
   const pathData = findProductPathById(categories, resolvedParams.id);
 
-  console.log("Path data found:", pathData);
+  console.log('Path data found:', pathData);
 
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
     pathData?.product.size ? Object.keys(pathData.product.size)[0] : undefined
@@ -90,7 +102,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
   const activeColor = activeColors[product.id];
 
   const isInCart = useMemo(
-    () => cartItems.some((item: any) => item.id === product.id && item.size === selectedSize && item.color === activeColor),
+    () =>
+      cartItems.some(
+        (item: any) =>
+          item.id === product.id &&
+          item.size === selectedSize &&
+          item.color === activeColor
+      ),
     [cartItems, product.id, selectedSize, activeColor]
   );
 
@@ -113,37 +131,107 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
     product.size?.[sizeKey]?.size || sizeKey;
 
   const currentPrice = useMemo(() => {
-    const key = selectedSize || (product.size ? Object.keys(product.size)[0] : "");
+    const key =
+      selectedSize || (product.size ? Object.keys(product.size)[0] : '');
     return key ? getPriceBySize(key) : 0;
   }, [selectedSize]);
 
   const handleAuthenticatedToggle = useCallback(async () => {
     try {
       if (isInCart) {
-        dispatch(removeCartItem({ id: product.id, size: selectedSize, color: activeColor }));
+        dispatch(
+          removeCartItem({
+            id: product.id,
+            size: selectedSize,
+            color: activeColor,
+          })
+        );
         await removeFromCart(product.id).unwrap();
       } else {
-        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor, name_eng: product.name_eng, name_ru: product.name_ru }));
+        dispatch(
+          addCartItem({
+            id: product.id,
+            price: currentPrice,
+            img: product.img?.[0],
+            size: selectedSize,
+            color: activeColor,
+            name_eng: product.name_eng,
+            name_ru: product.name_ru,
+          })
+        );
         await addToCart(product.id).unwrap();
       }
     } catch (error) {
       if (isInCart) {
-        dispatch(addCartItem({ id: product.id, price: currentPrice, img: product.img?.[0], size: selectedSize, color: activeColor, name_eng: product.name_eng, name_ru: product.name_ru }));
+        dispatch(
+          addCartItem({
+            id: product.id,
+            price: currentPrice,
+            img: product.img?.[0],
+            size: selectedSize,
+            color: activeColor,
+            name_eng: product.name_eng,
+            name_ru: product.name_ru,
+          })
+        );
       } else {
-        dispatch(removeCartItem({ id: product.id, size: selectedSize, color: activeColor }));
+        dispatch(
+          removeCartItem({
+            id: product.id,
+            size: selectedSize,
+            color: activeColor,
+          })
+        );
       }
-      console.error("Ошибка при работе с корзиной:", error);
+      console.error('Ошибка при работе с корзиной:', error);
     }
-  }, [isInCart, product?.id, currentPrice, product?.img, addToCart, removeFromCart, dispatch]);
+  }, [
+    isInCart,
+    product?.id,
+    currentPrice,
+    product?.img,
+    addToCart,
+    removeFromCart,
+    dispatch,
+  ]);
 
   const handleGuestToggle = useCallback(() => {
-    const cart = getLocalStorage("cart", []);
+    const cart = getLocalStorage('cart', []);
     const updatedCart = isInCart
-      ? cart.filter((item: any) => !(item.id === product.id && item.size === selectedSize && item.color === activeColor))
-      : [...cart, { id: product.id, price: currentPrice, quantity: 1, img: product.img?.[0], size: selectedSize, color: activeColor, name_eng: product.name_eng, name_ru: product.name_ru }];
-    setLocalStorage("cart", updatedCart);
+      ? cart.filter(
+          (item: any) =>
+            !(
+              item.id === product.id &&
+              item.size === selectedSize &&
+              item.color === activeColor
+            )
+        )
+      : [
+          ...cart,
+          {
+            id: product.id,
+            price: currentPrice,
+            quantity: 1,
+            img: product.img?.[0],
+            size: selectedSize,
+            color: activeColor,
+            name_eng: product.name_eng,
+            name_ru: product.name_ru,
+          },
+        ];
+    setLocalStorage('cart', updatedCart);
     dispatch(setCartItems(updatedCart));
-  }, [isInCart, product?.id, currentPrice, product?.img, selectedSize, activeColor, product?.name_eng, product?.name_ru, dispatch]);
+  }, [
+    isInCart,
+    product?.id,
+    currentPrice,
+    product?.img,
+    selectedSize,
+    activeColor,
+    product?.name_eng,
+    product?.name_ru,
+    dispatch,
+  ]);
 
   const handleCartClick = useCallback(() => {
     if (isAuthenticated) {
@@ -166,7 +254,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
 
   const categorySlug = customSlugify(category.name);
   const subCategorySlug = customSlugify(subCategory.name);
-  const typeSlug = type ? customSlugify(type.name) : "";
+  const typeSlug = type ? customSlugify(type.name) : '';
 
   return (
     <div className="flex flex-col ml-[10px]">
@@ -174,11 +262,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
         <Link href="/" className="flex items-center hover:underline">
           <HomeIcon />
         </Link>
-        <span className="mx-1">{">"}</span>
+        <span className="mx-1">{'>'}</span>
         <Link href="/products" className="hover:underline">
           Каталог товаров
         </Link>
-        <span className="mx-1">{">"}</span>
+        <span className="mx-1">{'>'}</span>
         <Link
           href={`/products/category/${categorySlug}`}
           className="hover:underline"
@@ -187,7 +275,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
         </Link>
         {subCategory.name && (
           <>
-            <span className="mx-1">{">"}</span>
+            <span className="mx-1">{'>'}</span>
             <Link
               href={`/products/category/${categorySlug}/${subCategorySlug}`}
               className="hover:underline"
@@ -198,7 +286,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
         )}
         {type && type.name && (
           <>
-            <span className="mx-1">{">"}</span>
+            <span className="mx-1">{'>'}</span>
             <Link
               href={`/products/category/${categorySlug}/${subCategorySlug}/${typeSlug}`}
               className="hover:underline"
@@ -207,7 +295,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
             </Link>
           </>
         )}
-        <span className="mx-1">{">"}</span>
+        <span className="mx-1">{'>'}</span>
         <span className="text-[#00000099] underline font-medium">
           {product.name_ru}
         </span>
@@ -228,7 +316,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
         <div className="flex flex-col max-w-[440px]">
           <p className="font-light mb-[11px]">Выберите цвет</p>
           <div className="mb-[24px] flex flex-row ">
-            {Object.keys(product.colors).map((color) => (
+            {Object.keys(product.colors).map(color => (
               <Color
                 key={color}
                 color={product.colors[color as keyof typeof product.colors]}
@@ -241,9 +329,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
           <p className="font-light mb-[12px]">Выберите размер</p>
           <FormControl fullWidth>
             <Select
-              value={selectedSize || ""}
+              value={selectedSize || ''}
               onChange={handleSizeChange}
-              renderValue={(selected) => {
+              renderValue={selected => {
                 if (!selected) return null;
                 const price = getPriceBySize(selected as string);
                 const sizeName = getSizeName(selected as string);
@@ -253,7 +341,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
                       {sizeName}
                     </div>
                     <div className="font-medium font-roboto text-[22px] z-10 flex items-center mr-[32px]">
-                      {price.toLocaleString("ru-RU")}{" "}
+                      {price.toLocaleString('ru-RU')}{' '}
                       <span className="font-bold font-ysabeau text-[20px] ml-1">
                         ₽
                       </span>
@@ -263,20 +351,20 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
                 );
               }}
               sx={{
-                fontSize: "18px",
-                fontWeight: "500",
-                fontFamily: "Ysabeau",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                "& .MuiSelect-icon": {
+                fontSize: '18px',
+                fontWeight: '500',
+                fontFamily: 'Ysabeau',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                '& .MuiSelect-icon': {
                   fontSize: 27,
                   right: 18,
                 },
               }}
             >
               {product.size &&
-                Object.keys(product.size).map((sizeKey) => {
+                Object.keys(product.size).map(sizeKey => {
                   const price = getPriceBySize(sizeKey);
                   const sizeName = getSizeName(sizeKey);
                   return (
@@ -284,12 +372,12 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
                       key={sizeKey}
                       value={sizeKey}
                       sx={{
-                        fontSize: "16px",
-                        fontWeight: "500",
-                        fontFamily: "Ysabeau SC",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        fontFamily: 'Ysabeau SC',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                       }}
                     >
                       {sizeName}
@@ -297,7 +385,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
                         className="font-medium text-[22px] font-roboto"
                         style={{ marginLeft: 12 }}
                       >
-                        {price.toLocaleString("ru-RU")}{" "}
+                        {price.toLocaleString('ru-RU')}{' '}
                         <span className="font-bold text-[20px] font-ysabeau">
                           ₽
                         </span>
@@ -312,7 +400,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ params }) => {
               <FavoriteButton productId={product.id} />
             </div>
             <MainButton
-              text={isInCart ? "В КОРЗИНЕ" : "ДОБАВИТЬ В КОРЗИНУ"}
+              text={isInCart ? 'В КОРЗИНЕ' : 'ДОБАВИТЬ В КОРЗИНУ'}
               disabled={false}
               onClick={handleCartClick}
               type="button"

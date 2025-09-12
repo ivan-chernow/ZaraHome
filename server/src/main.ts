@@ -50,7 +50,7 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
+    })
   );
 
   if (config.app.isDevelopment) {
@@ -58,9 +58,9 @@ async function bootstrap() {
   }
 
   await app.listen(config.app.port);
-  
+
   console.log(`🎉 Server is running on: http://localhost:${config.app.port}`);
-  
+
   if (config.app.isDevelopment) {
     logDevelopmentInfo(config);
   }
@@ -84,7 +84,9 @@ function validateCriticalConfig(config: any) {
   if (errors.length > 0) {
     console.error('❌ Configuration validation failed:');
     errors.forEach(error => console.error(`   - ${error}`));
-    console.error('Please check your .env file and required environment variables');
+    console.error(
+      'Please check your .env file and required environment variables'
+    );
     process.exit(1);
   }
 
@@ -95,7 +97,9 @@ function logServerConfig(config: any) {
   console.log('🚀 Starting ZaraHome ECOM Server');
   console.log(`🌍 Environment: ${config.app.nodeEnv}`);
   console.log(`🌐 Port: ${config.app.port}`);
-  console.log(`🗄️ Database: ${config.database.host}:${config.database.port}/${config.database.database}`);
+  console.log(
+    `🗄️ Database: ${config.database.host}:${config.database.port}/${config.database.database}`
+  );
   console.log(`🔐 JWT Expires In: ${config.jwt.accessExpiresIn}`);
 }
 
@@ -106,20 +110,22 @@ function setupSwagger(app: NestExpressApplication) {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  
+
   console.log('📚 Swagger documentation available at /docs');
 }
 
 function logDevelopmentInfo(config: any) {
   console.log('🔍 Development mode enabled');
-  console.log(`📊 Database sync: ${config.database.synchronize ? 'ON' : 'OFF'}`);
+  console.log(
+    `📊 Database sync: ${config.database.synchronize ? 'ON' : 'OFF'}`
+  );
   console.log(`📝 Database logging: ${config.database.logging ? 'ON' : 'OFF'}`);
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch(error => {
   console.error('❌ Failed to start server:', error);
   process.exit(1);
-});  
+});

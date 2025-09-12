@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
-import Header from "@/widgets/header/ui/Header";
-import NavMenu from "@/widgets/nav-menu/ui/NavMenu";
-import NewClothes from "@/widgets/new-clothes/ui/NewClothes";
-import Catalog from "@/widgets/catalog/ui/Catalog";
-import WhyUs from "@/widgets/why-us/ui/WhyUs";
-import Question from "@/widgets/Question";
-import Help from "@/widgets/help/ui/Help";
-import Footer from "@/widgets/footer/ui/Footer";
-import ScrollToTop from "@/shared/ui/ScrollToTop";
+import React from 'react';
+import Header from '@/widgets/header/ui/Header';
+import NavMenu from '@/widgets/nav-menu/ui/NavMenu';
+import NewClothes from '@/widgets/new-clothes/ui/NewClothes';
+import Catalog from '@/widgets/catalog/ui/Catalog';
+import WhyUs from '@/widgets/why-us/ui/WhyUs';
+import Question from '@/widgets/Question';
+import Help from '@/widgets/help/ui/Help';
+import Footer from '@/widgets/footer/ui/Footer';
+import ScrollToTop from '@/shared/ui/ScrollToTop';
 
 const App: React.FC = () => {
   return (

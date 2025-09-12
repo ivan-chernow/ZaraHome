@@ -1,12 +1,23 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ResourceNotFoundException, ConflictException } from 'src/shared/shared.interfaces';
+import {
+  ResourceNotFoundException,
+  ConflictException,
+} from 'src/shared/shared.interfaces';
 import { ProductsRepository } from './products.repository';
-import { Product, Category, IProductService, CreateProductDto } from '../shared/shared.interfaces';
+import {
+  Product,
+  Category,
+  IProductService,
+  CreateProductDto,
+} from '../shared/shared.interfaces';
 import { ImageOptimizationService } from 'src/shared/services/image-optimization.service';
-import { validateUploadedFiles } from 'src/shared/upload/file-upload.helper';
 import { FileUploadErrorHandlerService } from 'src/shared/services/file-upload-error-handler.service';
 import { CacheService } from '../shared/cache/cache.service';
-import { CACHE_TTL, CACHE_PREFIXES, CACHE_KEYS } from '../shared/cache/cache.constants';
+import {
+  CACHE_TTL,
+  CACHE_PREFIXES,
+  CACHE_KEYS,
+} from '../shared/cache/cache.constants';
 import { PRODUCTS_CONSTANTS } from './products.constants';
 
 interface ProductFilters {
@@ -43,22 +54,39 @@ interface ProductListResponse {
 
 @Injectable()
 export class ProductsService implements IProductService {
-  constructor(
-    private readonly productsRepository: ProductsRepository,
-    private readonly imageOptimizationService: ImageOptimizationService,
-    private readonly errorHandlerService: FileUploadErrorHandlerService,
-    private readonly cacheService: CacheService,
-  ) {}
+  private readonly productsRepository: ProductsRepository;
+  private readonly imageOptimizationService: ImageOptimizationService;
+  private readonly errorHandlerService: FileUploadErrorHandlerService;
+  private readonly cacheService: CacheService;
 
-  async createProduct(dto: CreateProductDto, files?: Express.Multer.File[]): Promise<Product> {
+  constructor(
+    productsRepository: ProductsRepository,
+    imageOptimizationService: ImageOptimizationService,
+    errorHandlerService: FileUploadErrorHandlerService,
+    cacheService: CacheService
+  ) {
+    this.productsRepository = productsRepository;
+    this.imageOptimizationService = imageOptimizationService;
+    this.errorHandlerService = errorHandlerService;
+    this.cacheService = cacheService;
+  }
+
+  async createProduct(
+    dto: CreateProductDto,
+    files?: Express.Multer.File[]
+  ): Promise<Product> {
     if (files && files.length > 0) {
       // Валидируем загруженные файлы с graceful fallback
       const validationResults = await Promise.all(
-        files.map(file => this.errorHandlerService.validateFileWithFallback(file))
+        files.map(file =>
+          this.errorHandlerService.validateFileWithFallback(file)
+        )
       );
 
-      const validFiles = files.filter((_, index) => validationResults[index].valid);
-      
+      const validFiles = files.filter(
+        (_, index) => validationResults[index].valid
+      );
+
       if (validFiles.length === 0) {
         throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.NO_VALID_FILES);
       }
@@ -66,7 +94,7 @@ export class ProductsService implements IProductService {
       // Обрабатываем изображения с обработкой ошибок
       const uploadResult = await this.errorHandlerService.handleUploadErrors(
         validFiles,
-        async (file) => {
+        async file => {
           const result = await this.imageOptimizationService.processAndSave(
             file.buffer,
             file.originalname,
@@ -74,7 +102,7 @@ export class ProductsService implements IProductService {
               quality: 80,
               width: 1600,
               height: 1600,
-              format: 'webp'
+              format: 'webp',
             }
           );
           return result.mainPath;
@@ -96,15 +124,15 @@ export class ProductsService implements IProductService {
   async create(data: CreateProductDto): Promise<Product> {
     // Валидация входных данных
     this.validateProductData(data);
-    
+
     // Создаем объект для передачи в репозиторий
     const productData: any = { ...data };
 
     const product = await this.productsRepository.createProduct(productData);
-    
+
     // Инвалидируем кеш после создания продукта
     await this.invalidateProductCache();
-    
+
     return product;
   }
 
@@ -113,14 +141,23 @@ export class ProductsService implements IProductService {
     sort?: ProductSort,
     pagination?: PaginationOptions
   ): Promise<ProductListResponse> {
-    const { page = 1, limit = PRODUCTS_CONSTANTS.DEFAULT_PAGE_SIZE } = pagination || {};
+    const { page = 1, limit = PRODUCTS_CONSTANTS.DEFAULT_PAGE_SIZE } =
+      pagination || {};
     const defaultSort: ProductSort = { field: 'createdAt', order: 'DESC' };
     const finalSort = sort || defaultSort;
 
     // Создаем ключ кеша на основе фильтров и сортировки
-    const cacheKey = this.generateCacheKey('products', { filters, sort: finalSort, page, limit });
+    const cacheKey = this.generateCacheKey('products', {
+      filters,
+      sort: finalSort,
+      page,
+      limit,
+    });
 
-    const cachedResult = await this.cacheService.get(cacheKey, CACHE_PREFIXES.PRODUCTS);
+    const cachedResult = await this.cacheService.get(
+      cacheKey,
+      CACHE_PREFIXES.PRODUCTS
+    );
     if (cachedResult) {
       return cachedResult as ProductListResponse;
     }
@@ -133,14 +170,10 @@ export class ProductsService implements IProductService {
     );
 
     // Кешируем результат
-    await this.cacheService.set(
-      cacheKey,
-      result,
-      { 
-        ttl: CACHE_TTL.PRODUCTS, 
-        prefix: CACHE_PREFIXES.PRODUCTS 
-      }
-    );
+    await this.cacheService.set(cacheKey, result, {
+      ttl: CACHE_TTL.PRODUCTS,
+      prefix: CACHE_PREFIXES.PRODUCTS,
+    });
 
     return result;
   }
@@ -149,9 +182,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       `${CACHE_KEYS.PRODUCT_BY_ID}:${id}`,
       () => this.productsRepository.findProductById(id),
-      { 
-        ttl: CACHE_TTL.PRODUCTS, 
-        prefix: CACHE_PREFIXES.PRODUCTS 
+      {
+        ttl: CACHE_TTL.PRODUCTS,
+        prefix: CACHE_PREFIXES.PRODUCTS,
       }
     );
   }
@@ -161,18 +194,21 @@ export class ProductsService implements IProductService {
     if (!product) {
       throw new ResourceNotFoundException('Продукт не найден');
     }
-    
+
     // Валидация обновляемых данных
     this.validateProductData(data, true);
-    
-    const updatedProduct = await this.productsRepository.updateProduct(id, data);
+
+    const updatedProduct = await this.productsRepository.updateProduct(
+      id,
+      data
+    );
     if (!updatedProduct) {
       throw new ConflictException(PRODUCTS_CONSTANTS.ERRORS.UPDATE_FAILED);
     }
 
     // Инвалидируем кеш после обновления
     await this.invalidateProductCacheById(id);
-    
+
     return updatedProduct;
   }
 
@@ -183,23 +219,25 @@ export class ProductsService implements IProductService {
     }
 
     await this.productsRepository.removeProduct(id);
-    
+
     // Инвалидируем кеш после удаления
     await this.invalidateProductCacheById(id);
   }
 
-  async deleteMultiple(ids: number[]): Promise<{ deleted: number; failed: number }> {
+  async deleteMultiple(
+    ids: number[]
+  ): Promise<{ deleted: number; failed: number }> {
     if (!ids.length) {
       throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.NO_IDS_PROVIDED);
     }
 
     if (ids.length > PRODUCTS_CONSTANTS.MAX_BATCH_SIZE) {
-      throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.BATCH_SIZE_EXCEEDED);
+      throw new BadRequestException(
+        PRODUCTS_CONSTANTS.ERRORS.BATCH_SIZE_EXCEEDED
+      );
     }
 
-    const results = await Promise.allSettled(
-      ids.map(id => this.delete(id))
-    );
+    const results = await Promise.allSettled(ids.map(id => this.delete(id)));
 
     const deleted = results.filter(r => r.status === 'fulfilled').length;
     const failed = results.filter(r => r.status === 'rejected').length;
@@ -217,7 +255,7 @@ export class ProductsService implements IProductService {
         const categories = await this.findAllCategories();
         const [newProducts, discountedProducts] = await Promise.all([
           this.findNewProducts(),
-          this.findDiscountedProducts()
+          this.findDiscountedProducts(),
         ]);
 
         // Бизнес-логика: добавление новинок и скидок в соответствующие категории
@@ -230,21 +268,23 @@ export class ProductsService implements IProductService {
         if (skidkiCategory) {
           skidkiCategory.products = discountedProducts;
         }
-        
+
         return categories;
       },
-      { 
-        ttl: CACHE_TTL.CATALOG, 
-        prefix: CACHE_PREFIXES.CATALOG 
+      {
+        ttl: CACHE_TTL.CATALOG,
+        prefix: CACHE_PREFIXES.CATALOG,
       }
     );
   }
 
   async findByIds(ids: number[]): Promise<Product[]> {
     if (!ids.length) return [];
-    
+
     if (ids.length > PRODUCTS_CONSTANTS.MAX_BATCH_SIZE) {
-      throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.BATCH_SIZE_EXCEEDED);
+      throw new BadRequestException(
+        PRODUCTS_CONSTANTS.ERRORS.BATCH_SIZE_EXCEEDED
+      );
     }
 
     return this.productsRepository.findProductsByIds(ids);
@@ -259,9 +299,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       cacheKey,
       () => this.productsRepository.searchProducts(query, limit),
-      { 
-        ttl: CACHE_TTL.SEARCH, 
-        prefix: CACHE_PREFIXES.SEARCH 
+      {
+        ttl: CACHE_TTL.SEARCH,
+        prefix: CACHE_PREFIXES.SEARCH,
       }
     );
   }
@@ -276,9 +316,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       'stats:products',
       () => this.productsRepository.getProductStats(),
-      { 
-        ttl: CACHE_TTL.STATS, 
-        prefix: CACHE_PREFIXES.STATS 
+      {
+        ttl: CACHE_TTL.STATS,
+        prefix: CACHE_PREFIXES.STATS,
       }
     );
   }
@@ -290,9 +330,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       CACHE_KEYS.ALL_CATEGORIES,
       () => this.productsRepository.findAllCategories(),
-      { 
-        ttl: CACHE_TTL.CATEGORIES, 
-        prefix: CACHE_PREFIXES.CATEGORIES 
+      {
+        ttl: CACHE_TTL.CATEGORIES,
+        prefix: CACHE_PREFIXES.CATEGORIES,
       }
     );
   }
@@ -304,9 +344,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       `${CACHE_KEYS.CATEGORY_BY_ID}:${id}`,
       () => this.productsRepository.findCategoryById(id),
-      { 
-        ttl: CACHE_TTL.CATEGORIES, 
-        prefix: CACHE_PREFIXES.CATEGORIES 
+      {
+        ttl: CACHE_TTL.CATEGORIES,
+        prefix: CACHE_PREFIXES.CATEGORIES,
       }
     );
   }
@@ -318,9 +358,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       CACHE_KEYS.NEW_PRODUCTS,
       () => this.productsRepository.findNewProducts(),
-      { 
-        ttl: CACHE_TTL.PRODUCTS, 
-        prefix: CACHE_PREFIXES.PRODUCTS 
+      {
+        ttl: CACHE_TTL.PRODUCTS,
+        prefix: CACHE_PREFIXES.PRODUCTS,
       }
     );
   }
@@ -332,9 +372,9 @@ export class ProductsService implements IProductService {
     return this.cacheService.getOrSet(
       CACHE_KEYS.DISCOUNTED_PRODUCTS,
       () => this.productsRepository.findDiscountedProducts(),
-      { 
-        ttl: CACHE_TTL.PRODUCTS, 
-        prefix: CACHE_PREFIXES.PRODUCTS 
+      {
+        ttl: CACHE_TTL.PRODUCTS,
+        prefix: CACHE_PREFIXES.PRODUCTS,
       }
     );
   }
@@ -342,16 +382,29 @@ export class ProductsService implements IProductService {
   /**
    * Валидация данных продукта
    */
-  private validateProductData(data: Partial<CreateProductDto>, isUpdate: boolean = false): void {
+  private validateProductData(
+    data: Partial<CreateProductDto>,
+    isUpdate: boolean = false
+  ): void {
     if (!isUpdate || data.name_eng !== undefined) {
-      if (!data.name_eng || data.name_eng.trim().length < PRODUCTS_CONSTANTS.MIN_NAME_LENGTH) {
-        throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.INVALID_NAME_ENG);
+      if (
+        !data.name_eng ||
+        data.name_eng.trim().length < PRODUCTS_CONSTANTS.MIN_NAME_LENGTH
+      ) {
+        throw new BadRequestException(
+          PRODUCTS_CONSTANTS.ERRORS.INVALID_NAME_ENG
+        );
       }
     }
 
     if (!isUpdate || data.name_ru !== undefined) {
-      if (!data.name_ru || data.name_ru.trim().length < PRODUCTS_CONSTANTS.MIN_NAME_LENGTH) {
-        throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.INVALID_NAME_RU);
+      if (
+        !data.name_ru ||
+        data.name_ru.trim().length < PRODUCTS_CONSTANTS.MIN_NAME_LENGTH
+      ) {
+        throw new BadRequestException(
+          PRODUCTS_CONSTANTS.ERRORS.INVALID_NAME_RU
+        );
       }
     }
 
@@ -362,13 +415,19 @@ export class ProductsService implements IProductService {
 
       for (const sizeItem of data.size) {
         if (!sizeItem.size || sizeItem.price <= 0) {
-          throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.INVALID_SIZE_ITEM);
+          throw new BadRequestException(
+            PRODUCTS_CONSTANTS.ERRORS.INVALID_SIZE_ITEM
+          );
         }
       }
     }
 
     if (!isUpdate || data.colors !== undefined) {
-      if (!data.colors || !Array.isArray(data.colors) || data.colors.length === 0) {
+      if (
+        !data.colors ||
+        !Array.isArray(data.colors) ||
+        data.colors.length === 0
+      ) {
         throw new BadRequestException(PRODUCTS_CONSTANTS.ERRORS.INVALID_COLORS);
       }
     }
@@ -390,7 +449,7 @@ export class ProductsService implements IProductService {
       this.cacheService.deleteByPrefix(CACHE_PREFIXES.PRODUCTS),
       this.cacheService.deleteByPrefix(CACHE_PREFIXES.CATEGORIES),
       this.cacheService.deleteByPrefix(CACHE_PREFIXES.SEARCH),
-      this.cacheService.deleteByPrefix(CACHE_PREFIXES.STATS)
+      this.cacheService.deleteByPrefix(CACHE_PREFIXES.STATS),
     ]);
   }
 
@@ -399,9 +458,12 @@ export class ProductsService implements IProductService {
    */
   async invalidateProductCacheById(id: number): Promise<void> {
     await Promise.all([
-      this.cacheService.delete(`${CACHE_KEYS.PRODUCT_BY_ID}:${id}`, CACHE_PREFIXES.PRODUCTS),
+      this.cacheService.delete(
+        `${CACHE_KEYS.PRODUCT_BY_ID}:${id}`,
+        CACHE_PREFIXES.PRODUCTS
+      ),
       this.cacheService.deleteByPrefix(CACHE_PREFIXES.SEARCH),
-      this.cacheService.deleteByPrefix(CACHE_PREFIXES.STATS)
+      this.cacheService.deleteByPrefix(CACHE_PREFIXES.STATS),
     ]);
   }
 }

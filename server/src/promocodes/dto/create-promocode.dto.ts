@@ -1,4 +1,12 @@
-import { IsString, IsNumber, IsOptional, IsDateString, Min, Max, Length } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsDateString,
+  Min,
+  Max,
+  Length,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { PROMOCODES_CONSTANTS } from '../promocodes.constants';
@@ -8,13 +16,15 @@ export class CreatePromocodeDto {
     description: 'Код промокода',
     example: 'SUMMER15',
     minLength: 3,
-    maxLength: 20
+    maxLength: 20,
   })
   @IsString({ message: 'Код промокода должен быть строкой' })
   @Length(
-    PROMOCODES_CONSTANTS.MIN_CODE_LENGTH, 
-    PROMOCODES_CONSTANTS.MAX_CODE_LENGTH, 
-    { message: `Код промокода должен содержать от ${PROMOCODES_CONSTANTS.MIN_CODE_LENGTH} до ${PROMOCODES_CONSTANTS.MAX_CODE_LENGTH} символов` }
+    PROMOCODES_CONSTANTS.MIN_CODE_LENGTH,
+    PROMOCODES_CONSTANTS.MAX_CODE_LENGTH,
+    {
+      message: `Код промокода должен содержать от ${PROMOCODES_CONSTANTS.MIN_CODE_LENGTH} до ${PROMOCODES_CONSTANTS.MAX_CODE_LENGTH} символов`,
+    }
   )
   code: string;
 
@@ -22,19 +32,23 @@ export class CreatePromocodeDto {
     description: 'Размер скидки в процентах',
     example: 15,
     minimum: 1,
-    maximum: 100
+    maximum: 100,
   })
   @Type(() => Number)
   @IsNumber({}, { message: 'Скидка должна быть числом' })
-  @Min(PROMOCODES_CONSTANTS.MIN_DISCOUNT, { message: 'Скидка должна быть не менее 1%' })
-  @Max(PROMOCODES_CONSTANTS.MAX_DISCOUNT, { message: 'Скидка не может превышать 100%' })
+  @Min(PROMOCODES_CONSTANTS.MIN_DISCOUNT, {
+    message: 'Скидка должна быть не менее 1%',
+  })
+  @Max(PROMOCODES_CONSTANTS.MAX_DISCOUNT, {
+    message: 'Скидка не может превышать 100%',
+  })
   discount: number;
 
   @ApiProperty({
     description: 'Максимальное количество использований',
     example: 100,
     required: false,
-    minimum: 1
+    minimum: 1,
   })
   @IsOptional()
   @Type(() => Number)
@@ -46,7 +60,7 @@ export class CreatePromocodeDto {
     description: 'Минимальная сумма заказа для применения промокода',
     example: 1000,
     required: false,
-    minimum: 0
+    minimum: 0,
   })
   @IsOptional()
   @Type(() => Number)
@@ -57,7 +71,7 @@ export class CreatePromocodeDto {
   @ApiProperty({
     description: 'Дата истечения промокода',
     example: '2024-12-31T23:59:59.000Z',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsDateString({}, { message: 'Неверный формат даты' })
@@ -67,7 +81,7 @@ export class CreatePromocodeDto {
     description: 'Описание промокода',
     example: 'Скидка 15% на все товары',
     required: false,
-    maxLength: 500
+    maxLength: 500,
   })
   @IsOptional()
   @IsString({ message: 'Описание должно быть строкой' })

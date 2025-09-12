@@ -13,11 +13,11 @@ import { ProductsModule } from '../products/products.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Favorite, User, Product]), 
+    TypeOrmModule.forFeature([Favorite, User, Product]),
     SharedModule,
     AppCacheModule,
     UsersModule,
-    ProductsModule
+    ProductsModule,
   ],
   controllers: [FavoritesController],
   providers: [FavoritesService, FavoritesRepository],

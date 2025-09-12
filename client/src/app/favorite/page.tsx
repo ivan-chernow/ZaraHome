@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React from "react";
-import MainLayout from "@/widgets/layout/MainLayout";
-import ProductCard from "@/entities/product/ui/ProductCard";
-import Link from "next/link";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
-import { useGetFavoritesQuery } from "@/entities/favorite/api/favorites.api";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import { ProductCardSkeleton } from "@/entities/product/ui/ProductCardSceleton";
-import { getLocalStorage } from "@/shared/lib/storage";
-import { setFavorites } from "@/entities/favorite/model/favorites.slice";
+import React from 'react';
+import MainLayout from '@/widgets/layout/MainLayout';
+import ProductCard from '@/entities/product/ui/ProductCard';
+import Link from 'next/link';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
+import { useGetFavoritesQuery } from '@/entities/favorite/api/favorites.api';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSceleton';
+import { getLocalStorage } from '@/shared/lib/storage';
+import { setFavorites } from '@/entities/favorite/model/favorites.slice';
 
 const FavoritePage: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,12 +25,12 @@ const FavoritePage: React.FC = () => {
 
   // Поднимаем локальные избранные на случай, если Redux пуст (например, сразу после F5)
   React.useEffect(() => {
-    const key = isAuthenticated && userId ? `favorites:${userId}` : "favorites";
+    const key = isAuthenticated && userId ? `favorites:${userId}` : 'favorites';
     const fromStorage: number[] = getLocalStorage(key, []);
     if (Array.isArray(fromStorage) && fromStorage.length > 0) {
       const differs =
         fromStorage.length !== favoriteIds.length ||
-        fromStorage.some((id) => !favoriteIds.includes(id));
+        fromStorage.some(id => !favoriteIds.includes(id));
       if (differs) dispatch(setFavorites(fromStorage));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,7 +55,7 @@ const FavoritePage: React.FC = () => {
   const localMapped = React.useMemo(() => {
     if (!categories || favoriteIds.length === 0) return [] as any[];
     const allProducts = getAllProducts(categories);
-    return allProducts.filter((p) => favoriteIds.includes(p.id));
+    return allProducts.filter(p => favoriteIds.includes(p.id));
   }, [categories, favoriteIds]);
 
   // Формируем итоговый список: приоритет — сервер (если уже пришёл), объединяя с локальным

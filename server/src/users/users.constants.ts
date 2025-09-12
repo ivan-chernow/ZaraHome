@@ -53,7 +53,8 @@ export const USERS_CONSTANTS = {
     PASSWORD_TOO_SHORT: 'Пароль должен содержать минимум 8 символов',
     PASSWORD_TOO_LONG: 'Пароль слишком длинный',
     INVALID_PAGINATION: 'Некорректные параметры пагинации',
-    SEARCH_QUERY_TOO_SHORT: 'Поисковый запрос должен содержать минимум 2 символа',
+    SEARCH_QUERY_TOO_SHORT:
+      'Поисковый запрос должен содержать минимум 2 символа',
     SEARCH_QUERY_TOO_LONG: 'Поисковый запрос слишком длинный',
     UNAUTHORIZED_ACCESS: 'Недостаточно прав для выполнения операции',
     INVALID_USER_DATA: 'Некорректные данные пользователя',
@@ -78,7 +79,14 @@ export const USERS_CONSTANTS = {
   FILTERS: {
     DEFAULT_SORT_FIELD: 'createdAt',
     DEFAULT_SORT_ORDER: 'DESC',
-    ALLOWED_SORT_FIELDS: ['id', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt'],
+    ALLOWED_SORT_FIELDS: [
+      'id',
+      'email',
+      'firstName',
+      'lastName',
+      'createdAt',
+      'updatedAt',
+    ],
     ALLOWED_SORT_ORDERS: ['ASC', 'DESC'],
   },
 
@@ -90,4 +98,3 @@ export const USERS_CONSTANTS = {
     SESSION_TIMEOUT: 3600, // 1 час
   },
 } as const;
-

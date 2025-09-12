@@ -10,5 +10,3 @@ export class LoginDto {
   @IsNotEmpty({ message: 'Пароль обязателен' })
   password: string;
 }
-
-

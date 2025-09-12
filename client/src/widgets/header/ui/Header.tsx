@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import React, { useRef, useEffect, useState, useMemo } from "react";
-import Image from "next/image";
-import VerticalLine from "@/shared/ui/VerticalLine";
-import Logo from "@/shared/ui/Logo";
-import CartDetails from "@/entities/cart/ui/cartDetails";
-import Link from "next/link";
-import { useSelector, useDispatch } from "react-redux";
-import { toggleCart } from "@/entities/cart/model/cart.slice";
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
+import VerticalLine from '@/shared/ui/VerticalLine';
+import Logo from '@/shared/ui/Logo';
+import CartDetails from '@/entities/cart/ui/cartDetails';
+import Link from 'next/link';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleCart } from '@/entities/cart/model/cart.slice';
 import {
   openModalAuth,
   setView,
   logout,
-} from "@/features/auth/model/auth.slice";
-import { usePathname } from "next/navigation";
-import { RootState, AppDispatch } from "@/shared/config/store/store";
+} from '@/features/auth/model/auth.slice';
+import { usePathname } from 'next/navigation';
+import { RootState, AppDispatch } from '@/shared/config/store/store';
 import {
   selectCartTotalCount,
   selectCartTotalPrice,
-} from "@/entities/cart/model/cartItems.slice";
-import { useGetCartQuery } from "@/entities/cart/api/cart.api";
-import { setCartItems } from "@/entities/cart/model/cartItems.slice";
+} from '@/entities/cart/model/cartItems.slice';
+import { useGetCartQuery } from '@/entities/cart/api/cart.api';
+import { setCartItems } from '@/entities/cart/model/cartItems.slice';
 
 const Header: React.FC = () => {
   const pathname = usePathname();
@@ -47,15 +47,15 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated && Array.isArray(serverCart)) {
-      const toItems = serverCart.map((p) => ({
+      const toItems = serverCart.map(p => ({
         id: p.id,
         price: (() => {
           const sizes = p.size as any;
           const first =
-            sizes && typeof sizes === "object"
+            sizes && typeof sizes === 'object'
               ? (Object.values(sizes)[0] as any)
               : null;
-          return first && typeof first.price === "number" ? first.price : 0;
+          return first && typeof first.price === 'number' ? first.price : 0;
         })(),
         quantity: 1,
         img: Array.isArray(p.img) ? p.img[0] : undefined,
@@ -75,7 +75,7 @@ const Header: React.FC = () => {
 
     // Читаем значения из localStorage после монтирования
     try {
-      const savedCart = localStorage.getItem("cart");
+      const savedCart = localStorage.getItem('cart');
       if (savedCart) {
         const cartItems = JSON.parse(savedCart);
         if (Array.isArray(cartItems) && cartItems.length > 0) {
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
         }
       }
     } catch (error) {
-      console.warn("Failed to load cart from localStorage:", error);
+      console.warn('Failed to load cart from localStorage:', error);
     }
   }, []);
 
@@ -112,27 +112,31 @@ const Header: React.FC = () => {
     return initialValues.price;
   }, [mounted, totalCount, totalPrice, initialValues.price]);
 
-  const isProfilePage = pathname?.startsWith("/profile");
-  const isCartOrOrderPage = pathname === "/cart" || pathname === "/order";
+  const isProfilePage = pathname?.startsWith('/profile');
+  const isCartOrOrderPage = pathname === '/cart' || pathname === '/order';
 
   const handleUserIconClick = () => {
     if (isProfilePage) {
       // Если мы в профиле, выполняем выход
       dispatch(logout());
-      window.location.href = "/";
+      window.location.href = '/';
     } else if (isAuthenticated && user) {
       // Если пользователь авторизован, перенаправляем в личный кабинет
-      const path = user.role === "admin" ? "/profile/admin" : "/profile";
+      const path = user.role === 'admin' ? '/profile/admin' : '/profile';
       window.location.href = path;
     } else {
       // Если не авторизован, открываем модальное окно входа
       dispatch(openModalAuth());
-      dispatch(setView("login"));
+      dispatch(setView('login'));
     }
   };
 
   return (
-    <header id="header" data-section="header" className="bg-white drop-shadow-md py-[20px] px-[5px] relative ">
+    <header
+      id="header"
+      data-section="header"
+      className="bg-white drop-shadow-md py-[20px] px-[5px] relative "
+    >
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         <div className="inline-block">
           <Link
@@ -152,10 +156,10 @@ const Header: React.FC = () => {
           <Image
             src={
               isProfilePage
-                ? "/assets/img/Header/logout.svg"
-                : "/assets/img/Header/user.svg"
+                ? '/assets/img/Header/logout.svg'
+                : '/assets/img/Header/user.svg'
             }
-            alt={isProfilePage ? "Выйти" : "Войти"}
+            alt={isProfilePage ? 'Выйти' : 'Войти'}
             width={19}
             height={20}
             className="mx-[22px] cursor-pointer hover:scale-120 duration-200 ease-in"
@@ -176,8 +180,8 @@ const Header: React.FC = () => {
             ref={cartButtonRef}
             className={`flex items-center mx-7 ${
               isCartOrOrderPage
-                ? "cursor-not-allowed opacity-50"
-                : "cursor-pointer hover:scale-105 hover:text-black duration-200 ease-in"
+                ? 'cursor-not-allowed opacity-50'
+                : 'cursor-pointer hover:scale-105 hover:text-black duration-200 ease-in'
             }`}
             onClick={() => {
               if (isCartOrOrderPage) return;
@@ -210,7 +214,7 @@ const Header: React.FC = () => {
             </div>
             <p
               className="ml-[16px] font-roboto font-medium tabular-nums"
-              style={{ minWidth: 72, textAlign: "left" }}
+              style={{ minWidth: 72, textAlign: 'left' }}
             >
               {!mounted || isCartLoading ? (
                 <span className="animate-pulse bg-gray-200 rounded w-12 h-5 inline-block" />

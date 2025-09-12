@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { Resend } from 'resend';
 import * as hbs from 'hbs';
 import * as fs from 'fs';
@@ -12,7 +17,7 @@ interface EmailTemplate {
   requiredFields: string[];
 }
 
-export interface EmailMetrics {
+interface EmailMetrics {
   sent: number;
   failed: number;
   totalAttempts: number;
@@ -24,39 +29,40 @@ export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private readonly fromAddress: string;
   private readonly templateCache = new Map<string, hbs.TemplateDelegate>();
-  private readonly metrics: EmailMetrics = {
-    sent: 0,
-    failed: 0,
-    totalAttempts: 0
-  };
+  private readonly config: ConfigService;
+  private metrics: EmailMetrics = { sent: 0, failed: 0, totalAttempts: 0 };
 
   // Шаблоны email
   private readonly emailTemplates: Record<string, EmailTemplate> = {
     verification: {
       subject: 'Ваш код подтверждения ZaraHome',
       templateName: 'email-verification-code',
-      requiredFields: ['code']
+      requiredFields: ['code'],
     },
     welcome: {
       subject: 'Добро пожаловать в ZaraHome',
       templateName: 'email-welcome-user',
-      requiredFields: ['name']
+      requiredFields: ['name'],
     },
     resetPassword: {
       subject: 'Код для сброса пароля ZaraHome',
       templateName: 'email-reset-password',
-      requiredFields: ['resetLink']
-    }
+      requiredFields: ['resetLink'],
+    },
   };
 
-  constructor(private readonly config: ConfigService) {
+  constructor(config: ConfigService) {
+    this.config = config;
     const apiKey = this.config.get<string>('RESEND_API_KEY');
-    this.fromAddress = this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
+    this.fromAddress =
+      this.config.get<string>('MAIL_FROM') || 'onboarding@resend.dev';
     if (apiKey) {
       this.resend = new Resend(apiKey);
       this.logger.log('EmailService initialized with API key: Present');
     } else {
-      this.logger.warn('EmailService initialized without API key - email sending will be disabled');
+      this.logger.warn(
+        'EmailService initialized without API key - email sending will be disabled'
+      );
     }
     // Всегда предзагружаем шаблоны (независимо от наличия API ключа)
     this.preloadTemplates();
@@ -74,14 +80,19 @@ export class EmailService {
       this.logger.log(`Email templates directory: ${templatesDir}`);
 
       Object.entries(this.emailTemplates).forEach(([key, template]) => {
-        const templatePath = path.join(templatesDir, `${template.templateName}.hbs`);
+        const templatePath = path.join(
+          templatesDir,
+          `${template.templateName}.hbs`
+        );
         if (fs.existsSync(templatePath)) {
           const templateSource = fs.readFileSync(templatePath, 'utf8');
           const compiledTemplate = hbs.compile(templateSource);
           // Кэшируем по имени файла и по ключу шаблона
           this.templateCache.set(template.templateName, compiledTemplate);
           this.templateCache.set(key, compiledTemplate);
-          this.logger.log(`Template cached: ${template.templateName} (alias: ${key})`);
+          this.logger.log(
+            `Template cached: ${template.templateName} (alias: ${key})`
+          );
         } else {
           this.logger.error(`Template file not found: ${templatePath}`);
         }
@@ -102,7 +113,10 @@ export class EmailService {
   /**
    * Валидация контекста шаблона
    */
-  private validateTemplateContext(templateName: string, context: Record<string, any>): void {
+  private validateTemplateContext(
+    templateName: string,
+    context: Record<string, unknown>
+  ): void {
     const template = this.emailTemplates[templateName];
     if (!template) {
       throw new BadRequestException(EMAIL_CONSTANTS.ERRORS.INVALID_TEMPLATE);
@@ -110,7 +124,9 @@ export class EmailService {
 
     for (const field of template.requiredFields) {
       if (!context[field]) {
-        throw new BadRequestException(EMAIL_CONSTANTS.ERRORS.MISSING_REQUIRED_FIELD(field));
+        throw new BadRequestException(
+          EMAIL_CONSTANTS.ERRORS.MISSING_REQUIRED_FIELD(field)
+        );
       }
     }
   }
@@ -122,7 +138,7 @@ export class EmailService {
     to: string,
     subject: string,
     templateName: string,
-    context: Record<string, any>,
+    context: Record<string, unknown>,
     retryAttempts: number = EMAIL_CONSTANTS.MAX_RETRY_ATTEMPTS
   ): Promise<void> {
     // Валидация входных данных
@@ -139,8 +155,6 @@ export class EmailService {
       return;
     }
 
-    this.metrics.totalAttempts++;
-
     // Проверяем rate limiting
     if (this.isRateLimited()) {
       throw new BadRequestException(EMAIL_CONSTANTS.ERRORS.RATE_LIMIT_EXCEEDED);
@@ -150,17 +164,22 @@ export class EmailService {
     this.validateTemplateContext(templateName, context);
 
     // Получаем кешированный шаблон: по ключу и по имени файла
-    const meta = this.emailTemplates[templateName as keyof typeof this.emailTemplates];
-    const template = this.templateCache.get(templateName) || (meta ? this.templateCache.get(meta.templateName) : undefined);
+    const meta =
+      this.emailTemplates[templateName as keyof typeof this.emailTemplates];
+    const template =
+      this.templateCache.get(templateName) ||
+      (meta ? this.templateCache.get(meta.templateName) : undefined);
     if (!template) {
-      throw new InternalServerErrorException(EMAIL_CONSTANTS.ERRORS.TEMPLATE_NOT_FOUND);
+      throw new InternalServerErrorException(
+        EMAIL_CONSTANTS.ERRORS.TEMPLATE_NOT_FOUND
+      );
     }
 
     // Добавляем общие поля в контекст
     const enrichedContext = {
       ...context,
       year: new Date().getFullYear(),
-      currentDate: new Date().toLocaleDateString('ru-RU')
+      currentDate: new Date().toLocaleDateString('ru-RU'),
     };
 
     // Компилируем HTML
@@ -168,16 +187,21 @@ export class EmailService {
 
     // Режим redirect: перенаправляем все письма на EMAIL_REDIRECT_TO
     // Если переменная не задана, используем дефолт для разработки
-    const redirectTo = this.config.get<string>('EMAIL_REDIRECT_TO') || 'sutrame735@gmail.com';
+    const redirectTo =
+      this.config.get<string>('EMAIL_REDIRECT_TO') || 'sutrame735@gmail.com';
     const finalTo = redirectTo || to;
-    const finalSubject = redirectTo ? `[REDIRECTED to ${finalTo}] ${subject} (original: ${to})` : subject;
+    const finalSubject = redirectTo
+      ? `[REDIRECTED to ${finalTo}] ${subject} (original: ${to})`
+      : subject;
 
     // Отправляем email с retry логикой
     let lastError: Error | undefined;
-    
+
     for (let attempt = 1; attempt <= retryAttempts; attempt++) {
       try {
-        this.logger.log(`Attempting to send email to: ${to} (attempt ${attempt}/${retryAttempts})`);
+        this.logger.log(
+          `Attempting to send email to: ${to} (attempt ${attempt}/${retryAttempts})`
+        );
 
         const result = await this.resend.emails.send({
           from: this.fromAddress,
@@ -187,16 +211,17 @@ export class EmailService {
         });
 
         this.logger.log('Email sent successfully:', result);
-        this.metrics.sent++;
-        
+
         // Логируем успешную отправку
         this.logEmailSuccess(finalTo, finalSubject, templateName);
         return;
-
       } catch (error) {
         lastError = error;
-        this.logger.error(`Failed to send email (attempt ${attempt}/${retryAttempts}):`, error);
-        
+        this.logger.error(
+          `Failed to send email (attempt ${attempt}/${retryAttempts}):`,
+          error
+        );
+
         // Если это последняя попытка, не ждем
         if (attempt < retryAttempts) {
           const delay = EMAIL_CONSTANTS.RETRY_DELAY * attempt;
@@ -207,10 +232,11 @@ export class EmailService {
     }
 
     // Все попытки исчерпаны
-    this.metrics.failed++;
     const finalError = lastError || new Error('Unknown error');
     this.logEmailFailure(to, subject, templateName, finalError);
-    throw new InternalServerErrorException(EMAIL_CONSTANTS.ERRORS.SEND_FAILED + finalError.message);
+    throw new InternalServerErrorException(
+      EMAIL_CONSTANTS.ERRORS.SEND_FAILED + finalError.message
+    );
   }
 
   /**
@@ -219,10 +245,10 @@ export class EmailService {
   private isRateLimited(): boolean {
     // Простая реализация rate limiting
     // В продакшене лучше использовать Redis или другой внешний сервис
-    const now = Date.now();
-    const windowMs = EMAIL_CONSTANTS.RATE_LIMIT_WINDOW;
-    const maxEmails = EMAIL_CONSTANTS.RATE_LIMIT_MAX_EMAILS;
-    
+    // const now = Date.now();
+    // const windowMs = EMAIL_CONSTANTS.RATE_LIMIT_WINDOW;
+    // const maxEmails = EMAIL_CONSTANTS.RATE_LIMIT_MAX_EMAILS;
+
     // Здесь можно добавить более сложную логику rate limiting
     return false; // Пока отключено
   }
@@ -237,15 +263,28 @@ export class EmailService {
   /**
    * Логирование успешной отправки
    */
-  private logEmailSuccess(to: string, subject: string, templateName: string): void {
-    this.logger.log(`✅ Email sent successfully to ${to} using template ${templateName}`);
+  private logEmailSuccess(
+    to: string,
+    subject: string,
+    templateName: string
+  ): void {
+    this.logger.log(
+      `✅ Email sent successfully to ${to} using template ${templateName}`
+    );
   }
 
   /**
    * Логирование неудачной отправки
    */
-  private logEmailFailure(to: string, subject: string, templateName: string, error: Error): void {
-    this.logger.error(`❌ Failed to send email to ${to} using template ${templateName}: ${error.message}`);
+  private logEmailFailure(
+    to: string,
+    subject: string,
+    templateName: string,
+    error: Error
+  ): void {
+    this.logger.error(
+      `❌ Failed to send email to ${to} using template ${templateName}: ${error.message}`
+    );
   }
 
   /**
@@ -277,7 +316,7 @@ export class EmailService {
    */
   async sendResetPasswordEmail(to: string, resetLink: string): Promise<void> {
     const fullResetLink = `http://localhost:3000/reset-password?token=${resetLink}`;
-    
+
     await this.sendTemplateEmail(
       to,
       this.emailTemplates.resetPassword.subject,
@@ -289,9 +328,6 @@ export class EmailService {
   /**
    * Получение метрик отправки
    */
-  getMetrics(): EmailMetrics {
-    return { ...this.metrics };
-  }
 
   /**
    * Сброс метрик

@@ -7,12 +7,9 @@ import { Promocode } from './entity/promocode.entity';
 import { SharedModule } from '../shared/modules/shared.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Promocode]),
-    SharedModule
-  ],
+  imports: [TypeOrmModule.forFeature([Promocode]), SharedModule],
   controllers: [PromocodesController],
   providers: [PromocodesService, PromocodesRepository],
   exports: [PromocodesService, PromocodesRepository],
 })
-export class PromocodesModule {} 
+export class PromocodesModule {}

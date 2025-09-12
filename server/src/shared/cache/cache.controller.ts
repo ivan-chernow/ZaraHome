@@ -1,5 +1,10 @@
 import { Controller, Get, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/login/jwt/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -12,9 +17,11 @@ import { CacheService } from './cache.service';
 @Roles(UserRole.ADMIN)
 @ApiBearerAuth()
 export class CacheController {
-  constructor(
-    private readonly cacheService: CacheService,
-  ) {}
+  private readonly cacheService: CacheService;
+
+  constructor(cacheService: CacheService) {
+    this.cacheService = cacheService;
+  }
 
   @Get('health')
   @ApiOperation({ summary: 'Проверить состояние кеша' })
@@ -24,7 +31,7 @@ export class CacheController {
     return {
       success: true,
       data: { isHealthy },
-      message: isHealthy ? 'Кеш работает нормально' : 'Проблемы с кешем'
+      message: isHealthy ? 'Кеш работает нормально' : 'Проблемы с кешем',
     };
   }
 
@@ -36,7 +43,7 @@ export class CacheController {
     return {
       success: true,
       data: stats,
-      message: 'Статистика кеша получена'
+      message: 'Статистика кеша получена',
     };
   }
 
@@ -48,7 +55,7 @@ export class CacheController {
     return {
       success: true,
       data: null,
-      message: 'Весь кеш очищен'
+      message: 'Весь кеш очищен',
     };
   }
 
@@ -60,7 +67,7 @@ export class CacheController {
     return {
       success: true,
       data: null,
-      message: 'Кеш продуктов очищен'
+      message: 'Кеш продуктов очищен',
     };
   }
 
@@ -72,7 +79,7 @@ export class CacheController {
     return {
       success: true,
       data: null,
-      message: 'Кеш категорий очищен'
+      message: 'Кеш категорий очищен',
     };
   }
 
@@ -84,7 +91,7 @@ export class CacheController {
     return {
       success: true,
       data: null,
-      message: 'Кеш корзин очищен'
+      message: 'Кеш корзин очищен',
     };
   }
 
@@ -96,7 +103,7 @@ export class CacheController {
     return {
       success: true,
       data: null,
-      message: 'Кеш избранного очищен'
+      message: 'Кеш избранного очищен',
     };
   }
 
@@ -108,7 +115,7 @@ export class CacheController {
     return {
       success: true,
       data: null,
-      message: 'Кеш промокодов очищен'
+      message: 'Кеш промокодов очищен',
     };
   }
 }

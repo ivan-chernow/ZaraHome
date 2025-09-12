@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import CloseIcon from "@mui/icons-material/Close";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/shared/config/store/store";
-import { findProductById } from "@/entities/category/lib/catalog.utils";
-import type { Product } from "@/entities/product/api/products.api";
+import React from 'react';
+import Image from 'next/image';
+import CloseIcon from '@mui/icons-material/Close';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '@/shared/config/store/store';
+import { findProductById } from '@/entities/category/lib/catalog.utils';
+import type { Product } from '@/entities/product/api/products.api';
 import {
   addCartItem,
   removeCartItem,
   deleteCartItem,
   setCartItemQuantity,
   type CartItem as CartItemType,
-} from "@/entities/cart/model/cartItems.slice";
-import { useState, useCallback, useEffect } from "react";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import { useRemoveFromCartMutation } from "@/entities/cart/api/cart.api";
+} from '@/entities/cart/model/cartItems.slice';
+import { useState, useCallback, useEffect } from 'react';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
+import { useRemoveFromCartMutation } from '@/entities/cart/api/cart.api';
 
 interface CartPageItemProps {
   item: CartItemType;
@@ -25,12 +25,12 @@ interface CartPageItemProps {
   product?: Product;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const getFullImageUrl = (path?: string): string | undefined => {
   if (!path) return undefined;
   try {
-    const cleanPath = path.replace(/^\/+/, "");
+    const cleanPath = path.replace(/^\/+/, '');
     return `${API_URL}/${cleanPath}`;
   } catch {
     return path;
@@ -55,16 +55,29 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
     setInputValue(String(item.quantity));
   }, [item.quantity]);
 
-  const handleDecrease = () => dispatch(removeCartItem({ id: item.id, size: item.size, color: item.color }));
+  const handleDecrease = () =>
+    dispatch(
+      removeCartItem({ id: item.id, size: item.size, color: item.color })
+    );
   const handleIncrease = () =>
-    dispatch(addCartItem({ id: item.id, price: item.price, img: item.img, size: item.size, color: item.color }));
+    dispatch(
+      addCartItem({
+        id: item.id,
+        price: item.price,
+        img: item.img,
+        size: item.size,
+        color: item.color,
+      })
+    );
   const handleDelete = async () => {
-    dispatch(deleteCartItem({ id: item.id, size: item.size, color: item.color }));
+    dispatch(
+      deleteCartItem({ id: item.id, size: item.size, color: item.color })
+    );
     try {
       await removeFromCart(item.id).unwrap();
     } catch (error) {
       // Можно откатить, если нужно: dispatch(addCartItem({ ...item }));
-      console.error("Ошибка удаления из корзины на сервере", error);
+      console.error('Ошибка удаления из корзины на сервере', error);
     }
   };
 
@@ -74,7 +87,14 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
       setInputValue(String(item.quantity));
       return;
     }
-    dispatch(setCartItemQuantity({ id: item.id, quantity: numeric, size: item.size, color: item.color }));
+    dispatch(
+      setCartItemQuantity({
+        id: item.id,
+        quantity: numeric,
+        size: item.size,
+        color: item.color,
+      })
+    );
     setInputValue(String(numeric));
   }, [dispatch, inputValue, item.id, item.quantity]);
 
@@ -87,7 +107,7 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
           src={
             getFullImageUrl(product?.img?.[0]) ||
             getFullImageUrl(item.img) ||
-            "/assets/img/Catalog/product2.png"
+            '/assets/img/Catalog/product2.png'
           }
           width={79}
           height={79}
@@ -113,15 +133,31 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
                   const colorKey = colorKeyRaw.trim();
                   const colorValue = product?.colors?.[colorKey] ?? colorKeyRaw;
                   if (!colorKey && !colorValue) return null;
-                  const isWhite = typeof colorValue === 'string' && /^(#fff(f{0,3})?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))$/i.test(colorValue);
-                  const isBlack = typeof colorValue === 'string' && /^(#000(0{0,3})?|black|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))$/i.test(colorValue);
-                  const colorLabel = colorKey || (isWhite ? 'белый' : isBlack ? 'черный' : (colorValue || '').toString());
+                  const isWhite =
+                    typeof colorValue === 'string' &&
+                    /^(#fff(f{0,3})?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))$/i.test(
+                      colorValue
+                    );
+                  const isBlack =
+                    typeof colorValue === 'string' &&
+                    /^(#000(0{0,3})?|black|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))$/i.test(
+                      colorValue
+                    );
+                  const colorLabel =
+                    colorKey ||
+                    (isWhite
+                      ? 'белый'
+                      : isBlack
+                        ? 'черный'
+                        : (colorValue || '').toString());
                   return (
                     <span className="flex items-center gap-1">
                       Цвет:
                       <span
                         className={`inline-block ${isWhite ? 'w-4 h-4' : 'w-3 h-3'} rounded-full border ${isWhite ? 'border-gray-400 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.2)]' : ''}`}
-                        style={{ backgroundColor: (colorValue as string) || undefined }}
+                        style={{
+                          backgroundColor: (colorValue as string) || undefined,
+                        }}
                         aria-label={`Цвет ${colorLabel}`}
                       />
                       <span className="ml-1">{colorLabel}</span>
@@ -153,17 +189,24 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
           inputMode="numeric"
           pattern="[0-9]*"
           value={inputValue}
-          onChange={(e) => {
-            const raw = e.target.value.replace(/\D+/g, "");
+          onChange={e => {
+            const raw = e.target.value.replace(/\D+/g, '');
             setInputValue(raw);
             const numeric = parseInt(raw, 10);
             if (Number.isFinite(numeric) && numeric > 0) {
-              dispatch(setCartItemQuantity({ id: item.id, quantity: numeric, size: item.size, color: item.color }));
+              dispatch(
+                setCartItemQuantity({
+                  id: item.id,
+                  quantity: numeric,
+                  size: item.size,
+                  color: item.color,
+                })
+              );
             }
           }}
           onBlur={commitInput}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
               e.currentTarget.blur();
             }
           }}
@@ -180,7 +223,7 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
       {/* Right: price + delete */}
       <div className="flex items-center gap-3">
         <span className="font-medium text-[16px] font-roboto whitespace-nowrap">
-          {(item.price * item.quantity).toLocaleString("ru-RU")}{" "}
+          {(item.price * item.quantity).toLocaleString('ru-RU')}{' '}
           <span className="font-bold font-ysabeau text-[14px]">₽</span>
         </span>
         <button

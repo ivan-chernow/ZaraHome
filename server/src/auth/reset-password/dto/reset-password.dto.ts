@@ -22,5 +22,3 @@ export class ResetSetDto {
   @IsNotEmpty({ message: 'Пароль обязателен' })
   password: string;
 }
-
-

@@ -1,5 +1,5 @@
-import { authApi } from "@/features/auth/api/auth.api";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { authApi } from '@/features/auth/api/auth.api';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 type View = 'login' | 'signup' | 'resetPassword';
 export interface AuthState {
@@ -14,8 +14,10 @@ export interface AuthState {
   isAuthenticated: boolean;
 }
 
-export interface ErrorData { message?: string }
-import { User } from "@/features/auth/api/auth.api";
+export interface ErrorData {
+  message?: string;
+}
+import { User } from '@/features/auth/api/auth.api';
 
 // Функция для загрузки начального состояния из localStorage
 const loadInitialState = (): AuthState => {
@@ -78,17 +80,23 @@ export const authSlice = createSlice({
       state.isOpenAuth = false;
       state.error = null;
     },
-    setView: (state, action: PayloadAction<'login' | 'signup' | 'resetPassword'>) => {
+    setView: (
+      state,
+      action: PayloadAction<'login' | 'signup' | 'resetPassword'>
+    ) => {
       state.view = action.payload;
       state.error = null;
     },
-    toggleViewPassword: (state) => {
+    toggleViewPassword: state => {
       state.viewPassword = !state.viewPassword;
     },
     setAuthenticating: (state, action: PayloadAction<boolean>) => {
       state.isAuthenticating = action.payload;
     },
-    setCredentials: (state, action: PayloadAction<{ user: User | null; accessToken: string }>) => {
+    setCredentials: (
+      state,
+      action: PayloadAction<{ user: User | null; accessToken: string }>
+    ) => {
       // Если user равен null (при обновлении токена), сохраняем существующего пользователя
       if (action.payload.user !== null) {
         state.user = action.payload.user;
@@ -96,49 +104,55 @@ export const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
       state.error = null;
-      
+
       // Сохраняем токен в localStorage
       localStorage.setItem('accessToken', action.payload.accessToken);
-      
+
       // Сохраняем состояние в localStorage
-      localStorage.setItem('authState', JSON.stringify({
-        user: state.user,
-        accessToken: state.accessToken,
-        isAuthenticated: state.isAuthenticated,
-      }));
+      localStorage.setItem(
+        'authState',
+        JSON.stringify({
+          user: state.user,
+          accessToken: state.accessToken,
+          isAuthenticated: state.isAuthenticated,
+        })
+      );
     },
-    logout: (state) => {
+    logout: state => {
       state.user = null;
       state.accessToken = null;
       state.isAuthenticated = false;
       state.error = null;
-      
+
       // Очищаем состояние в localStorage
       localStorage.removeItem('authState');
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
     },
-    clearToken: (state) => {
+    clearToken: state => {
       // Очищаем только токен, но сохраняем пользователя и состояние
       state.accessToken = null;
       state.isAuthenticated = false;
-      
+
       // Очищаем только токены из localStorage
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      
+
       // Сохраняем обновленное состояние без токенов
-      localStorage.setItem('authState', JSON.stringify({
-        user: state.user,
-        accessToken: null,
-        isAuthenticated: false,
-      }));
+      localStorage.setItem(
+        'authState',
+        JSON.stringify({
+          user: state.user,
+          accessToken: null,
+          isAuthenticated: false,
+        })
+      );
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Login
-      .addMatcher(authApi.endpoints.login.matchPending, (state) => {
+      .addMatcher(authApi.endpoints.login.matchPending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -148,35 +162,40 @@ export const authSlice = createSlice({
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
-        
+
         // Сохраняем токены в localStorage
         localStorage.setItem('accessToken', action.payload.accessToken);
         localStorage.setItem('refreshToken', action.payload.refreshToken);
-        
+
         // Сохраняем состояние в localStorage
-        localStorage.setItem('authState', JSON.stringify({
-          user: state.user,
-          accessToken: state.accessToken,
-          isAuthenticated: state.isAuthenticated,
-        }));
+        localStorage.setItem(
+          'authState',
+          JSON.stringify({
+            user: state.user,
+            accessToken: state.accessToken,
+            isAuthenticated: state.isAuthenticated,
+          })
+        );
       })
       .addMatcher(authApi.endpoints.login.matchRejected, (state, action) => {
         state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при входе';
+        state.error =
+          ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message ||
+          'Ошибка при входе';
       })
 
       // Logout
-      .addMatcher(authApi.endpoints.logout.matchPending, (state) => {
+      .addMatcher(authApi.endpoints.logout.matchPending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addMatcher(authApi.endpoints.logout.matchFulfilled, (state) => {
+      .addMatcher(authApi.endpoints.logout.matchFulfilled, state => {
         state.isLoading = false;
         state.isOpenAuth = false;
         state.user = null;
         state.accessToken = null;
         state.isAuthenticated = false;
-        
+
         // Очищаем состояние в localStorage
         localStorage.removeItem('authState');
         localStorage.removeItem('accessToken');
@@ -184,7 +203,9 @@ export const authSlice = createSlice({
       })
       .addMatcher(authApi.endpoints.logout.matchRejected, (state, action) => {
         state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при выходе';
+        state.error =
+          ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message ||
+          'Ошибка при выходе';
       })
 
       // Refresh Token
@@ -192,82 +213,128 @@ export const authSlice = createSlice({
         state.accessToken = action.payload.accessToken;
         // Сохраняем токен в localStorage
         localStorage.setItem('accessToken', action.payload.accessToken);
-        
+
         // Обновляем состояние в localStorage (пользователь остается прежним)
-        localStorage.setItem('authState', JSON.stringify({
-          user: state.user,
-          accessToken: state.accessToken,
-          isAuthenticated: state.isAuthenticated,
-        }));
+        localStorage.setItem(
+          'authState',
+          JSON.stringify({
+            user: state.user,
+            accessToken: state.accessToken,
+            isAuthenticated: state.isAuthenticated,
+          })
+        );
       })
 
       // Registration
-      .addMatcher(authApi.endpoints.initiateRegistration.matchPending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addMatcher(authApi.endpoints.initiateRegistration.matchFulfilled, (state) => {
-        state.isLoading = false;
-      })
-      .addMatcher(authApi.endpoints.initiateRegistration.matchRejected, (state, action) => {
-        state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при регистрации';
-      })
+      .addMatcher(
+        authApi.endpoints.initiateRegistration.matchPending,
+        state => {
+          state.isLoading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.initiateRegistration.matchFulfilled,
+        state => {
+          state.isLoading = false;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.initiateRegistration.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            ((action.error as FetchBaseQueryError)?.data as ErrorData)
+              ?.message || 'Ошибка при регистрации';
+        }
+      )
 
       // Verify Code
-      .addMatcher(authApi.endpoints.verifyCode.matchPending, (state) => {
+      .addMatcher(authApi.endpoints.verifyCode.matchPending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addMatcher(authApi.endpoints.verifyCode.matchFulfilled, (state) => {
+      .addMatcher(authApi.endpoints.verifyCode.matchFulfilled, state => {
         state.isLoading = false;
       })
-      .addMatcher(authApi.endpoints.verifyCode.matchRejected, (state, action) => {
-        state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при проверке кода';
-      })
+      .addMatcher(
+        authApi.endpoints.verifyCode.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            ((action.error as FetchBaseQueryError)?.data as ErrorData)
+              ?.message || 'Ошибка при проверке кода';
+        }
+      )
 
       // Complete Registration
-      .addMatcher(authApi.endpoints.completeRegistration.matchPending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addMatcher(authApi.endpoints.completeRegistration.matchFulfilled, (state) => {
-        state.isLoading = false;
-        state.isOpenAuth = false;
-      })
-      .addMatcher(authApi.endpoints.completeRegistration.matchRejected, (state, action) => {
-        state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при завершении регистрации';
-      })
+      .addMatcher(
+        authApi.endpoints.completeRegistration.matchPending,
+        state => {
+          state.isLoading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.completeRegistration.matchFulfilled,
+        state => {
+          state.isLoading = false;
+          state.isOpenAuth = false;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.completeRegistration.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            ((action.error as FetchBaseQueryError)?.data as ErrorData)
+              ?.message || 'Ошибка при завершении регистрации';
+        }
+      )
 
       // Password Reset
-      .addMatcher(authApi.endpoints.requestPasswordReset.matchPending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addMatcher(authApi.endpoints.requestPasswordReset.matchFulfilled, (state) => {
-        state.isLoading = false;
-      })
-      .addMatcher(authApi.endpoints.requestPasswordReset.matchRejected, (state, action) => {
-        state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при запросе сброса пароля';
-      })
+      .addMatcher(
+        authApi.endpoints.requestPasswordReset.matchPending,
+        state => {
+          state.isLoading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.requestPasswordReset.matchFulfilled,
+        state => {
+          state.isLoading = false;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.requestPasswordReset.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            ((action.error as FetchBaseQueryError)?.data as ErrorData)
+              ?.message || 'Ошибка при запросе сброса пароля';
+        }
+      )
 
       // Reset Password
-      .addMatcher(authApi.endpoints.resetPassword.matchPending, (state) => {
+      .addMatcher(authApi.endpoints.resetPassword.matchPending, state => {
         state.isLoading = true;
         state.error = null;
       })
-      .addMatcher(authApi.endpoints.resetPassword.matchFulfilled, (state) => {
+      .addMatcher(authApi.endpoints.resetPassword.matchFulfilled, state => {
         state.isLoading = false;
         state.isOpenAuth = false;
       })
-      .addMatcher(authApi.endpoints.resetPassword.matchRejected, (state, action) => {
-        state.isLoading = false;
-        state.error = ((action.error as FetchBaseQueryError)?.data as ErrorData)?.message || 'Ошибка при сбросе пароля';
-      });
-  }
+      .addMatcher(
+        authApi.endpoints.resetPassword.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.error =
+            ((action.error as FetchBaseQueryError)?.data as ErrorData)
+              ?.message || 'Ошибка при сбросе пароля';
+        }
+      );
+  },
 });
 
 export const {

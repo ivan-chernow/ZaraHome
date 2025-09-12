@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, LessThan, Like, Between, In } from 'typeorm';
+import { Repository, MoreThan, Like, In } from 'typeorm';
 import { Category } from './entity/category.entity';
 import { SubCategory } from './entity/sub-category.entity';
 import { Type } from './entity/type.entity';
@@ -35,12 +35,22 @@ interface ProductListResponse {
 
 @Injectable()
 export class ProductsRepository {
+  private readonly categoryRepo: Repository<Category>;
+  private readonly subCategoryRepo: Repository<SubCategory>;
+  private readonly typeRepo: Repository<Type>;
+  private readonly productRepo: Repository<Product>;
+
   constructor(
-    @InjectRepository(Category) private categoryRepo: Repository<Category>,
-    @InjectRepository(SubCategory) private subCategoryRepo: Repository<SubCategory>,
-    @InjectRepository(Type) private typeRepo: Repository<Type>,
-    @InjectRepository(Product) private productRepo: Repository<Product>,
-  ) {}
+    @InjectRepository(Category) categoryRepo: Repository<Category>,
+    @InjectRepository(SubCategory) subCategoryRepo: Repository<SubCategory>,
+    @InjectRepository(Type) typeRepo: Repository<Type>,
+    @InjectRepository(Product) productRepo: Repository<Product>
+  ) {
+    this.categoryRepo = categoryRepo;
+    this.subCategoryRepo = subCategoryRepo;
+    this.typeRepo = typeRepo;
+    this.productRepo = productRepo;
+  }
 
   async findCategoryById(id: number): Promise<Category | null> {
     return this.categoryRepo.findOneBy({ id });
@@ -57,13 +67,13 @@ export class ProductsRepository {
   async findProductById(id: number): Promise<Product | null> {
     return this.productRepo.findOne({
       where: { id },
-      relations: ['category', 'subCategory', 'type']
+      relations: ['category', 'subCategory', 'type'],
     });
   }
 
   async findAllProducts(): Promise<Product[]> {
     return this.productRepo.find({
-      relations: ['category', 'subCategory', 'type']
+      relations: ['category', 'subCategory', 'type'],
     });
   }
 
@@ -73,7 +83,8 @@ export class ProductsRepository {
     page: number = 1,
     limit: number = 20
   ): Promise<ProductListResponse> {
-    const queryBuilder = this.productRepo.createQueryBuilder('product')
+    const queryBuilder = this.productRepo
+      .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.subCategory', 'subCategory')
       .leftJoinAndSelect('product.type', 'type');
@@ -81,11 +92,15 @@ export class ProductsRepository {
     // Применяем фильтры
     if (filters) {
       if (filters.categoryId) {
-        queryBuilder.andWhere('category.id = :categoryId', { categoryId: filters.categoryId });
+        queryBuilder.andWhere('category.id = :categoryId', {
+          categoryId: filters.categoryId,
+        });
       }
 
       if (filters.subCategoryId) {
-        queryBuilder.andWhere('subCategory.id = :subCategoryId', { subCategoryId: filters.subCategoryId });
+        queryBuilder.andWhere('subCategory.id = :subCategoryId', {
+          subCategoryId: filters.subCategoryId,
+        });
       }
 
       if (filters.typeId) {
@@ -95,35 +110,50 @@ export class ProductsRepository {
       if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
         // Фильтрация по цене (берем минимальную цену из массива размеров)
         if (filters.minPrice !== undefined && filters.maxPrice !== undefined) {
-          queryBuilder.andWhere('EXISTS (SELECT 1 FROM jsonb_array_elements(product.size) AS size_item WHERE (size_item->>\'price\')::numeric BETWEEN :minPrice AND :maxPrice)', {
-            minPrice: filters.minPrice,
-            maxPrice: filters.maxPrice
-          });
+          queryBuilder.andWhere(
+            "EXISTS (SELECT 1 FROM jsonb_array_elements(product.size) AS size_item WHERE (size_item->>'price')::numeric BETWEEN :minPrice AND :maxPrice)",
+            {
+              minPrice: filters.minPrice,
+              maxPrice: filters.maxPrice,
+            }
+          );
         } else if (filters.minPrice !== undefined) {
-          queryBuilder.andWhere('EXISTS (SELECT 1 FROM jsonb_array_elements(product.size) AS size_item WHERE (size_item->>\'price\')::numeric >= :minPrice)', {
-            minPrice: filters.minPrice
-          });
+          queryBuilder.andWhere(
+            "EXISTS (SELECT 1 FROM jsonb_array_elements(product.size) AS size_item WHERE (size_item->>'price')::numeric >= :minPrice)",
+            {
+              minPrice: filters.minPrice,
+            }
+          );
         } else if (filters.maxPrice !== undefined) {
-          queryBuilder.andWhere('EXISTS (SELECT 1 FROM jsonb_array_elements(product.size) AS size_item WHERE (size_item->>\'price\')::numeric <= :maxPrice)', {
-            maxPrice: filters.maxPrice
-          });
+          queryBuilder.andWhere(
+            "EXISTS (SELECT 1 FROM jsonb_array_elements(product.size) AS size_item WHERE (size_item->>'price')::numeric <= :maxPrice)",
+            {
+              maxPrice: filters.maxPrice,
+            }
+          );
         }
       }
 
       if (filters.isNew !== undefined) {
-        queryBuilder.andWhere('product.isNew = :isNew', { isNew: filters.isNew });
+        queryBuilder.andWhere('product.isNew = :isNew', {
+          isNew: filters.isNew,
+        });
       }
 
       if (filters.hasDiscount !== undefined) {
         if (filters.hasDiscount) {
           queryBuilder.andWhere('product.discount > 0');
         } else {
-          queryBuilder.andWhere('product.discount = 0 OR product.discount IS NULL');
+          queryBuilder.andWhere(
+            'product.discount = 0 OR product.discount IS NULL'
+          );
         }
       }
 
       if (filters.isAvailable !== undefined) {
-        queryBuilder.andWhere('product.isAvailable = :isAvailable', { isAvailable: filters.isAvailable });
+        queryBuilder.andWhere('product.isAvailable = :isAvailable', {
+          isAvailable: filters.isAvailable,
+        });
       }
 
       if (filters.search) {
@@ -139,7 +169,7 @@ export class ProductsRepository {
       if (sort.field === 'price') {
         // Сортировка по минимальной цене из массива размеров
         queryBuilder.orderBy(
-          '(SELECT MIN((size_item->>\'price\')::numeric) FROM jsonb_array_elements(product.size) AS size_item)',
+          "(SELECT MIN((size_item->>'price')::numeric) FROM jsonb_array_elements(product.size) AS size_item)",
           sort.order
         );
       } else {
@@ -169,7 +199,7 @@ export class ProductsRepository {
       limit,
       totalPages,
       hasNext,
-      hasPrev
+      hasPrev,
     };
   }
 
@@ -177,21 +207,21 @@ export class ProductsRepository {
     if (!ids.length) return [];
     return this.productRepo.find({
       where: { id: In(ids) },
-      relations: ['category', 'subCategory', 'type']
+      relations: ['category', 'subCategory', 'type'],
     });
   }
 
   async findNewProducts(): Promise<Product[]> {
-    return this.productRepo.find({ 
+    return this.productRepo.find({
       where: { isNew: true },
-      relations: ['category', 'subCategory', 'type']
+      relations: ['category', 'subCategory', 'type'],
     });
   }
 
   async findDiscountedProducts(): Promise<Product[]> {
-    return this.productRepo.find({ 
+    return this.productRepo.find({
       where: { discount: MoreThan(0) },
-      relations: ['category', 'subCategory', 'type']
+      relations: ['category', 'subCategory', 'type'],
     });
   }
 
@@ -200,11 +230,11 @@ export class ProductsRepository {
       where: [
         { name_ru: Like(`%${query}%`) },
         { name_eng: Like(`%${query}%`) },
-        { description: Like(`%${query}%`) }
+        { description: Like(`%${query}%`) },
       ],
       relations: ['category', 'subCategory', 'type'],
       take: limit,
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -215,31 +245,32 @@ export class ProductsRepository {
     discounted: number;
     categories: number;
   }> {
-    const [total, available, newProducts, discounted, categories] = await Promise.all([
-      this.productRepo.count(),
-      this.productRepo.count({ where: { isAvailable: true } }),
-      this.productRepo.count({ where: { isNew: true } }),
-      this.productRepo.count({ where: { discount: MoreThan(0) } }),
-      this.categoryRepo.count()
-    ]);
+    const [total, available, newProducts, discounted, categories] =
+      await Promise.all([
+        this.productRepo.count(),
+        this.productRepo.count({ where: { isAvailable: true } }),
+        this.productRepo.count({ where: { isNew: true } }),
+        this.productRepo.count({ where: { discount: MoreThan(0) } }),
+        this.categoryRepo.count(),
+      ]);
 
     return {
       total,
       available,
       new: newProducts,
       discounted,
-      categories
+      categories,
     };
   }
 
   async findAllCategories(): Promise<Category[]> {
     return this.categoryRepo.find({
       relations: [
-        'subCategories', 
+        'subCategories',
         'subCategories.products',
-        'subCategories.types', 
+        'subCategories.types',
         'subCategories.types.products',
-        'products'
+        'products',
       ],
     });
   }
@@ -249,7 +280,10 @@ export class ProductsRepository {
     return this.productRepo.save(product);
   }
 
-  async updateProduct(id: number, data: Partial<Product>): Promise<Product | null> {
+  async updateProduct(
+    id: number,
+    data: Partial<Product>
+  ): Promise<Product | null> {
     await this.productRepo.update(id, data);
     return this.findProductById(id);
   }
@@ -266,30 +300,39 @@ export class ProductsRepository {
     return result.affected || 0;
   }
 
-  async getProductsByCategory(categoryId: number, limit: number = 10): Promise<Product[]> {
+  async getProductsByCategory(
+    categoryId: number,
+    limit: number = 10
+  ): Promise<Product[]> {
     return this.productRepo.find({
       where: { category: { id: categoryId } },
       relations: ['category', 'subCategory', 'type'],
       take: limit,
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
-  async getProductsBySubCategory(subCategoryId: number, limit: number = 10): Promise<Product[]> {
+  async getProductsBySubCategory(
+    subCategoryId: number,
+    limit: number = 10
+  ): Promise<Product[]> {
     return this.productRepo.find({
       where: { subCategory: { id: subCategoryId } },
       relations: ['category', 'subCategory', 'type'],
       take: limit,
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
-  async getProductsByType(typeId: number, limit: number = 10): Promise<Product[]> {
+  async getProductsByType(
+    typeId: number,
+    limit: number = 10
+  ): Promise<Product[]> {
     return this.productRepo.find({
       where: { type: { id: typeId } },
       relations: ['category', 'subCategory', 'type'],
       take: limit,
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 }

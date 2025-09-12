@@ -6,7 +6,7 @@ const AdminAddProductSkeleton: React.FC = () => {
       <div className="max-w-[1200px] mx-auto p-6">
         <div className="flex flex-col items-center">
           <div className="h-[42px] bg-gray-200 rounded w-[400px] mb-[37px]"></div>
-          
+
           {/* Секция создания товара */}
           <div className="flex items-center mb-[28px]">
             <div className="h-[20px] bg-gray-200 rounded w-[200px] mr-[5px]"></div>
@@ -42,7 +42,7 @@ const AdminAddProductSkeleton: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                    {[1, 2, 3, 4, 5, 6].map(i => (
                       <th key={i} className="px-6 py-3">
                         <div className="h-[16px] bg-gray-200 rounded w-[80px]"></div>
                       </th>
@@ -50,9 +50,9 @@ const AdminAddProductSkeleton: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {[1, 2, 3].map((i) => (
+                  {[1, 2, 3].map(i => (
                     <tr key={i}>
-                      {[1, 2, 3, 4, 5, 6].map((j) => (
+                      {[1, 2, 3, 4, 5, 6].map(j => (
                         <td key={j} className="px-6 py-4">
                           <div className="h-[16px] bg-gray-200 rounded w-[60px]"></div>
                         </td>

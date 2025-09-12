@@ -7,10 +7,7 @@ import { EmailVerification } from './entity/email-verification.entity';
 import { SharedModule } from '../shared/modules/shared.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([EmailVerification]),
-    SharedModule
-  ],
+  imports: [TypeOrmModule.forFeature([EmailVerification]), SharedModule],
   controllers: [EmailController],
   providers: [EmailService, EmailRepository],
   exports: [EmailService, EmailRepository],

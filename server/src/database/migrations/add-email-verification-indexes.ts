@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddEmailVerificationIndexes1700000000002 implements MigrationInterface {
+export class AddEmailVerificationIndexes1700000000002
+  implements MigrationInterface
+{
   name = 'AddEmailVerificationIndexes1700000000002';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -38,10 +40,14 @@ export class AddEmailVerificationIndexes1700000000002 implements MigrationInterf
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Удаляем индексы в обратном порядке
     await queryRunner.query(`DROP INDEX "IDX_email_verification_created_at"`);
-    await queryRunner.query(`DROP INDEX "IDX_email_verification_email_expires"`);
+    await queryRunner.query(
+      `DROP INDEX "IDX_email_verification_email_expires"`
+    );
     await queryRunner.query(`DROP INDEX "IDX_email_verification_expires_at"`);
     await queryRunner.query(`DROP INDEX "IDX_email_verification_code"`);
     await queryRunner.query(`DROP INDEX "IDX_email_verification_token"`);
-    await queryRunner.query(`DROP INDEX "IDX_email_verification_email_verified"`);
+    await queryRunner.query(
+      `DROP INDEX "IDX_email_verification_email_verified"`
+    );
   }
 }

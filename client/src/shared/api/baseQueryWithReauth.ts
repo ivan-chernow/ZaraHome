@@ -1,5 +1,9 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import type {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from '@reduxjs/toolkit/query';
 // Избегаем циклической зависимости с auth.api/auth.slice
 // Диспетчим экшены по строковым типам: 'auth/setCredentials' и 'auth/logout'
 import { Mutex } from 'async-mutex';
@@ -39,12 +43,12 @@ export const baseQueryWithReauth: BaseQueryFn<
     console.log('Unauthorized request, attempting token refresh...');
     const state: any = api.getState?.();
     const isAuthenticated: boolean = !!state?.auth?.isAuthenticated;
-    
+
     // Если пользователь не авторизован, просто возвращаем ошибку
     if (!isAuthenticated) {
       return result;
     }
-    
+
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
       try {
@@ -60,12 +64,17 @@ export const baseQueryWithReauth: BaseQueryFn<
 
         if (refreshResult.data) {
           const { accessToken } = refreshResult.data as { accessToken: string };
-          
+
           // Обновляем только токен, пользователь остается прежним
-          api.dispatch({ type: 'auth/setCredentials', payload: { accessToken, user: null } });
-          
-          console.log('Token refreshed successfully, retrying original request...');
-          
+          api.dispatch({
+            type: 'auth/setCredentials',
+            payload: { accessToken, user: null },
+          });
+
+          console.log(
+            'Token refreshed successfully, retrying original request...'
+          );
+
           // Повторяем исходный запрос с новым токеном
           result = await baseQuery(args, api, extraOptions);
         } else {
@@ -92,4 +101,4 @@ export const baseQueryWithReauth: BaseQueryFn<
   }
 
   return result;
-}; 
+};

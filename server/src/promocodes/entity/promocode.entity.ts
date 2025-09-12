@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 @Entity('promocodes')
 @Index(['code'], { unique: true })
@@ -27,7 +34,13 @@ export class Promocode {
   @Column({ name: 'current_usage', type: 'int', default: 0 })
   currentUsage: number;
 
-  @Column({ name: 'min_order_amount', type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    name: 'min_order_amount',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
   minOrderAmount: number;
 
   @Column({ name: 'expires_at', type: 'timestamp', nullable: true })

@@ -1,14 +1,14 @@
-import React from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { toggleSubCategory } from "@/entities/category/model/catalog.slice";
-import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
-import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import Link from "next/link";
-import slugify from "slugify";
-import { productAnimation, subCategoryAnimation } from "@/shared/lib/animation";
+import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { toggleSubCategory } from '@/entities/category/model/catalog.slice';
+import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
+import { Container } from '@mui/material';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import Link from 'next/link';
+import slugify from 'slugify';
+import { productAnimation, subCategoryAnimation } from '@/shared/lib/animation';
 
 interface NavMenuAccordionProps {
   onClose: () => void;
@@ -22,7 +22,7 @@ const NavMenuAccordion: React.FC<NavMenuAccordionProps> = ({ onClose }) => {
   const { data: categories, isLoading, error } = useGetCatalogQuery();
 
   const customSlugify = (text: string) =>
-    slugify(text.replace(/й/g, "y").replace(/и$/g, "i"), {
+    slugify(text.replace(/й/g, 'y').replace(/и$/g, 'i'), {
       lower: true,
       strict: true,
     });
@@ -31,13 +31,13 @@ const NavMenuAccordion: React.FC<NavMenuAccordionProps> = ({ onClose }) => {
   if (error)
     return (
       <div>
-        Ошибка: {error instanceof Error ? error.message : "Произошла ошибка"}
+        Ошибка: {error instanceof Error ? error.message : 'Произошла ошибка'}
       </div>
     );
   if (!categories) return null;
 
   const filteredCategories = categories.filter(
-    (category) => category.name !== "Новинки" && category.name !== "Скидки"
+    category => category.name !== 'Новинки' && category.name !== 'Скидки'
   );
 
   // Разделяем каталог на 4 равные части
@@ -50,15 +50,15 @@ const NavMenuAccordion: React.FC<NavMenuAccordionProps> = ({ onClose }) => {
 
   return (
     <div className="flex w-full px-6 pb-[70px]">
-      <Container maxWidth="lg" sx={{ display: "flex", flexWrap: "wrap" }}>
+      <Container maxWidth="lg" sx={{ display: 'flex', flexWrap: 'wrap' }}>
         {columns.map((columnItems, columnIndex) => (
           <div
             key={columnIndex}
             className={`w-1/4 min-w-[250px] px-4 ${
-              columnIndex > 0 ? "border-l border-[#E5E5E5]" : ""
+              columnIndex > 0 ? 'border-l border-[#E5E5E5]' : ''
             }`}
           >
-            {columnItems.map((category) => (
+            {columnItems.map(category => (
               <div key={category.id} className="mb-8">
                 {/* Заголовок колонки */}
                 <div className="mb-4 font-semibold text-[18px] uppercase tracking-wide">
@@ -75,7 +75,7 @@ const NavMenuAccordion: React.FC<NavMenuAccordionProps> = ({ onClose }) => {
                         Array.isArray(b.types) && b.types.length > 0;
                       return aHasTypes === bHasTypes ? 0 : aHasTypes ? -1 : 1;
                     })
-                    .map((subCategory) => {
+                    .map(subCategory => {
                       const categorySlug = customSlugify(category.name);
                       const subCategorySlug = customSlugify(subCategory.name);
                       const subCategoryLink = `/products/category/${categorySlug}/${subCategorySlug}`;
@@ -102,18 +102,18 @@ const NavMenuAccordion: React.FC<NavMenuAccordionProps> = ({ onClose }) => {
                                       : -90,
                                   }}
                                   transition={{
-                                    type: "spring",
+                                    type: 'spring',
                                     stiffness: 300,
                                   }}
                                 >
                                   <KeyboardArrowRightOutlinedIcon
                                     fontSize="small"
                                     sx={{
-                                      color: "black",
+                                      color: 'black',
                                       transform: `rotate(${
                                         expandedSubCategories[subCategory.id]
-                                          ? "90deg"
-                                          : "0deg"
+                                          ? '90deg'
+                                          : '0deg'
                                       })`,
                                     }}
                                   />
@@ -144,7 +144,7 @@ const NavMenuAccordion: React.FC<NavMenuAccordionProps> = ({ onClose }) => {
                                     exit="exit"
                                     variants={subCategoryAnimation}
                                   >
-                                    {subCategory.types.map((type) => {
+                                    {subCategory.types.map(type => {
                                       const typeSlug = customSlugify(type.name);
                                       const typeLink = `${subCategoryLink}/${typeSlug}`;
                                       return (

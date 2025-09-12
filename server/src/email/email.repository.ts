@@ -5,10 +5,14 @@ import { EmailVerification } from './entity/email-verification.entity';
 
 @Injectable()
 export class EmailRepository {
+  private readonly emailVerificationRepository: Repository<EmailVerification>;
+
   constructor(
     @InjectRepository(EmailVerification)
-    private readonly emailVerificationRepository: Repository<EmailVerification>,
-  ) {}
+    emailVerificationRepository: Repository<EmailVerification>
+  ) {
+    this.emailVerificationRepository = emailVerificationRepository;
+  }
 
   /**
    * Создать запись верификации email
@@ -24,7 +28,7 @@ export class EmailRepository {
       code,
       token,
       expiresAt,
-      isVerified: false
+      isVerified: false,
     });
 
     return this.emailVerificationRepository.save(verification);
@@ -33,36 +37,43 @@ export class EmailRepository {
   /**
    * Найти активную верификацию по email
    */
-  async findActiveVerificationByEmail(email: string): Promise<EmailVerification | null> {
+  async findActiveVerificationByEmail(
+    email: string
+  ): Promise<EmailVerification | null> {
     return this.emailVerificationRepository.findOne({
       where: {
         email,
         expiresAt: LessThan(new Date()),
-        isVerified: false
+        isVerified: false,
       },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
   /**
    * Найти верификацию по токену
    */
-  async findVerificationByToken(token: string): Promise<EmailVerification | null> {
+  async findVerificationByToken(
+    token: string
+  ): Promise<EmailVerification | null> {
     return this.emailVerificationRepository.findOne({
-      where: { token }
+      where: { token },
     });
   }
 
   /**
    * Найти верификацию по коду
    */
-  async findVerificationByCode(email: string, code: string): Promise<EmailVerification | null> {
+  async findVerificationByCode(
+    email: string,
+    code: string
+  ): Promise<EmailVerification | null> {
     return this.emailVerificationRepository.findOne({
       where: {
         email,
         code,
-        isVerified: false
-      }
+        isVerified: false,
+      },
     });
   }
 
@@ -78,7 +89,7 @@ export class EmailRepository {
    */
   async deleteExpiredVerifications(): Promise<number> {
     const result = await this.emailVerificationRepository.delete({
-      expiresAt: LessThan(new Date())
+      expiresAt: LessThan(new Date()),
     });
 
     return result.affected || 0;
@@ -96,14 +107,16 @@ export class EmailRepository {
     const [total, verified, expired] = await Promise.all([
       this.emailVerificationRepository.count(),
       this.emailVerificationRepository.count({ where: { isVerified: true } }),
-      this.emailVerificationRepository.count({ where: { expiresAt: LessThan(new Date()) } })
+      this.emailVerificationRepository.count({
+        where: { expiresAt: LessThan(new Date()) },
+      }),
     ]);
 
     return {
       total,
       verified,
       expired,
-      pending: total - verified - expired
+      pending: total - verified - expired,
     };
   }
 
@@ -122,8 +135,8 @@ export class EmailRepository {
       where: {
         email,
         expiresAt: LessThan(new Date()),
-        isVerified: false
-      }
+        isVerified: false,
+      },
     });
 
     return count > 0;

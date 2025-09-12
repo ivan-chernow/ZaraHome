@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface PaginationStatsProps {
   currentPage: number;
@@ -13,7 +13,7 @@ const PaginationStats: React.FC<PaginationStatsProps> = ({
   totalPages,
   totalItems,
   pageSize,
-  className = "",
+  className = '',
 }) => {
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);

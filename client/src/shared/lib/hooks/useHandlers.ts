@@ -76,13 +76,16 @@ export const useThrottledHandler = <T extends (...args: any[]) => any>(
 ): T => {
   const lastCallRef = useRef<number>(0);
 
-  return useCallback((...args: Parameters<T>) => {
-    const now = Date.now();
-    if (now - lastCallRef.current >= delay) {
-      lastCallRef.current = now;
-      return handler(...args);
-    }
-  }, [handler, delay]) as T;
+  return useCallback(
+    (...args: Parameters<T>) => {
+      const now = Date.now();
+      if (now - lastCallRef.current >= delay) {
+        lastCallRef.current = now;
+        return handler(...args);
+      }
+    },
+    [handler, delay]
+  ) as T;
 };
 
 /**
@@ -97,15 +100,18 @@ export const useDebouncedHandler = <T extends (...args: any[]) => any>(
 ): T => {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  return useCallback((...args: Parameters<T>) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-    timeoutRef.current = setTimeout(() => {
-      handler(...args);
-    }, delay);
-  }, [handler, delay]) as T;
+      timeoutRef.current = setTimeout(() => {
+        handler(...args);
+      }, delay);
+    },
+    [handler, delay]
+  ) as T;
 };
 
 /**
@@ -120,15 +126,18 @@ export const useCancellableHandler = <T extends (...args: any[]) => any>(
 ) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  const cancellableHandler = useCallback((...args: Parameters<T>) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+  const cancellableHandler = useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-    timeoutRef.current = setTimeout(() => {
-      handler(...args);
-    }, delay);
-  }, [handler, delay]);
+      timeoutRef.current = setTimeout(() => {
+        handler(...args);
+      }, delay);
+    },
+    [handler, delay]
+  );
 
   const cancel = useCallback(() => {
     if (timeoutRef.current) {

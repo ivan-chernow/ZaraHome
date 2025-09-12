@@ -1,7 +1,7 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import HorizontalLine from "../../../shared/ui/HorizontalLine";
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import HorizontalLine from '../../../shared/ui/HorizontalLine';
 
 interface SearchInputProps {
   value: string;
@@ -12,7 +12,7 @@ interface SearchInputProps {
 const SearchInput: React.FC<SearchInputProps> = ({
   value,
   onChange,
-  placeholder = "Что хотите найти?",
+  placeholder = 'Что хотите найти?',
 }) => {
   return (
     <div className="w-full">

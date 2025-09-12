@@ -60,7 +60,7 @@ export const useDataLoading = <T>(
     const now = Date.now();
     const { data, timestamp } = cacheRef.current;
 
-    if (data && (now - timestamp) < cacheTime) {
+    if (data && now - timestamp < cacheTime) {
       return data;
     }
 
@@ -72,73 +72,76 @@ export const useDataLoading = <T>(
     const now = Date.now();
     const { timestamp } = cacheRef.current;
 
-    return (now - timestamp) > cacheTime;
+    return now - timestamp > cacheTime;
   }, [cacheTime]);
 
   // Загрузка данных
-  const loadData = useCallback(async (forceRefresh: boolean = false) => {
-    // Отменяем предыдущий запрос
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+  const loadData = useCallback(
+    async (forceRefresh: boolean = false) => {
+      // Отменяем предыдущий запрос
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
 
-    // Проверяем кеш если не принудительное обновление
-    if (!forceRefresh) {
-      const cachedData = getCachedData();
-      if (cachedData && !isDataStale()) {
+      // Проверяем кеш если не принудительное обновление
+      if (!forceRefresh) {
+        const cachedData = getCachedData();
+        if (cachedData && !isDataStale()) {
+          setState(prevState => ({
+            ...prevState,
+            data: cachedData,
+            loading: false,
+            error: null,
+          }));
+          return cachedData;
+        }
+      }
+
+      setState(prevState => ({
+        ...prevState,
+        loading: true,
+        error: null,
+      }));
+
+      // Создаем новый AbortController
+      abortControllerRef.current = new AbortController();
+
+      try {
+        const data = await fetcher();
+
+        // Сохраняем в кеш
+        cacheRef.current = {
+          data,
+          timestamp: Date.now(),
+          staleTime,
+        };
+
         setState(prevState => ({
           ...prevState,
-          data: cachedData,
+          data,
           loading: false,
           error: null,
+          retryCount: 0,
         }));
-        return cachedData;
+
+        return data;
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Запрос был отменен
+          return;
+        }
+
+        setState(prevState => ({
+          ...prevState,
+          loading: false,
+          error: error as Error,
+        }));
+
+        throw error;
       }
-    }
-
-    setState(prevState => ({
-      ...prevState,
-      loading: true,
-      error: null,
-    }));
-
-    // Создаем новый AbortController
-    abortControllerRef.current = new AbortController();
-
-    try {
-      const data = await fetcher();
-      
-      // Сохраняем в кеш
-      cacheRef.current = {
-        data,
-        timestamp: Date.now(),
-        staleTime,
-      };
-
-      setState(prevState => ({
-        ...prevState,
-        data,
-        loading: false,
-        error: null,
-        retryCount: 0,
-      }));
-
-      return data;
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        // Запрос был отменен
-        return;
-      }
-
-      setState(prevState => ({
-        ...prevState,
-        loading: false,
-        error: error as Error,
-      }));
-
-      throw error;
-    }
-  }, [fetcher, getCachedData, isDataStale, staleTime]);
+    },
+    [fetcher, getCachedData, isDataStale, staleTime]
+  );
 
   // Повторная попытка загрузки
   const retry = useCallback(async () => {
@@ -153,7 +156,10 @@ export const useDataLoading = <T>(
 
     // Задержка перед повторной попыткой
     await new Promise(resolve => {
-      retryTimeoutRef.current = setTimeout(resolve, retryDelay * state.retryCount);
+      retryTimeoutRef.current = setTimeout(
+        resolve,
+        retryDelay * state.retryCount
+      );
     });
 
     try {

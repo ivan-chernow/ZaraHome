@@ -14,19 +14,22 @@ import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { AppCacheModule } from './shared/cache/cache.module';
 import { ConditionalThrottlerGuard } from './shared/guards/conditional-throttler.guard';
-import { envValidationSchema, validationOptions } from '../config/env.validation';
-import { 
-  appConfig, 
-  databaseConfig, 
-  jwtConfig, 
-  rateLimitConfig, 
+import {
+  envValidationSchema,
+  validationOptions,
+} from '../config/env.validation';
+import {
+  appConfig,
+  databaseConfig,
+  jwtConfig,
+  rateLimitConfig,
   corsConfig,
   cacheConfig,
   fileUploadConfig,
   emailConfig,
   getDatabaseConfig,
   getJwtConfig,
-  getRateLimitConfig
+  getRateLimitConfig,
 } from '../config/env.config';
 
 @Module({

@@ -1,9 +1,9 @@
-import React from "react";
-import { Alert, Fade, TextField } from "@mui/material";
-import MainButton from "@/shared/ui/Button/MainButton";
-import { useForm } from "react-hook-form";
-import { useChangeEmailMutation } from "@/entities/user/api/profile.api";
-import { emailValidation } from "@/shared/lib/validation";
+import React from 'react';
+import { Alert, Fade, TextField } from '@mui/material';
+import MainButton from '@/shared/ui/Button/MainButton';
+import { useForm } from 'react-hook-form';
+import { useChangeEmailMutation } from '@/entities/user/api/profile.api';
+import { emailValidation } from '@/shared/lib/validation';
 
 interface FormInputs {
   email: string;
@@ -16,7 +16,7 @@ const ChangeEmail = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormInputs>({
-    mode: "onChange",
+    mode: 'onChange',
   });
   const [
     changeEmail,
@@ -49,9 +49,9 @@ const ChangeEmail = () => {
         <h4 className="font-light text-[42px] mb-[37px]">Смена E-mail</h4>
         {errorChangeEmail && (
           <Alert severity="error" className="mb-4">
-            {("data" in errorChangeEmail &&
+            {('data' in errorChangeEmail &&
               (errorChangeEmail.data as { message: string })?.message) ||
-              ""}
+              ''}
           </Alert>
         )}
         {isSuccessChangeEmail && (
@@ -69,8 +69,8 @@ const ChangeEmail = () => {
                 Текущий email
               </label>
               <TextField
-                sx={{ width: "410px", height: "48px" }}
-                {...register("email", emailValidation)}
+                sx={{ width: '410px', height: '48px' }}
+                {...register('email', emailValidation)}
                 error={!!errors.email}
                 helperText={errors.email?.message as string}
               />
@@ -83,8 +83,8 @@ const ChangeEmail = () => {
                 Новый E-mail
               </label>
               <TextField
-                sx={{ width: "410px", height: "48px" }}
-                {...register("newEmail", emailValidation)}
+                sx={{ width: '410px', height: '48px' }}
+                {...register('newEmail', emailValidation)}
                 error={!!errors.newEmail}
                 helperText={errors.newEmail?.message as string}
               />

@@ -9,10 +9,7 @@ import { FileUploadErrorHandlerService } from '../../shared/services/file-upload
 import { UploadMonitoringService } from '../../shared/services/upload-monitoring.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    ProductsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User]), ProductsModule],
   controllers: [AdminController],
   providers: [
     AdminService,

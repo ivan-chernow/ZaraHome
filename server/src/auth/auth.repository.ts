@@ -6,16 +6,21 @@ import { RefreshToken } from './login/entity/refresh-token.entity';
 
 @Injectable()
 export class AuthRepository {
+  private readonly userRepository: Repository<User>;
+  private readonly refreshTokenRepository: Repository<RefreshToken>;
+
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(User) userRepository: Repository<User>,
     @InjectRepository(RefreshToken)
-    private readonly refreshTokenRepository: Repository<RefreshToken>,
-  ) {}
+    refreshTokenRepository: Repository<RefreshToken>
+  ) {
+    this.userRepository = userRepository;
+    this.refreshTokenRepository = refreshTokenRepository;
+  }
 
   async findUserByEmail(email: string): Promise<User | null> {
     const normalizedEmail = email.toLowerCase().trim();
-    
+
     return this.userRepository.findOne({
       where: { email: normalizedEmail },
       select: ['id', 'email', 'password', 'isEmailVerified', 'role'],
@@ -23,26 +28,29 @@ export class AuthRepository {
   }
 
   async findUserById(userId: number): Promise<User | null> {
-    return this.userRepository.findOne({ 
-      where: { id: userId } 
+    return this.userRepository.findOne({
+      where: { id: userId },
     });
   }
 
   async findRefreshTokenByUser(userId: number): Promise<RefreshToken | null> {
-    return this.refreshTokenRepository.findOne({ 
-      where: { user: { id: userId } } 
+    return this.refreshTokenRepository.findOne({
+      where: { user: { id: userId } },
     });
   }
 
-  async findRefreshTokenByToken(token: string, userId: number): Promise<RefreshToken | null> {
-    return this.refreshTokenRepository.findOne({ 
-      where: { token, user: { id: userId } } 
+  async findRefreshTokenByToken(
+    token: string,
+    userId: number
+  ): Promise<RefreshToken | null> {
+    return this.refreshTokenRepository.findOne({
+      where: { token, user: { id: userId } },
     });
   }
 
   async deleteRefreshTokenByUser(userId: number): Promise<void> {
-    await this.refreshTokenRepository.delete({ 
-      user: { id: userId } 
+    await this.refreshTokenRepository.delete({
+      user: { id: userId },
     });
   }
 
@@ -51,8 +59,8 @@ export class AuthRepository {
   }
 
   async saveRefreshToken(
-    token: string, 
-    user: User, 
+    token: string,
+    user: User,
     expiresAt: Date
   ): Promise<RefreshToken> {
     const refreshToken = this.refreshTokenRepository.create({
@@ -60,16 +68,16 @@ export class AuthRepository {
       user,
       expiresAt,
     });
-    
+
     return this.refreshTokenRepository.save(refreshToken);
   }
 
   async isUserExists(email: string): Promise<boolean> {
     const normalizedEmail = email.toLowerCase().trim();
     const count = await this.userRepository.count({
-      where: { email: normalizedEmail }
+      where: { email: normalizedEmail },
     });
-    
+
     return count > 0;
   }
 }

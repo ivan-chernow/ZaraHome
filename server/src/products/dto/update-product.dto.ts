@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsBoolean, IsNumber, IsPositive, IsArray } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsNumber,
+  IsPositive,
+  IsArray,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -35,7 +42,13 @@ export class UpdateProductDto {
   })
   colors?: string[];
 
-  @ApiPropertyOptional({ type: 'array', items: { type: 'object', properties: { size: { type: 'string' }, price: { type: 'number' } } } })
+  @ApiPropertyOptional({
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: { size: { type: 'string' }, price: { type: 'number' } },
+    },
+  })
   @IsOptional()
   @Transform(({ value }) => {
     if (typeof value === 'string') {
@@ -62,7 +75,9 @@ export class UpdateProductDto {
   @ApiPropertyOptional({ example: true })
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : value))
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value === 'true' : value
+  )
   isNew?: boolean;
 
   @ApiPropertyOptional({ example: 10 })
@@ -74,29 +89,35 @@ export class UpdateProductDto {
   @ApiPropertyOptional({ example: true })
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : value))
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value === 'true' : value
+  )
   isAvailable?: boolean;
 
   @ApiPropertyOptional({ example: 1 })
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  @Transform(({ value }) => (typeof value === 'string' ? parseInt(value) : value))
+  @Transform(({ value }) =>
+    typeof value === 'string' ? parseInt(value) : value
+  )
   categoryId?: number;
 
   @ApiPropertyOptional({ example: 2 })
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  @Transform(({ value }) => (typeof value === 'string' ? parseInt(value) : value))
+  @Transform(({ value }) =>
+    typeof value === 'string' ? parseInt(value) : value
+  )
   subCategoryId?: number;
 
   @ApiPropertyOptional({ example: 3 })
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  @Transform(({ value }) => (typeof value === 'string' ? parseInt(value) : value))
+  @Transform(({ value }) =>
+    typeof value === 'string' ? parseInt(value) : value
+  )
   typeId?: number;
 }
-
-

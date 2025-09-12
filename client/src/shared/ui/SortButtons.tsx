@@ -1,6 +1,6 @@
-import React from "react";
-import Image from "next/image";
-import { SortType } from "@/shared/lib/hooks/useSorting";
+import React from 'react';
+import Image from 'next/image';
+import { SortType } from '@/shared/lib/hooks/useSorting';
 
 interface SortButtonsProps {
   sortType: SortType;
@@ -13,13 +13,13 @@ const SortButtons: React.FC<SortButtonsProps> = ({
   sortType,
   onSortByPrice,
   onSortByDate,
-  className = "",
+  className = '',
 }) => {
   return (
     <div className={`flex items-center justify-end ${className}`}>
       <button
         className={`flex items-center mr-[12px] cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
-          sortType === "price" ? "text-blue-600 font-semibold underline" : ""
+          sortType === 'price' ? 'text-blue-600 font-semibold underline' : ''
         }`}
         onClick={onSortByPrice}
       >
@@ -33,7 +33,7 @@ const SortButtons: React.FC<SortButtonsProps> = ({
       </button>
       <button
         className={`flex items-center cursor-pointer transition-all ease-in-out duration-300 hover:underline ${
-          sortType === "date" ? "text-blue-600 font-semibold underline" : ""
+          sortType === 'date' ? 'text-blue-600 font-semibold underline' : ''
         }`}
         onClick={onSortByDate}
       >

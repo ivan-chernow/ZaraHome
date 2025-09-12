@@ -22,7 +22,8 @@ export const ORDERS_CONSTANTS = {
     ADDRESS_TOO_LONG: 'Адрес слишком длинный',
     COMMENT_TOO_LONG: 'Комментарий слишком длинный',
     INVALID_PAGINATION: 'Некорректные параметры пагинации',
-    SEARCH_QUERY_TOO_SHORT: 'Поисковый запрос должен содержать минимум 2 символа',
+    SEARCH_QUERY_TOO_SHORT:
+      'Поисковый запрос должен содержать минимум 2 символа',
   },
   VALIDATION: {
     MIN_ITEMS: 1,

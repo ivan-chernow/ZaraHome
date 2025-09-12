@@ -1,7 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
-import { User } from "../../users/user/entity/user.entity";
-import { OrderItem } from "src/shared/shared.interfaces";
-import { OrderStatus } from "src/shared/shared.interfaces";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
+import { User } from '../../users/user/entity/user.entity';
+import { OrderItem } from 'src/shared/shared.interfaces';
+import { OrderStatus } from 'src/shared/shared.interfaces';
 
 @Entity('order')
 @Index(['user', 'status']) // Индекс для поиска заказов пользователя по статусу
@@ -19,14 +28,14 @@ export class Order {
   @Column('jsonb', { comment: 'Товары в заказе' })
   items: OrderItem[];
 
-  @Column('decimal', { 
-    precision: 10, 
-    scale: 2, 
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
     comment: 'Общая стоимость заказа',
     transformer: {
       to: (value: number) => value,
-      from: (value: string) => parseFloat(value)
-    }
+      from: (value: string) => parseFloat(value),
+    },
   })
   totalPrice: number;
 
@@ -37,46 +46,46 @@ export class Order {
     type: 'enum',
     enum: OrderStatus,
     default: OrderStatus.PENDING,
-    comment: 'Статус заказа'
+    comment: 'Статус заказа',
   })
   status: OrderStatus;
 
-  @Column({ 
-    nullable: true, 
+  @Column({
+    nullable: true,
     length: 500,
-    comment: 'Адрес доставки'
+    comment: 'Адрес доставки',
   })
   address: string;
 
-  @Column({ 
-    nullable: true, 
+  @Column({
+    nullable: true,
     length: 20,
-    comment: 'Номер телефона'
+    comment: 'Номер телефона',
   })
   phone: string;
 
-  @Column({ 
-    nullable: true, 
+  @Column({
+    nullable: true,
     type: 'text',
-    comment: 'Комментарий к заказу'
+    comment: 'Комментарий к заказу',
   })
   comment: string;
 
-  @Column({ 
+  @Column({
     nullable: true,
     type: 'decimal',
     precision: 10,
     scale: 2,
     comment: 'Скидка по промокоду',
-    default: 0
+    default: 0,
   })
   discount: number;
 
-  @Column({ 
+  @Column({
     nullable: true,
     type: 'varchar',
     length: 50,
-    comment: 'Использованный промокод'
+    comment: 'Использованный промокод',
   })
   promocode: string | null;
 

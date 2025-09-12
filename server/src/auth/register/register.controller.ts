@@ -2,18 +2,24 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { RegistrationService } from './register.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { Throttle } from '@nestjs/throttler';
-import { 
-  RegistrationInitiateDto, 
-  RegistrationVerifyDto, 
-  RegistrationCompleteDto 
+import {
+  RegistrationInitiateDto,
+  RegistrationVerifyDto,
+  RegistrationCompleteDto,
 } from './dto/registration.dto';
 
 @Controller('auth/registration')
 export class RegistrationController {
+  private readonly registrationService: RegistrationService;
+  private readonly responseService: ResponseService;
+
   constructor(
-    private readonly registrationService: RegistrationService,
-    private readonly responseService: ResponseService,
-  ) {}
+    registrationService: RegistrationService,
+    responseService: ResponseService
+  ) {
+    this.registrationService = registrationService;
+    this.responseService = responseService;
+  }
 
   @Post('initiate')
   @HttpCode(HttpStatus.OK)
@@ -21,19 +27,22 @@ export class RegistrationController {
   async initiate(@Body() dto: RegistrationInitiateDto) {
     await this.registrationService.initiateRegistration(dto.email);
     return this.responseService.success(
-      undefined, 
+      undefined,
       `Код подтверждения отправлен на email ${dto.email}`
     );
-  }   
+  }
 
   @Post('verify-code')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 3, ttl: 300 } })
   async verifyCode(@Body() dto: RegistrationVerifyDto) {
-    const sessionToken = await this.registrationService.verifyByCode(dto.email, dto.code);
+    const sessionToken = await this.registrationService.verifyByCode(
+      dto.email,
+      dto.code
+    );
     return this.responseService.success(
-      { sessionToken }, 
-      'Код подтверждения подтвержден'
+      { sessionToken },
+      'Код подтверждения валиден'
     );
   }
 
@@ -41,9 +50,12 @@ export class RegistrationController {
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 3, ttl: 300 } })
   async complete(@Body() dto: RegistrationCompleteDto) {
-    const user = await this.registrationService.completeRegistration(dto.sessionToken, dto.password);
+    const user = await this.registrationService.completeRegistration(
+      dto.sessionToken,
+      dto.password
+    );
     return this.responseService.success(
-      { user }, 
+      { user },
       `Регистрация завершена для пользователя ${user.email}`
     );
   }

@@ -1,25 +1,25 @@
-"use client";
-import React, { useCallback, useEffect, useState } from "react";
-import CartButton from "@/shared/ui/Button/CartButton";
-import Link from "next/link";
-import { RootState } from "@/shared/config/store/store";
-import { useSelector, useDispatch } from "react-redux";
-import { setActiveColor } from "@/entities/favorite/model/productCard.slice";
-import SliderSwiper from "@/shared/ui/SliderSwiper";
-import FavoriteButton from "@/shared/ui/Button/FavoriteButton";
-import Color from "@/shared/ui/Color";
-import New from "@/shared/ui/New";
-import { Product } from "@/entities/product/api/products.api";
-import Discount from "@/widgets/discount/Discount";
+'use client';
+import React, { useCallback, useEffect, useState } from 'react';
+import CartButton from '@/shared/ui/Button/CartButton';
+import Link from 'next/link';
+import { RootState } from '@/shared/config/store/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { setActiveColor } from '@/entities/favorite/model/productCard.slice';
+import SliderSwiper from '@/shared/ui/SliderSwiper';
+import FavoriteButton from '@/shared/ui/Button/FavoriteButton';
+import Color from '@/shared/ui/Color';
+import New from '@/shared/ui/New';
+import { Product } from '@/entities/product/api/products.api';
+import Discount from '@/widgets/discount/Discount';
 
 interface ProductCardProps {
   product: Product;
-  cartButtonSize?: "default" | "small";
+  cartButtonSize?: 'default' | 'small';
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
-  cartButtonSize = "default",
+  cartButtonSize = 'default',
 }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
@@ -42,9 +42,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const activeColor = activeColors[product.id];
 
-  const handleColorClick = useCallback((color: string) => {
-    dispatch(setActiveColor({ productId: product.id, color }));
-  }, [dispatch, product.id]);
+  const handleColorClick = useCallback(
+    (color: string) => {
+      dispatch(setActiveColor({ productId: product.id, color }));
+    },
+    [dispatch, product.id]
+  );
 
   return (
     <li
@@ -65,12 +68,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <div
         className="mb-[18px] relative overflow-hidden"
-        style={{ width: "auto", height: 326, background: "transparent" }}
+        style={{ width: 'auto', height: 326, background: 'transparent' }}
       >
         <SliderSwiper product={product} isHovered={isHovered} quantity={3} />
         <div
           className={`absolute right-0 bottom-[-2.2px] z-10 transition-all duration-300  ease-in-out ${
-            isHovered ? "opacity-100" : "opacity-0"
+            isHovered ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <FavoriteButton productId={product.id} />
@@ -86,7 +89,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="flex px-[10px]">
         {Object.entries(product.colors).map(([key, color]) => (
           <Color
-            display={isHovered ? "opacity-100" : "opacity-0"}
+            display={isHovered ? 'opacity-100' : 'opacity-0'}
             color={color}
             key={key}
             onClick={() => handleColorClick(key)}
@@ -144,8 +147,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           items-baseline
         "
         >
-          {Object.values(product.size)[0]?.price?.toLocaleString("ru-RU") ||
-            "-"}{" "}
+          {Object.values(product.size)[0]?.price?.toLocaleString('ru-RU') ||
+            '-'}{' '}
           <span className="font-bold text-[18px] ml-0.5">₽</span>
         </p>
 

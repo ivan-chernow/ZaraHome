@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { useMemo } from "react";
-import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import NavMenuProductCard from "./NavMenuProductCard";
-import type { Product } from "@/entities/product/api/products.api";
-import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
-import PaginationBlock from "../../shared/ui/pagination/PaginationBlock";
-import PaginationStats from "../../shared/ui/pagination/PaginationStats";
-import { usePagination } from "@/shared/lib/hooks/usePagination";
+import React, { useMemo } from 'react';
+import { Container } from '@mui/material';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import NavMenuProductCard from './NavMenuProductCard';
+import type { Product } from '@/entities/product/api/products.api';
+import NavMenuSearchWrapper from './NavMenuSearchWrapper';
+import PaginationBlock from '../../shared/ui/pagination/PaginationBlock';
+import PaginationStats from '../../shared/ui/pagination/PaginationStats';
+import { usePagination } from '@/shared/lib/hooks/usePagination';
 
 interface NavMenuPaginationProps {
-  filterType: "discount" | "new";
+  filterType: 'discount' | 'new';
   pageSize?: number;
 }
 
@@ -28,13 +28,13 @@ const NavMenuPagination: React.FC<NavMenuPaginationProps> = ({
 
     const allProducts = getAllProducts(categories);
 
-    if (filterType === "discount") {
+    if (filterType === 'discount') {
       return allProducts
         .filter((p: Product) => p.discount && p.discount > 0)
         .sort((a: Product, b: Product) => b.discount! - a.discount!);
-    } else if (filterType === "new") {
+    } else if (filterType === 'new') {
       return allProducts
-        .filter((p) => p.isNew)
+        .filter(p => p.isNew)
         .sort(
           (a, b) =>
             new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
@@ -57,7 +57,7 @@ const NavMenuPagination: React.FC<NavMenuPaginationProps> = ({
 
   // Получаем заголовок в зависимости от типа фильтра
   const getTitle = () => {
-    return filterType === "discount" ? "Товары со скидкой" : "Новые товары";
+    return filterType === 'discount' ? 'Товары со скидкой' : 'Новые товары';
   };
 
   return (
@@ -100,9 +100,9 @@ const NavMenuPagination: React.FC<NavMenuPaginationProps> = ({
               {filteredProducts.length === 0 && (
                 <div className="text-center py-8">
                   <p className="text-gray-500">
-                    {filterType === "discount"
-                      ? "Товары со скидкой не найдены"
-                      : "Новые товары не найдены"}
+                    {filterType === 'discount'
+                      ? 'Товары со скидкой не найдены'
+                      : 'Новые товары не найдены'}
                   </p>
                 </div>
               )}

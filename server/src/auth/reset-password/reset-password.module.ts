@@ -9,9 +9,9 @@ import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ResetPassword, User]), 
-    EmailModule, 
-    SharedModule
+    TypeOrmModule.forFeature([ResetPassword, User]),
+    EmailModule,
+    SharedModule,
   ],
   providers: [ResetPasswordService],
   controllers: [ResetPasswordController],

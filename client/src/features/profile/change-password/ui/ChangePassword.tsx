@@ -1,13 +1,13 @@
-import React from "react";
-import { Fade, TextField, Alert } from "@mui/material";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import { useForm } from "react-hook-form";
+import React from 'react';
+import { Fade, TextField, Alert } from '@mui/material';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import { useForm } from 'react-hook-form';
 import {
   getPasswordValidation,
   getRepeatPasswordValidation,
-} from "@/shared/lib/validation";
-import { useChangePasswordMutation } from "@/entities/user/api/profile.api";
-import MainButton from "@/shared/ui/Button/MainButton";
+} from '@/shared/lib/validation';
+import { useChangePasswordMutation } from '@/entities/user/api/profile.api';
+import MainButton from '@/shared/ui/Button/MainButton';
 
 interface FormInputs {
   password: string;
@@ -21,7 +21,7 @@ const ChangePassword = () => {
     getValues,
     formState: { errors },
   } = useForm<FormInputs>({
-    mode: "onChange",
+    mode: 'onChange',
   });
   const [
     changePassword,
@@ -65,7 +65,7 @@ const ChangePassword = () => {
         {errorChangePassword && (
           <Alert severity="error" className="mb-4">
             {(errorChangePassword as any).data?.message ||
-              "Произошла ошибка при смене пароля"}
+              'Произошла ошибка при смене пароля'}
           </Alert>
         )}
         {isSuccessChangePassword && (
@@ -83,9 +83,9 @@ const ChangePassword = () => {
                 Пароль
               </label>
               <TextField
-                sx={{ width: "410px", height: "48px" }}
+                sx={{ width: '410px', height: '48px' }}
                 type="password"
-                {...register("password", getPasswordValidation())}
+                {...register('password', getPasswordValidation())}
                 error={!!errors.password}
                 helperText={errors.password?.message as string}
               />
@@ -98,10 +98,10 @@ const ChangePassword = () => {
                 Повторите пароль
               </label>
               <TextField
-                sx={{ width: "410px", height: "48px" }}
+                sx={{ width: '410px', height: '48px' }}
                 type="password"
                 {...register(
-                  "confirmPassword",
+                  'confirmPassword',
                   getRepeatPasswordValidation(getValues)
                 )}
                 error={!!errors.confirmPassword}
@@ -112,8 +112,8 @@ const ChangePassword = () => {
           <div
             className={`flex  ${
               !!errors.password || !!errors.confirmPassword
-                ? "pt-[40px]"
-                : "pt-[0]"
+                ? 'pt-[40px]'
+                : 'pt-[0]'
             }`}
           >
             <MainButton

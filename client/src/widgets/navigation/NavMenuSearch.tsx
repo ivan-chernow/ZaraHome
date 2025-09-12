@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo } from "react";
-import { Container } from "@mui/material";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import { getAllProducts } from "@/entities/category/lib/catalog.utils";
-import NavMenuProductCard from "./NavMenuProductCard";
-import type { Product } from "@/entities/product/api/products.api";
-import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
-import PaginationBlock from "../../shared/ui/pagination/PaginationBlock";
-import PaginationStats from "../../shared/ui/pagination/PaginationStats";
-import { usePagination } from "@/shared/lib/hooks/usePagination";
-import SearchInput from "../../features/search/ui/SearchInput";
+import React, { useState, useMemo } from 'react';
+import { Container } from '@mui/material';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import { getAllProducts } from '@/entities/category/lib/catalog.utils';
+import NavMenuProductCard from './NavMenuProductCard';
+import type { Product } from '@/entities/product/api/products.api';
+import NavMenuSearchWrapper from './NavMenuSearchWrapper';
+import PaginationBlock from '../../shared/ui/pagination/PaginationBlock';
+import PaginationStats from '../../shared/ui/pagination/PaginationStats';
+import { usePagination } from '@/shared/lib/hooks/usePagination';
+import SearchInput from '../../features/search/ui/SearchInput';
 
 interface NavMenuSearchProps {
   pageSize?: number;
@@ -18,7 +18,7 @@ interface NavMenuSearchProps {
 
 const NavMenuSearch: React.FC<NavMenuSearchProps> = ({ pageSize = 8 }) => {
   const { data: categories } = useGetCatalogQuery();
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
 
   // Получаем все продукты
   const allProducts: Product[] = useMemo(() => {
@@ -31,7 +31,7 @@ const NavMenuSearch: React.FC<NavMenuSearchProps> = ({ pageSize = 8 }) => {
     if (!searchValue.trim()) return [];
 
     const searchLower = searchValue.toLowerCase();
-    return allProducts.filter((product) => {
+    return allProducts.filter(product => {
       const nameMatch = product.name_ru.toLowerCase().includes(searchLower);
       const descriptionMatch = product.description
         ?.toLowerCase()

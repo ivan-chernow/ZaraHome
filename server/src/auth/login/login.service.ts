@@ -3,16 +3,18 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../users/user/entity/user.entity';
-import { RefreshToken } from './entity/refresh-token.entity';
 import { AuthRepository } from '../auth.repository';
 import { IAuthService } from 'src/shared/shared.interfaces';
 
 @Injectable()
 export class LoginService implements IAuthService {
-  constructor(
-    private readonly authRepository: AuthRepository,
-    private readonly jwtService: JwtService,
-  ) {}
+  private readonly authRepository: AuthRepository;
+  private readonly jwtService: JwtService;
+
+  constructor(authRepository: AuthRepository, jwtService: JwtService) {
+    this.authRepository = authRepository;
+    this.jwtService = jwtService;
+  }
 
   async validateUser(email: string, password: string): Promise<User> {
     if (!email || !password) {
@@ -67,24 +69,31 @@ export class LoginService implements IAuthService {
     try {
       const payload = this.jwtService.verify(refreshToken);
       const user = await this.authRepository.findUserById(payload.sub);
-      
+
       if (!user) {
         throw new UnauthorizedException('Пользователь не найден');
       }
 
-      const tokenInDb = await this.authRepository.findRefreshTokenByToken(refreshToken, user.id);
+      const tokenInDb = await this.authRepository.findRefreshTokenByToken(
+        refreshToken,
+        user.id
+      );
       if (!tokenInDb) {
         throw new UnauthorizedException('Невалидный refresh token');
       }
 
       await this.authRepository.deleteRefreshTokenByToken(refreshToken);
       const newRefreshToken = this.jwtService.sign(
-        { sub: user.id, email: user.email, role: user.role }, 
+        { sub: user.id, email: user.email, role: user.role },
         { expiresIn: '30d' }
       );
-      
+
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      await this.authRepository.saveRefreshToken(newRefreshToken, user, expiresAt);
+      await this.authRepository.saveRefreshToken(
+        newRefreshToken,
+        user,
+        expiresAt
+      );
 
       if (res) {
         this.setRefreshTokenCookie(res, newRefreshToken, expiresAt);
@@ -92,7 +101,7 @@ export class LoginService implements IAuthService {
 
       return {
         accessToken: this.jwtService.sign(
-          { sub: user.id, email: user.email, role: user.role }, 
+          { sub: user.id, email: user.email, role: user.role },
           { expiresIn: '24h' }
         ),
         user: {
@@ -101,25 +110,29 @@ export class LoginService implements IAuthService {
           role: user.role,
         },
       };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Невалидный refresh token');
     }
   }
 
   async logout(userId: number, res?: Response) {
     await this.authRepository.deleteRefreshTokenByUser(userId);
-    
+
     if (res) {
       this.clearRefreshTokenCookie(res);
     }
-    
-    return { 
-      success: true, 
-      message: 'Вы успешно вышли из системы' 
+
+    return {
+      success: true,
+      message: 'Вы успешно вышли из системы',
     };
   }
 
-  private setRefreshTokenCookie(res: Response, token: string, expiresAt: Date): void {
+  private setRefreshTokenCookie(
+    res: Response,
+    token: string,
+    expiresAt: Date
+  ): void {
     res.cookie('refreshToken', token, {
       httpOnly: true,
       sameSite: 'lax',

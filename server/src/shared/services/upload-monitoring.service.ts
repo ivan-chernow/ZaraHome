@@ -41,7 +41,9 @@ export class UploadMonitoringService {
       this.uploadTimes.splice(0, excess);
     }
 
-    this.logger.log(`Записаны результаты загрузки: ${results.length} файлов за ${uploadTimeMs}ms`);
+    this.logger.log(
+      `Записаны результаты загрузки: ${results.length} файлов за ${uploadTimeMs}ms`
+    );
   }
 
   /**
@@ -70,11 +72,13 @@ export class UploadMonitoringService {
       .map(path => this.estimateFileSize(path!));
 
     const totalFileSize = fileSizes.reduce((sum, size) => sum + size, 0);
-    const averageFileSize = fileSizes.length > 0 ? totalFileSize / fileSizes.length : 0;
+    const averageFileSize =
+      fileSizes.length > 0 ? totalFileSize / fileSizes.length : 0;
 
-    const lastUploadTime = this.uploadTimes.length > 0 
-      ? new Date(Date.now() - this.uploadTimes[this.uploadTimes.length - 1])
-      : new Date();
+    const lastUploadTime =
+      this.uploadTimes.length > 0
+        ? new Date(Date.now() - this.uploadTimes[this.uploadTimes.length - 1])
+        : new Date();
 
     return {
       totalUploads,
@@ -95,7 +99,7 @@ export class UploadMonitoringService {
   analyzeErrors(): ErrorAnalysis {
     const metrics = this.getCurrentMetrics();
     const commonErrors = Array.from(metrics.commonErrors.entries());
-    
+
     if (commonErrors.length === 0) {
       return {
         mostCommonError: 'Нет ошибок',
@@ -112,14 +116,17 @@ export class UploadMonitoringService {
     // Анализируем тренд ошибок (последние 100 загрузок vs предыдущие 100)
     const recentUploads = this.uploadHistory.slice(-100);
     const previousUploads = this.uploadHistory.slice(-200, -100);
-    
-    const recentErrorRate = recentUploads.length > 0 
-      ? recentUploads.filter(r => !r.success).length / recentUploads.length 
-      : 0;
-    
-    const previousErrorRate = previousUploads.length > 0 
-      ? previousUploads.filter(r => !r.success).length / previousUploads.length 
-      : 0;
+
+    const recentErrorRate =
+      recentUploads.length > 0
+        ? recentUploads.filter(r => !r.success).length / recentUploads.length
+        : 0;
+
+    const previousErrorRate =
+      previousUploads.length > 0
+        ? previousUploads.filter(r => !r.success).length /
+          previousUploads.length
+        : 0;
 
     let errorTrend: 'increasing' | 'decreasing' | 'stable';
     if (recentErrorRate > previousErrorRate + 0.1) {
@@ -131,7 +138,11 @@ export class UploadMonitoringService {
     }
 
     // Генерируем рекомендации на основе анализа
-    const recommendations = this.generateRecommendations(commonErrors, errorTrend, metrics);
+    const recommendations = this.generateRecommendations(
+      commonErrors,
+      errorTrend,
+      metrics
+    );
 
     return {
       mostCommonError,
@@ -145,16 +156,18 @@ export class UploadMonitoringService {
    * Генерируем рекомендации на основе анализа ошибок
    */
   private generateRecommendations(
-    commonErrors: [string, number][], 
+    commonErrors: [string, number][],
     errorTrend: 'increasing' | 'decreasing' | 'stable',
     metrics: UploadMetrics
   ): string[] {
     const recommendations: string[] = [];
 
     // Анализируем конкретные ошибки
-    commonErrors.forEach(([error, count]) => {
+    commonErrors.forEach(([error, _count]) => {
       if (error.includes('слишком большой')) {
-        recommendations.push('Рассмотрите возможность увеличения лимита размера файлов');
+        recommendations.push(
+          'Рассмотрите возможность увеличения лимита размера файлов'
+        );
       }
       if (error.includes('неподдерживаемый тип')) {
         recommendations.push('Проверьте список поддерживаемых форматов файлов');
@@ -166,21 +179,30 @@ export class UploadMonitoringService {
 
     // Анализируем тренды
     if (errorTrend === 'increasing') {
-      recommendations.push('⚠️ Увеличивается количество ошибок. Проверьте системные ресурсы');
+      recommendations.push(
+        '⚠️ Увеличивается количество ошибок. Проверьте системные ресурсы'
+      );
     } else if (errorTrend === 'decreasing') {
-      recommendations.push('✅ Количество ошибок уменьшается. Система стабилизируется');
+      recommendations.push(
+        '✅ Количество ошибок уменьшается. Система стабилизируется'
+      );
     }
 
     // Анализируем общую статистику
     if (metrics.successRate < 0.8) {
-      recommendations.push('🔴 Низкий процент успешных загрузок. Требуется диагностика');
+      recommendations.push(
+        '🔴 Низкий процент успешных загрузок. Требуется диагностика'
+      );
     } else if (metrics.successRate > 0.95) {
       recommendations.push('🟢 Отличная стабильность загрузок');
     }
 
     // Анализируем размеры файлов
-    if (metrics.averageFileSize > 5 * 1024 * 1024) { // > 5MB
-      recommendations.push('📁 Большие файлы могут замедлять загрузку. Рассмотрите сжатие');
+    if (metrics.averageFileSize > 5 * 1024 * 1024) {
+      // > 5MB
+      recommendations.push(
+        '📁 Большие файлы могут замедлять загрузку. Рассмотрите сжатие'
+      );
     }
 
     return recommendations;
@@ -198,10 +220,10 @@ export class UploadMonitoringService {
   /**
    * Экспортируем статистику для внешних систем
    */
-  exportMetrics(): any {
+  exportMetrics(): Record<string, unknown> {
     const metrics = this.getCurrentMetrics();
     const errorAnalysis = this.analyzeErrors();
-    
+
     return {
       timestamp: new Date().toISOString(),
       metrics: {
@@ -216,10 +238,12 @@ export class UploadMonitoringService {
   /**
    * Вычисляем общее состояние системы
    */
-  private calculateSystemHealth(metrics: UploadMetrics): 'excellent' | 'good' | 'warning' | 'critical' {
+  private calculateSystemHealth(
+    metrics: UploadMetrics
+  ): 'excellent' | 'good' | 'warning' | 'critical' {
     if (metrics.successRate >= 0.95) return 'excellent';
     if (metrics.successRate >= 0.85) return 'good';
-    if (metrics.successRate >= 0.70) return 'warning';
+    if (metrics.successRate >= 0.7) return 'warning';
     return 'critical';
   }
 
@@ -244,7 +268,9 @@ export class UploadMonitoringService {
     const errorAnalysis = this.analyzeErrors();
 
     if (metrics.successRate < 0.8) {
-      warnings.push(`Низкий процент успешных загрузок: ${Math.round(metrics.successRate * 100)}%`);
+      warnings.push(
+        `Низкий процент успешных загрузок: ${Math.round(metrics.successRate * 100)}%`
+      );
     }
 
     if (errorAnalysis.errorTrend === 'increasing') {
@@ -252,7 +278,9 @@ export class UploadMonitoringService {
     }
 
     if (metrics.failedUploads > 50) {
-      warnings.push(`Большое количество неудачных загрузок: ${metrics.failedUploads}`);
+      warnings.push(
+        `Большое количество неудачных загрузок: ${metrics.failedUploads}`
+      );
     }
 
     return warnings;

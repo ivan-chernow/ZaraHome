@@ -23,7 +23,7 @@ export class CacheService {
     try {
       const fullKey = this.buildKey(key, prefix);
       const item = this.cache.get(fullKey);
-      
+
       if (!item) {
         this.logger.debug(`Cache MISS: ${fullKey}`);
         return null;
@@ -51,8 +51,8 @@ export class CacheService {
     try {
       const fullKey = this.buildKey(key, options?.prefix);
       const ttl = options?.ttl || this.defaultTTL;
-      const expiresAt = Date.now() + (ttl * 1000);
-      
+      const expiresAt = Date.now() + ttl * 1000;
+
       this.cache.set(fullKey, { value, expiresAt });
       this.logger.debug(`Cache SET: ${fullKey} (TTL: ${ttl}s)`);
     } catch (error) {
@@ -79,17 +79,22 @@ export class CacheService {
   async deleteByPrefix(prefix: string): Promise<void> {
     try {
       const keysToDelete: string[] = [];
-      
+
       for (const key of this.cache.keys()) {
         if (key.startsWith(`${prefix}:`)) {
           keysToDelete.push(key);
         }
       }
-      
+
       keysToDelete.forEach(key => this.cache.delete(key));
-      this.logger.debug(`Cache CLEAR by prefix: ${prefix} (${keysToDelete.length} keys)`);
+      this.logger.debug(
+        `Cache CLEAR by prefix: ${prefix} (${keysToDelete.length} keys)`
+      );
     } catch (error) {
-      this.logger.error(`Error clearing cache by prefix ${prefix}:`, error.message);
+      this.logger.error(
+        `Error clearing cache by prefix ${prefix}:`,
+        error.message
+      );
     }
   }
 
@@ -97,12 +102,12 @@ export class CacheService {
    * Получить или установить значение (get-or-set pattern)
    */
   async getOrSet<T>(
-    key: string, 
-    factory: () => Promise<T>, 
+    key: string,
+    factory: () => Promise<T>,
     options?: CacheOptions
   ): Promise<T> {
     const cached = await this.get<T>(key, options?.prefix);
-    
+
     if (cached !== null) {
       return cached;
     }
@@ -121,7 +126,10 @@ export class CacheService {
       this.cache.clear();
       this.logger.debug(`Cache INVALIDATE pattern: ${pattern}`);
     } catch (error) {
-      this.logger.error(`Error invalidating cache pattern ${pattern}:`, error.message);
+      this.logger.error(
+        `Error invalidating cache pattern ${pattern}:`,
+        error.message
+      );
     }
   }
 
@@ -132,7 +140,7 @@ export class CacheService {
     try {
       const keys = this.cache.size;
       const memory = `${Math.round(keys * 0.1)} KB`; // Примерная оценка
-      
+
       return { keys, memory };
     } catch (error) {
       this.logger.error('Error getting cache stats:', error.message);
@@ -170,10 +178,10 @@ export class CacheService {
       // Простая проверка - пробуем записать и прочитать тестовое значение
       const testKey = 'health-check';
       const testValue = { timestamp: Date.now() };
-      
+
       await this.set(testKey, testValue, { ttl: 60 });
       const result = await this.get(testKey);
-      
+
       return result !== null;
     } catch (error) {
       this.logger.error('Cache health check failed:', error.message);
@@ -187,15 +195,15 @@ export class CacheService {
   private cleanupExpiredKeys(): void {
     const now = Date.now();
     const keysToDelete: string[] = [];
-    
+
     for (const [key, item] of this.cache.entries()) {
       if (now > item.expiresAt) {
         keysToDelete.push(key);
       }
     }
-    
+
     keysToDelete.forEach(key => this.cache.delete(key));
-    
+
     if (keysToDelete.length > 0) {
       this.logger.debug(`Cleaned up ${keysToDelete.length} expired cache keys`);
     }

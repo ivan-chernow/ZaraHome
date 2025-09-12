@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import MainLayout from "@/widgets/layout/MainLayout";
+import MainLayout from '@/widgets/layout/MainLayout';
 
 const TermsOfServicePage: React.FC = () => {
   const currentDate = new Date().toLocaleDateString('ru-RU', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 
   return (
@@ -16,8 +16,12 @@ const TermsOfServicePage: React.FC = () => {
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           {/* Header */}
           <div className="bg-blue-600 px-6 py-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Пользовательское соглашение</h1>
-            <p className="text-blue-100 mt-1">Последнее обновление: {currentDate}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">
+              Пользовательское соглашение
+            </h1>
+            <p className="text-blue-100 mt-1">
+              Последнее обновление: {currentDate}
+            </p>
           </div>
 
           {/* Content */}
@@ -25,9 +29,10 @@ const TermsOfServicePage: React.FC = () => {
             {/* Intro */}
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r">
               <p className="text-gray-800">
-                Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует отношения между
-                [Название компании] (далее — «Мы», «Сервис») и пользователем (далее — «Вы») при
-                использовании нашего веб-сайта, мобильного приложения или иных услуг.
+                Настоящее Пользовательское соглашение (далее — «Соглашение»)
+                регулирует отношения между [Название компании] (далее — «Мы»,
+                «Сервис») и пользователем (далее — «Вы») при использовании
+                нашего веб-сайта, мобильного приложения или иных услуг.
               </p>
             </div>
 
@@ -39,15 +44,19 @@ const TermsOfServicePage: React.FC = () => {
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">1.1.</span>
-                  Используя Сервис, Вы соглашаетесь с условиями данного Соглашения, Политикой конфиденциальности и иными применимыми документами.
+                  Используя Сервис, Вы соглашаетесь с условиями данного
+                  Соглашения, Политикой конфиденциальности и иными применимыми
+                  документами.
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">1.2.</span>
-                  Если Вы не согласны с условиями, Вы должны немедленно прекратить использование Сервиса.
+                  Если Вы не согласны с условиями, Вы должны немедленно
+                  прекратить использование Сервиса.
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">1.3.</span>
-                  Сервис предоставляется «как есть», без гарантий бесперебойной работы и соответствия Вашим ожиданиям.
+                  Сервис предоставляется «как есть», без гарантий бесперебойной
+                  работы и соответствия Вашим ожиданиям.
                 </li>
               </ul>
             </div>
@@ -60,7 +69,8 @@ const TermsOfServicePage: React.FC = () => {
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">2.1.</span>
-                  Для доступа к некоторым функциям может потребоваться регистрация.
+                  Для доступа к некоторым функциям может потребоваться
+                  регистрация.
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">2.2.</span>
@@ -68,7 +78,8 @@ const TermsOfServicePage: React.FC = () => {
                   <ul className="ml-6 mt-2 space-y-2">
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
-                      Предоставлять достоверные и актуальные данные при регистрации
+                      Предоставлять достоверные и актуальные данные при
+                      регистрации
                     </li>
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
@@ -76,13 +87,15 @@ const TermsOfServicePage: React.FC = () => {
                     </li>
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
-                      Немедленно уведомлять нас о несанкционированном доступе к аккаунту
+                      Немедленно уведомлять нас о несанкционированном доступе к
+                      аккаунту
                     </li>
                   </ul>
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">2.3.</span>
-                  Мы оставляем за собой право блокировать аккаунт при нарушении условий Соглашения.
+                  Мы оставляем за собой право блокировать аккаунт при нарушении
+                  условий Соглашения.
                 </li>
               </ul>
             </div>
@@ -95,11 +108,13 @@ const TermsOfServicePage: React.FC = () => {
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">3.1.</span>
-                  Все материалы Сервиса (тексты, изображения, логотипы, программный код) защищены авторским правом.
+                  Все материалы Сервиса (тексты, изображения, логотипы,
+                  программный код) защищены авторским правом.
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">3.2.</span>
-                  Запрещается копирование, распространение или иное использование материалов без нашего письменного согласия.
+                  Запрещается копирование, распространение или иное
+                  использование материалов без нашего письменного согласия.
                 </li>
               </ul>
             </div>
@@ -116,7 +131,8 @@ const TermsOfServicePage: React.FC = () => {
                   <ul className="ml-6 mt-2 space-y-2">
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
-                      Прямой или косвенный ущерб, возникший в результате использования Сервиса
+                      Прямой или косвенный ущерб, возникший в результате
+                      использования Сервиса
                     </li>
                     <li className="flex items-start">
                       <span className="text-blue-400 mr-2">•</span>
@@ -147,7 +163,8 @@ const TermsOfServicePage: React.FC = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">5.3.</span>
-                  Продолжение использования Сервиса после изменений означает Ваше согласие с новыми условиями.
+                  Продолжение использования Сервиса после изменений означает
+                  Ваше согласие с новыми условиями.
                 </li>
               </ul>
             </div>
@@ -164,7 +181,8 @@ const TermsOfServicePage: React.FC = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-blue-600 mr-2">6.2.</span>
-                  Все споры разрешаются путем переговоров, а при невозможности — в судебном порядке.
+                  Все споры разрешаются путем переговоров, а при невозможности —
+                  в судебном порядке.
                 </li>
               </ul>
             </div>
@@ -172,7 +190,13 @@ const TermsOfServicePage: React.FC = () => {
             {/* Footer */}
             <div className="border-t border-gray-200 pt-6 mt-8">
               <p className="text-gray-600 text-center">
-                По всем вопросам обращайтесь: <a href="mailto:info@зарахоум.рф" className="text-blue-600 hover:underline">info@зарахоум.рф</a>
+                По всем вопросам обращайтесь:{' '}
+                <a
+                  href="mailto:info@зарахоум.рф"
+                  className="text-blue-600 hover:underline"
+                >
+                  info@зарахоум.рф
+                </a>
               </p>
               <p className="text-gray-500 text-sm text-center mt-2">
                 © {new Date().getFullYear()} ZARAHOME. Все права защищены.

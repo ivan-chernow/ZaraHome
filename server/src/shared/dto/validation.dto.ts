@@ -1,66 +1,76 @@
-import { IsString, IsOptional, IsNumber, IsPositive, IsEmail, MaxLength, MinLength, IsArray, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsPositive,
+  IsEmail,
+  MaxLength,
+  MinLength,
+  IsArray,
+  IsObject,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SHARED_CONSTANTS } from '../shared.constants';
 
 export class ValidateEmailDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Email для валидации',
     example: 'user@example.com',
-    maxLength: SHARED_CONSTANTS.VALIDATION.EMAIL_MAX_LENGTH
+    maxLength: SHARED_CONSTANTS.VALIDATION.EMAIL_MAX_LENGTH,
   })
   @IsEmail({}, { message: 'Некорректный формат email' })
-  @MaxLength(SHARED_CONSTANTS.VALIDATION.EMAIL_MAX_LENGTH, { 
-    message: `Email не может быть длиннее ${SHARED_CONSTANTS.VALIDATION.EMAIL_MAX_LENGTH} символов` 
+  @MaxLength(SHARED_CONSTANTS.VALIDATION.EMAIL_MAX_LENGTH, {
+    message: `Email не может быть длиннее ${SHARED_CONSTANTS.VALIDATION.EMAIL_MAX_LENGTH} символов`,
   })
   email: string;
 }
 
 export class ValidatePhoneDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Номер телефона для валидации',
     example: '+7 999 123-45-67',
-    maxLength: SHARED_CONSTANTS.VALIDATION.PHONE_MAX_LENGTH
+    maxLength: SHARED_CONSTANTS.VALIDATION.PHONE_MAX_LENGTH,
   })
   @IsString()
-  @MaxLength(SHARED_CONSTANTS.VALIDATION.PHONE_MAX_LENGTH, { 
-    message: `Номер телефона не может быть длиннее ${SHARED_CONSTANTS.VALIDATION.PHONE_MAX_LENGTH} символов` 
+  @MaxLength(SHARED_CONSTANTS.VALIDATION.PHONE_MAX_LENGTH, {
+    message: `Номер телефона не может быть длиннее ${SHARED_CONSTANTS.VALIDATION.PHONE_MAX_LENGTH} символов`,
   })
   phone: string;
 }
 
 export class ValidatePasswordDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Пароль для валидации',
     example: 'SecurePassword123!',
     minLength: SHARED_CONSTANTS.SECURITY.PASSWORD_MIN_LENGTH,
-    maxLength: SHARED_CONSTANTS.SECURITY.PASSWORD_MAX_LENGTH
+    maxLength: SHARED_CONSTANTS.SECURITY.PASSWORD_MAX_LENGTH,
   })
   @IsString()
-  @MinLength(SHARED_CONSTANTS.SECURITY.PASSWORD_MIN_LENGTH, { 
-    message: `Пароль должен содержать минимум ${SHARED_CONSTANTS.SECURITY.PASSWORD_MIN_LENGTH} символов` 
+  @MinLength(SHARED_CONSTANTS.SECURITY.PASSWORD_MIN_LENGTH, {
+    message: `Пароль должен содержать минимум ${SHARED_CONSTANTS.SECURITY.PASSWORD_MIN_LENGTH} символов`,
   })
-  @MaxLength(SHARED_CONSTANTS.SECURITY.PASSWORD_MAX_LENGTH, { 
-    message: `Пароль не может быть длиннее ${SHARED_CONSTANTS.SECURITY.PASSWORD_MAX_LENGTH} символов` 
+  @MaxLength(SHARED_CONSTANTS.SECURITY.PASSWORD_MAX_LENGTH, {
+    message: `Пароль не может быть длиннее ${SHARED_CONSTANTS.SECURITY.PASSWORD_MAX_LENGTH} символов`,
   })
   password: string;
 }
 
 export class ValidateStringDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Строка для валидации',
     example: 'Пример строки для валидации',
-    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH
+    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH,
   })
   @IsString()
-  @MaxLength(SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH, { 
-    message: `Строка не может быть длиннее ${SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH} символов` 
+  @MaxLength(SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH, {
+    message: `Строка не может быть длиннее ${SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH} символов`,
   })
   value: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Максимальная длина строки',
     example: 500,
-    default: SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH
+    default: SHARED_CONSTANTS.VALIDATION.MAX_STRING_LENGTH,
   })
   @IsOptional()
   @IsNumber()
@@ -69,18 +79,18 @@ export class ValidateStringDto {
 }
 
 export class ValidateArrayDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Массив для валидации',
     example: ['item1', 'item2', 'item3'],
-    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_ARRAY_LENGTH
+    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_ARRAY_LENGTH,
   })
   @IsArray()
   value: any[];
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Максимальная длина массива',
     example: 100,
-    default: SHARED_CONSTANTS.VALIDATION.MAX_ARRAY_LENGTH
+    default: SHARED_CONSTANTS.VALIDATION.MAX_ARRAY_LENGTH,
   })
   @IsOptional()
   @IsNumber()
@@ -89,18 +99,18 @@ export class ValidateArrayDto {
 }
 
 export class ValidateObjectDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Объект для валидации',
     example: { key1: 'value1', key2: 'value2' },
-    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_OBJECT_KEYS
+    maxLength: SHARED_CONSTANTS.VALIDATION.MAX_OBJECT_KEYS,
   })
   @IsObject()
   value: Record<string, any>;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Максимальное количество ключей',
     example: 50,
-    default: SHARED_CONSTANTS.VALIDATION.MAX_OBJECT_KEYS
+    default: SHARED_CONSTANTS.VALIDATION.MAX_OBJECT_KEYS,
   })
   @IsOptional()
   @IsNumber()
@@ -109,86 +119,86 @@ export class ValidateObjectDto {
 }
 
 export class ValidationResultDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Результат валидации',
-    example: true
+    example: true,
   })
   isValid: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Список ошибок',
-    example: ['Email имеет некорректный формат']
+    example: ['Email имеет некорректный формат'],
   })
   errors: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Список предупреждений',
-    example: ['Email может быть слишком длинным']
+    example: ['Email может быть слишком длинным'],
   })
   warnings: string[];
 
-  @ApiPropertyOptional({ 
-    description: 'Нормализованное значение'
+  @ApiPropertyOptional({
+    description: 'Нормализованное значение',
   })
   normalizedValue?: any;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Время выполнения валидации в миллисекундах',
-    example: 5
+    example: 5,
   })
   executionTime: number;
 }
 
 export class BulkValidationDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Массив значений для валидации',
-    example: ['user@example.com', 'admin@example.com']
+    example: ['user@example.com', 'admin@example.com'],
   })
   @IsArray()
   values: any[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Тип валидации',
     example: 'email',
-    enum: ['email', 'phone', 'password', 'string', 'array', 'object']
+    enum: ['email', 'phone', 'password', 'string', 'array', 'object'],
   })
   @IsString()
   type: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Дополнительные параметры валидации'
+  @ApiPropertyOptional({
+    description: 'Дополнительные параметры валидации',
   })
   @IsOptional()
   options?: Record<string, any>;
 }
 
 export class BulkValidationResultDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Общий результат валидации',
-    example: true
+    example: true,
   })
   overallValid: boolean;
 
-  @ApiProperty({ 
-    description: 'Результаты валидации для каждого значения'
+  @ApiProperty({
+    description: 'Результаты валидации для каждого значения',
   })
   results: ValidationResultDto[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество валидных значений',
-    example: 8
+    example: 8,
   })
   validCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество невалидных значений',
-    example: 2
+    example: 2,
   })
   invalidCount: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Общее время выполнения в миллисекундах',
-    example: 25
+    example: 25,
   })
   totalExecutionTime: number;
 }

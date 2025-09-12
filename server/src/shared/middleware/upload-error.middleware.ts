@@ -7,7 +7,7 @@ export class UploadErrorMiddleware implements NestMiddleware {
   private readonly logger = new Logger(UploadErrorMiddleware.name);
 
   constructor(
-    private readonly errorHandlerService: FileUploadErrorHandlerService,
+    private readonly errorHandlerService: FileUploadErrorHandlerService
   ) {}
 
   use(req: Request, res: Response, next: NextFunction) {
@@ -15,12 +15,14 @@ export class UploadErrorMiddleware implements NestMiddleware {
     const originalSend = res.send;
 
     // Перехватываем ошибки загрузки
-    res.send = function(body) {
+    res.send = function (body) {
       try {
         // Если есть ошибки загрузки в request
         if (req.uploadErrors && Array.isArray(req.uploadErrors)) {
-          this.logger.warn(`Upload errors detected: ${req.uploadErrors.length} errors`);
-          
+          this.logger.warn(
+            `Upload errors detected: ${req.uploadErrors.length} errors`
+          );
+
           // Логируем ошибки
           req.uploadErrors.forEach((error: any) => {
             this.logger.error(`Upload error: ${error.message}`, error.stack);
@@ -43,4 +45,3 @@ export class UploadErrorMiddleware implements NestMiddleware {
     next();
   }
 }
-

@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getLocalStorage, setLocalStorage, removeLocalStorage } from '../storage';
+import {
+  getLocalStorage,
+  setLocalStorage,
+  removeLocalStorage,
+} from '../storage';
 
 /**
  * Хук для работы с localStorage
@@ -23,20 +27,24 @@ export const useLocalStorage = <T>(
   });
 
   // Функция для установки значения
-  const setValue = useCallback((value: T | ((prev: T) => T)) => {
-    try {
-      // Позволяем value быть функцией, чтобы обновить состояние
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      
-      // Сохраняем в состояние
-      setStoredValue(valueToStore);
-      
-      // Сохраняем в localStorage
-      setLocalStorage(key, valueToStore);
-    } catch {
-      // console.warn(`Error setting localStorage key "${key}":`, error);
-    }
-  }, [key, storedValue]);
+  const setValue = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      try {
+        // Позволяем value быть функцией, чтобы обновить состояние
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+
+        // Сохраняем в состояние
+        setStoredValue(valueToStore);
+
+        // Сохраняем в localStorage
+        setLocalStorage(key, valueToStore);
+      } catch {
+        // console.warn(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [key, storedValue]
+  );
 
   // Функция для удаления значения
   const removeValue = useCallback(() => {
@@ -98,14 +106,18 @@ export const useDebouncedLocalStorage = <T>(
     return () => clearTimeout(timer);
   }, [storedValue, key, delay]);
 
-  const setValue = useCallback((value: T | ((prev: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-    } catch {
-      // console.warn(`Error setting localStorage key "${key}":`, error);
-    }
-  }, [storedValue]);
+  const setValue = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+      } catch {
+        // console.warn(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [storedValue]
+  );
 
   const removeValue = useCallback(() => {
     try {

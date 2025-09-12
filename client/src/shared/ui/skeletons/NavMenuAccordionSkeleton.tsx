@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 const Column = () => (
   <div className="w-1/4 min-w-[250px] px-4">

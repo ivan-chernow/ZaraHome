@@ -9,9 +9,9 @@ import { SharedModule } from 'src/shared/modules/shared.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, EmailVerification]), 
-    EmailModule, 
-    SharedModule
+    TypeOrmModule.forFeature([User, EmailVerification]),
+    EmailModule,
+    SharedModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationService],

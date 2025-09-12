@@ -2,7 +2,11 @@ import { DataSource } from 'typeorm';
 import { Promocode } from '../entity/promocode.entity';
 
 export class PromocodesSeed {
-  constructor(private readonly dataSource: DataSource) {}
+  private readonly dataSource: DataSource;
+
+  constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
+  }
 
   async run() {
     const repo = this.dataSource.getRepository(Promocode);
@@ -24,5 +28,3 @@ export class PromocodesSeed {
     console.log('Promocodes seeded');
   }
 }
-
-

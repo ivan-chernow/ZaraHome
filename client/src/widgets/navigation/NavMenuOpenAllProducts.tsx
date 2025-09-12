@@ -1,9 +1,9 @@
-import React from "react";
-import { Container } from "@mui/material";
-import NavMenuAccordion from "./NavMenuAccordion";
-import NavMenuSearchWrapper from "./NavMenuSearchWrapper";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import NavMenuAccordionSkeleton from "@/shared/ui/skeletons/NavMenuAccordionSkeleton";
+import React from 'react';
+import { Container } from '@mui/material';
+import NavMenuAccordion from './NavMenuAccordion';
+import NavMenuSearchWrapper from './NavMenuSearchWrapper';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import NavMenuAccordionSkeleton from '@/shared/ui/skeletons/NavMenuAccordionSkeleton';
 
 interface NavMenuOpenProps {
   onClose: () => void;

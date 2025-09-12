@@ -18,7 +18,13 @@ export interface Notification {
 interface NotificationOptions {
   maxNotifications?: number;
   defaultDuration?: number;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
+  position?:
+    | 'top-right'
+    | 'top-left'
+    | 'bottom-right'
+    | 'bottom-left'
+    | 'top-center'
+    | 'bottom-center';
 }
 
 /**
@@ -38,8 +44,10 @@ export const useNotifications = (options: NotificationOptions = {}) => {
 
   // Удаление уведомления
   const removeNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(notification => notification.id !== id));
-    
+    setNotifications(prev =>
+      prev.filter(notification => notification.id !== id)
+    );
+
     // Очищаем таймаут
     const timeout = timeoutsRef.current.get(id);
     if (timeout) {
@@ -49,70 +57,85 @@ export const useNotifications = (options: NotificationOptions = {}) => {
   }, []);
 
   // Создание уведомления
-  const createNotification = useCallback((
-    type: NotificationType,
-    title: string,
-    message?: string,
-    duration?: number
-  ) => {
-    const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const notification: Notification = {
-      id,
-      type,
-      title,
-      message,
-      duration: duration ?? defaultDuration,
-      timestamp: Date.now(),
-    };
+  const createNotification = useCallback(
+    (
+      type: NotificationType,
+      title: string,
+      message?: string,
+      duration?: number
+    ) => {
+      const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const notification: Notification = {
+        id,
+        type,
+        title,
+        message,
+        duration: duration ?? defaultDuration,
+        timestamp: Date.now(),
+      };
 
-    setNotifications(prev => {
-      const newNotifications = [notification, ...prev];
-      
-      // Ограничиваем количество уведомлений
-      if (newNotifications.length > maxNotifications) {
-        return newNotifications.slice(0, maxNotifications);
+      setNotifications(prev => {
+        const newNotifications = [notification, ...prev];
+
+        // Ограничиваем количество уведомлений
+        if (newNotifications.length > maxNotifications) {
+          return newNotifications.slice(0, maxNotifications);
+        }
+
+        return newNotifications;
+      });
+
+      // Автоматическое удаление уведомления
+      if (notification.duration && notification.duration > 0) {
+        const timeout = setTimeout(() => {
+          removeNotification(id);
+        }, notification.duration);
+
+        timeoutsRef.current.set(id, timeout);
       }
-      
-      return newNotifications;
-    });
 
-    // Автоматическое удаление уведомления
-    if (notification.duration && notification.duration > 0) {
-      const timeout = setTimeout(() => {
-        removeNotification(id);
-      }, notification.duration);
-
-      timeoutsRef.current.set(id, timeout);
-    }
-
-    return id;
-  }, [defaultDuration, maxNotifications, removeNotification]);
+      return id;
+    },
+    [defaultDuration, maxNotifications, removeNotification]
+  );
 
   // Очистка всех уведомлений
   const clearAllNotifications = useCallback(() => {
     setNotifications([]);
-    
+
     // Очищаем все таймауты
     timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
     timeoutsRef.current.clear();
   }, []);
 
   // Методы для создания уведомлений разных типов
-  const showSuccess = useCallback((title: string, message?: string, duration?: number) => {
-    return createNotification('success', title, message, duration);
-  }, [createNotification]);
+  const showSuccess = useCallback(
+    (title: string, message?: string, duration?: number) => {
+      return createNotification('success', title, message, duration);
+    },
+    [createNotification]
+  );
 
-  const showError = useCallback((title: string, message?: string, duration?: number) => {
-    return createNotification('error', title, message, duration);
-  }, [createNotification]);
+  const showError = useCallback(
+    (title: string, message?: string, duration?: number) => {
+      return createNotification('error', title, message, duration);
+    },
+    [createNotification]
+  );
 
-  const showWarning = useCallback((title: string, message?: string, duration?: number) => {
-    return createNotification('warning', title, message, duration);
-  }, [createNotification]);
+  const showWarning = useCallback(
+    (title: string, message?: string, duration?: number) => {
+      return createNotification('warning', title, message, duration);
+    },
+    [createNotification]
+  );
 
-  const showInfo = useCallback((title: string, message?: string, duration?: number) => {
-    return createNotification('info', title, message, duration);
-  }, [createNotification]);
+  const showInfo = useCallback(
+    (title: string, message?: string, duration?: number) => {
+      return createNotification('info', title, message, duration);
+    },
+    [createNotification]
+  );
 
   // Очистка таймаутов при размонтировании
   useEffect(() => {
@@ -144,14 +167,22 @@ export const useNotifications = (options: NotificationOptions = {}) => {
 export const useToast = (options: NotificationOptions = {}) => {
   const notificationHook = useNotifications(options);
 
-  const toast = useCallback((
-    type: NotificationType,
-    title: string,
-    message?: string,
-    duration?: number
-  ) => {
-    return notificationHook.createNotification(type, title, message, duration);
-  }, [notificationHook]);
+  const toast = useCallback(
+    (
+      type: NotificationType,
+      title: string,
+      message?: string,
+      duration?: number
+    ) => {
+      return notificationHook.createNotification(
+        type,
+        title,
+        message,
+        duration
+      );
+    },
+    [notificationHook]
+  );
 
   return {
     ...notificationHook,
@@ -165,7 +196,8 @@ export const useToast = (options: NotificationOptions = {}) => {
  * @returns объект с методами управления системными уведомлениями
  */
 export const useSystemNotifications = (options: NotificationOptions = {}) => {
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [permission, setPermission] =
+    useState<NotificationPermission>('default');
   const notificationHook = useNotifications(options);
 
   // Запрос разрешения на уведомления
@@ -179,33 +211,41 @@ export const useSystemNotifications = (options: NotificationOptions = {}) => {
   }, []);
 
   // Создание системного уведомления
-  const createSystemNotification = useCallback((
-    type: NotificationType,
-    title: string,
-    message?: string,
-    duration?: number
-  ) => {
-    // Создаем уведомление в UI
-    const id = notificationHook.createNotification(type, title, message, duration);
+  const createSystemNotification = useCallback(
+    (
+      type: NotificationType,
+      title: string,
+      message?: string,
+      duration?: number
+    ) => {
+      // Создаем уведомление в UI
+      const id = notificationHook.createNotification(
+        type,
+        title,
+        message,
+        duration
+      );
 
-    // Создаем системное уведомление если разрешено
-    if (permission === 'granted' && 'Notification' in window) {
-      const systemNotification = new Notification(title, {
-        body: message,
-        icon: '/favicon.ico',
-        tag: id,
-      });
+      // Создаем системное уведомление если разрешено
+      if (permission === 'granted' && 'Notification' in window) {
+        const systemNotification = new Notification(title, {
+          body: message,
+          icon: '/favicon.ico',
+          tag: id,
+        });
 
-      // Автоматически закрываем системное уведомление
-      if (duration && duration > 0) {
-        setTimeout(() => {
-          systemNotification.close();
-        }, duration);
+        // Автоматически закрываем системное уведомление
+        if (duration && duration > 0) {
+          setTimeout(() => {
+            systemNotification.close();
+          }, duration);
+        }
       }
-    }
 
-    return id;
-  }, [notificationHook, permission]);
+      return id;
+    },
+    [notificationHook, permission]
+  );
 
   return {
     ...notificationHook,

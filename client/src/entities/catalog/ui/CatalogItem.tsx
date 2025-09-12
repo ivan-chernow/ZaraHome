@@ -1,7 +1,7 @@
-import React from "react";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import Link from "next/link";
-import slugify from "slugify";
+import React from 'react';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import Link from 'next/link';
+import slugify from 'slugify';
 
 const CatalogItem = ({
   card,
@@ -9,23 +9,23 @@ const CatalogItem = ({
   card: { category: string; subtitle: string; img: string; link: string };
 }) => {
   const customSlugify = (text: string) =>
-    slugify(text.replace("й", "y"), { lower: true, strict: true });
+    slugify(text.replace('й', 'y'), { lower: true, strict: true });
   const categorySlug = customSlugify(card.link);
 
   return (
     <li
       className="hover:scale-105 ease-in-out duration-300 shadow-lg"
       style={{
-        cursor: "pointer",
+        cursor: 'pointer',
         backgroundImage: `url(${card.img})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        height: "480px",
-        width: "480px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: "52px",
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        height: '480px',
+        width: '480px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '52px',
       }}
     >
       <Link href={`/products/category/${categorySlug}`}>

@@ -12,7 +12,12 @@ const getSavedAddress = (): DeliveryAddressDto | null => {
   try {
     const saved = localStorage.getItem('selectedDeliveryAddress');
     const parsed = saved ? JSON.parse(saved) : null;
-    if (parsed && typeof parsed === 'object' && 'city' in parsed && 'region' in parsed) {
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      'city' in parsed &&
+      'region' in parsed
+    ) {
       return parsed as DeliveryAddressDto;
     }
     return null;
@@ -30,19 +35,25 @@ const deliverySlice = createSlice({
   name: 'delivery',
   initialState,
   reducers: {
-    setSelectedAddress: (state, action: PayloadAction<{ address: DeliveryAddressDto; index: number }>) => {
+    setSelectedAddress: (
+      state,
+      action: PayloadAction<{ address: DeliveryAddressDto; index: number }>
+    ) => {
       state.selectedAddress = action.payload.address;
       state.selectedAddressIndex = action.payload.index;
-      
+
       // Сохраняем в localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('selectedDeliveryAddress', JSON.stringify(action.payload.address));
+        localStorage.setItem(
+          'selectedDeliveryAddress',
+          JSON.stringify(action.payload.address)
+        );
       }
     },
-    clearSelectedAddress: (state) => {
+    clearSelectedAddress: state => {
       state.selectedAddress = null;
       state.selectedAddressIndex = null;
-      
+
       // Удаляем из localStorage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('selectedDeliveryAddress');
@@ -51,5 +62,6 @@ const deliverySlice = createSlice({
   },
 });
 
-export const { setSelectedAddress, clearSelectedAddress } = deliverySlice.actions;
+export const { setSelectedAddress, clearSelectedAddress } =
+  deliverySlice.actions;
 export default deliverySlice.reducer;

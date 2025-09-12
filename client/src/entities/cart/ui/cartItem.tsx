@@ -1,28 +1,28 @@
-import React, { useCallback } from "react";
-import Image from "next/image";
-import CloseIcon from "@mui/icons-material/Close";
-import { CartItem as CartItemType } from "@/entities/cart/model/cartItems.slice";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
-import { findProductById } from "@/entities/category/lib/catalog.utils";
+import React, { useCallback } from 'react';
+import Image from 'next/image';
+import CloseIcon from '@mui/icons-material/Close';
+import { CartItem as CartItemType } from '@/entities/cart/model/cartItems.slice';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
+import { findProductById } from '@/entities/category/lib/catalog.utils';
 import {
   deleteCartItem,
   setCartItems,
-} from "@/entities/cart/model/cartItems.slice";
-import { useRemoveFromCartMutation } from "@/entities/cart/api/cart.api";
-import { getLocalStorage, setLocalStorage } from "@/shared/lib/storage";
+} from '@/entities/cart/model/cartItems.slice';
+import { useRemoveFromCartMutation } from '@/entities/cart/api/cart.api';
+import { getLocalStorage, setLocalStorage } from '@/shared/lib/storage';
 
 interface CartItemProps {
   item: CartItemType;
   isLast?: boolean;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const getFullImageUrl = (path?: string): string | undefined => {
   if (!path) return undefined;
   try {
-    const cleanPath = path.replace(/^\/+/, "");
+    const cleanPath = path.replace(/^\/+/, '');
     return `${API_URL}/${cleanPath}`;
   } catch {
     return path;
@@ -43,11 +43,14 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
 
   const handleDelete = useCallback(async () => {
     // Оптимистично удаляем конкретную вариацию из Redux
-    dispatch(deleteCartItem({ id: item.id, size: item.size, color: item.color }));
+    dispatch(
+      deleteCartItem({ id: item.id, size: item.size, color: item.color })
+    );
 
     // Проверяем, остались ли другие вариации этого товара
     const otherVariantsExist = cartItems.some(
-      (ci) => ci.id === item.id && (ci.size !== item.size || ci.color !== item.color)
+      ci =>
+        ci.id === item.id && (ci.size !== item.size || ci.color !== item.color)
     );
 
     if (isAuthenticated) {
@@ -57,22 +60,35 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
           await removeFromCart(item.id).unwrap();
         }
       } catch (e) {
-        console.error("Ошибка удаления из корзины на сервере", e);
+        console.error('Ошибка удаления из корзины на сервере', e);
       }
       return;
     }
 
     // Гость: обновляем localStorage точечно по вариации
-    const cart = getLocalStorage("cart", [] as any[]);
+    const cart = getLocalStorage('cart', [] as any[]);
     const updated = Array.isArray(cart)
       ? cart.filter(
           (ci: any) =>
-            !(ci && ci.id === item.id && (ci.size ?? undefined) === (item.size ?? undefined) && (ci.color ?? undefined) === (item.color ?? undefined))
+            !(
+              ci &&
+              ci.id === item.id &&
+              (ci.size ?? undefined) === (item.size ?? undefined) &&
+              (ci.color ?? undefined) === (item.color ?? undefined)
+            )
         )
       : [];
-    setLocalStorage("cart", updated);
+    setLocalStorage('cart', updated);
     dispatch(setCartItems(updated));
-  }, [dispatch, isAuthenticated, item.id, item.size, item.color, removeFromCart, cartItems]);
+  }, [
+    dispatch,
+    isAuthenticated,
+    item.id,
+    item.size,
+    item.color,
+    removeFromCart,
+    cartItems,
+  ]);
 
   return (
     <li className="flex items-start py-4 w-full">
@@ -81,7 +97,7 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
         src={
           getFullImageUrl(product?.img?.[0]) ||
           getFullImageUrl(item.img) ||
-          "/assets/img/Catalog/product2.png"
+          '/assets/img/Catalog/product2.png'
         }
         width={79}
         height={79}
@@ -104,7 +120,11 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
               )}
               {item.color && (
                 <span className="flex items-center gap-1">
-                  Цвет: <span className="inline-block w-3 h-3 rounded-full border" style={{ backgroundColor: product?.colors?.[item.color] }} />
+                  Цвет:{' '}
+                  <span
+                    className="inline-block w-3 h-3 rounded-full border"
+                    style={{ backgroundColor: product?.colors?.[item.color] }}
+                  />
                 </span>
               )}
             </div>
@@ -117,7 +137,7 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
         )}
         <div className="mt-3 flex items-center">
           <span className="font-medium text-[20px] font-roboto">
-            {(item.price * item.quantity).toLocaleString("ru-RU")}{" "}
+            {(item.price * item.quantity).toLocaleString('ru-RU')}{' '}
             <span className="font-bold font-ysabeau text-[16px]">₽</span>
           </span>
         </div>

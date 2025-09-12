@@ -1,16 +1,18 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
-import { ChangePasswordDto, ProfileDto } from './dto/user.dto';
+import { ChangePasswordDto } from './dto/user.dto';
 import { ChangeDeliveryAddressDto } from './dto/user.dto';
 import { IUserService } from 'src/shared/shared.interfaces';
 import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService implements IUserService {
-  constructor(
-    private readonly userRepository: UserRepository,
-  ) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findOne(userId: number) {
     return this.userRepository.findUserByIdBasic(userId);
@@ -36,7 +38,9 @@ export class UserService implements IUserService {
     // Проверяем, что новый пароль отличается от текущего
     const isSamePassword = await bcrypt.compare(dto.newPassword, user.password);
     if (isSamePassword) {
-      throw new BadRequestException('Новый пароль не может совпадать с текущим');
+      throw new BadRequestException(
+        'Новый пароль не может совпадать с текущим'
+      );
     }
 
     // Проверяем время последней смены пароля
@@ -56,7 +60,8 @@ export class UserService implements IUserService {
   }
 
   async changeEmail(userId: number, currentEmail: string, newEmail: string) {
-    const currentEmailUser = await this.userRepository.findUserByEmail(currentEmail);
+    const currentEmailUser =
+      await this.userRepository.findUserByEmail(currentEmail);
 
     if (!currentEmailUser) {
       throw new NotFoundException('Введите корректный текущий email');
@@ -71,7 +76,8 @@ export class UserService implements IUserService {
     }
 
     // Проверяем время с последнего обновления
-    const timeSinceLastChange = Date.now() - currentEmailUser.updatedAt.getTime();
+    const timeSinceLastChange =
+      Date.now() - currentEmailUser.updatedAt.getTime();
     const minutesSinceLastChange = timeSinceLastChange / (1000 * 60);
 
     if (minutesSinceLastChange < 10) {
@@ -85,7 +91,10 @@ export class UserService implements IUserService {
     return { message: 'Email успешно изменен' };
   }
 
-  async changeDeliveryAddress(userId: number, addressData: ChangeDeliveryAddressDto) {
+  async changeDeliveryAddress(
+    userId: number,
+    addressData: ChangeDeliveryAddressDto
+  ) {
     const user = await this.userRepository.findUserByIdWithAddresses(userId);
 
     if (!user) {
@@ -100,9 +109,9 @@ export class UserService implements IUserService {
     }
 
     // Если адреса нет, создаем новый
-    const deliveryAddress = await this.userRepository.createAddress({
+    await this.userRepository.createAddress({
       ...addressData,
-      user
+      user,
     });
 
     return { message: 'Адрес доставки добавлен' };
@@ -118,7 +127,10 @@ export class UserService implements IUserService {
     return user.deliveryAddresses;
   }
 
-  async addDeliveryAddress(userId: number, addressData: ChangeDeliveryAddressDto) {
+  async addDeliveryAddress(
+    userId: number,
+    addressData: ChangeDeliveryAddressDto
+  ) {
     const user = await this.userRepository.findUserByIdBasic(userId);
 
     if (!user) {
@@ -127,11 +139,15 @@ export class UserService implements IUserService {
 
     return this.userRepository.createAddress({
       ...addressData,
-      user
+      user,
     });
   }
 
-  async updateDeliveryAddress(userId: number, addressId: number, addressData: ChangeDeliveryAddressDto) {
+  async updateDeliveryAddress(
+    userId: number,
+    addressId: number,
+    addressData: ChangeDeliveryAddressDto
+  ) {
     const address = await this.userRepository.findAddressById(addressId);
 
     if (!address) {
@@ -146,7 +162,10 @@ export class UserService implements IUserService {
     return this.userRepository.findAddressById(addressId);
   }
 
-  async deleteDeliveryAddress(userId: number, addressId: number): Promise<void> {
+  async deleteDeliveryAddress(
+    userId: number,
+    addressId: number
+  ): Promise<void> {
     const address = await this.userRepository.findAddressById(addressId);
 
     if (!address) {
@@ -161,7 +180,7 @@ export class UserService implements IUserService {
   }
 
   // Реализация методов из IBaseService
-  async create(data: unknown): Promise<unknown> {
+  async create(_data: unknown): Promise<unknown> {
     // Этот метод не используется в UserService, но требуется интерфейсом
     throw new Error('Method not implemented');
   }
@@ -171,12 +190,12 @@ export class UserService implements IUserService {
     throw new Error('Method not implemented');
   }
 
-  async update(id: number, data: unknown): Promise<unknown> {
+  async update(_id: number, _data: unknown): Promise<unknown> {
     // Этот метод не используется в UserService, но требуется интерфейсом
     throw new Error('Method not implemented');
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(_id: number): Promise<void> {
     // Этот метод не используется в UserService, но требуется интерфейсом
     throw new Error('Method not implemented');
   }

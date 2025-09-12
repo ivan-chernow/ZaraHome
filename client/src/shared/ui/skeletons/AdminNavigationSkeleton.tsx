@@ -9,36 +9,32 @@ const AdminNavigationSkeleton: React.FC = () => {
       {/* Breadcrumb - отображаем сразу, без скелетона */}
       <div className="flex items-center mb-[31px]">
         <HomeIcon />
-        <span className='text-[#00000099] ml-[4px] mr-[6px]'>{'>'}</span>
-        <span className='text-[14px] font-medium text-[#00000099] underline'>Личный кабинет</span>
+        <span className="text-[#00000099] ml-[4px] mr-[6px]">{'>'}</span>
+        <span className="text-[14px] font-medium text-[#00000099] underline">
+          Личный кабинет
+        </span>
       </div>
-      
+
       <div className="flex">
         {/* Navigation menu - отображаем сразу, без скелетона */}
-                        <ul className="flex flex-col pr-[123px] w-[300px] flex-shrink-0">
+        <ul className="flex flex-col pr-[123px] w-[300px] flex-shrink-0">
           <li className="flex items-center mb-[5px] cursor-pointer">
             <ShoppingCartOutlinedIcon
-              fontSize='medium'
+              fontSize="medium"
               sx={{ color: 'gray' }}
             />
             <p className="font-medium text-[18px] ml-[2px]">Добавить товары</p>
           </li>
           <li className="flex items-center mb-[5px] cursor-pointer">
-            <HttpsOutlinedIcon 
-              fontSize='medium'
-              sx={{ color: 'gray' }}
-            />
+            <HttpsOutlinedIcon fontSize="medium" sx={{ color: 'gray' }} />
             <p className="font-medium text-[18px] ml-[2px]">Сменить пароль</p>
           </li>
           <li className="flex items-center mb-[5px] cursor-pointer">
-            <HttpsOutlinedIcon 
-              fontSize='medium'
-              sx={{ color: 'gray' }}
-            />
+            <HttpsOutlinedIcon fontSize="medium" sx={{ color: 'gray' }} />
             <p className="font-medium text-[18px] ml-[2px]">Промокоды</p>
           </li>
         </ul>
-        
+
         {/* Content area skeleton */}
         <div className="flex-1 animate-pulse">
           <div className="flex flex-col items-center">

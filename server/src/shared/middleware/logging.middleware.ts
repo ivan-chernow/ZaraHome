@@ -26,14 +26,14 @@ export class LoggingMiddleware implements NestMiddleware {
 
     // Перехватываем ответ
     const originalSend = res.send;
-    res.send = function(body: any) {
+    res.send = function (body: any) {
       const responseTime = Date.now() - startTime;
       const statusCode = res.statusCode;
-      
+
       // Логируем исходящий ответ
       const logLevel = statusCode >= 400 ? 'error' : 'log';
       const message = `[${requestId}] ${method} ${originalUrl} - ${statusCode} - ${responseTime}ms`;
-      
+
       if (logLevel === 'error') {
         Logger.error(message);
       } else {
@@ -45,7 +45,7 @@ export class LoggingMiddleware implements NestMiddleware {
     };
 
     // Логируем ошибки
-    res.on('error', (error) => {
+    res.on('error', error => {
       const responseTime = Date.now() - startTime;
       this.logger.error(
         `[${requestId}] ${method} ${originalUrl} - Error: ${error.message} - ${responseTime}ms`
@@ -76,19 +76,21 @@ export class PerformanceLoggingMiddleware implements NestMiddleware {
 
     // Перехватываем ответ для измерения производительности
     const originalSend = res.send;
-    res.send = function(body: any) {
+    res.send = function (body: any) {
       const endTime = process.hrtime.bigint();
       const duration = Number(endTime - startTime) / 1000000; // в миллисекундах
-      
+
       // Логируем медленные запросы
-      if (duration > 1000) { // больше 1 секунды
+      if (duration > 1000) {
+        // больше 1 секунды
         Logger.warn(
           `[${requestId}] SLOW REQUEST: ${method} ${originalUrl} - ${duration.toFixed(2)}ms`
         );
       }
-      
+
       // Логируем очень медленные запросы
-      if (duration > 5000) { // больше 5 секунд
+      if (duration > 5000) {
+        // больше 5 секунд
         Logger.error(
           `[${requestId}] VERY SLOW REQUEST: ${method} ${originalUrl} - ${duration.toFixed(2)}ms`
         );
@@ -117,29 +119,47 @@ export class RequestBodyLoggingMiddleware implements NestMiddleware {
 
     // Логируем параметры запроса
     if (Object.keys(query).length > 0) {
-      this.logger.debug(`[${requestId}] Query params: ${JSON.stringify(query)}`);
+      this.logger.debug(
+        `[${requestId}] Query params: ${JSON.stringify(query)}`
+      );
     }
 
     if (Object.keys(params).length > 0) {
-      this.logger.debug(`[${requestId}] Route params: ${JSON.stringify(params)}`);
+      this.logger.debug(
+        `[${requestId}] Route params: ${JSON.stringify(params)}`
+      );
     }
 
     // Логируем тело запроса (только для POST/PUT/PATCH)
-    if (['POST', 'PUT', 'PATCH'].includes(method) && body && Object.keys(body).length > 0) {
+    if (
+      ['POST', 'PUT', 'PATCH'].includes(method) &&
+      body &&
+      Object.keys(body).length > 0
+    ) {
       // Маскируем чувствительные данные
       const maskedBody = this.maskSensitiveData(body);
-      this.logger.debug(`[${requestId}] Request body: ${JSON.stringify(maskedBody)}`);
+      this.logger.debug(
+        `[${requestId}] Request body: ${JSON.stringify(maskedBody)}`
+      );
     }
 
     next();
   }
 
-  private maskSensitiveData(data: any): any {
+  private maskSensitiveData(
+    data: Record<string, unknown>
+  ): Record<string, unknown> | unknown {
     if (typeof data !== 'object' || data === null) {
       return data;
     }
 
-    const sensitiveFields = ['password', 'token', 'secret', 'key', 'authorization'];
+    const sensitiveFields = [
+      'password',
+      'token',
+      'secret',
+      'key',
+      'authorization',
+    ];
     const maskedData = { ...data };
 
     for (const field of sensitiveFields) {
@@ -169,19 +189,23 @@ export class HeadersLoggingMiddleware implements NestMiddleware {
     // Логируем важные заголовки
     const importantHeaders = {
       'content-type': headers['content-type'],
-      'authorization': headers['authorization'] ? '***MASKED***' : undefined,
+      authorization: headers['authorization'] ? '***MASKED***' : undefined,
       'user-agent': headers['user-agent'],
-      'accept': headers['accept'],
-      'content-length': headers['content-length']
+      accept: headers['accept'],
+      'content-length': headers['content-length'],
     };
 
     // Убираем undefined значения
     const filteredHeaders = Object.fromEntries(
-      Object.entries(importantHeaders).filter(([_, value]) => value !== undefined)
+      Object.entries(importantHeaders).filter(
+        ([_, value]) => value !== undefined
+      )
     );
 
     if (Object.keys(filteredHeaders).length > 0) {
-      this.logger.debug(`[${requestId}] Headers: ${JSON.stringify(filteredHeaders)}`);
+      this.logger.debug(
+        `[${requestId}] Headers: ${JSON.stringify(filteredHeaders)}`
+      );
     }
 
     next();

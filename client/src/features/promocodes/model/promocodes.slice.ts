@@ -12,18 +12,18 @@ interface PromocodesState {
 }
 
 const initialState: PromocodesState = {
-  currentPromocode: null
+  currentPromocode: null,
 };
 
 const promocodesSlice = createSlice({
   name: 'promocodes',
   initialState,
   reducers: {
-    clearCurrentPromocode: (state) => {
+    clearCurrentPromocode: state => {
       state.currentPromocode = null;
-    }
+    },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Обработка применения промокода
       .addMatcher(
@@ -33,19 +33,19 @@ const promocodesSlice = createSlice({
             state.currentPromocode = {
               code: action.payload.code,
               discount: action.payload.discount,
-              finalAmount: action.payload.finalAmount
+              finalAmount: action.payload.finalAmount,
             };
           }
         }
       )
       .addMatcher(
         promocodesApi.endpoints.applyPromocode.matchRejected,
-        (state) => {
+        state => {
           state.currentPromocode = null;
         }
       );
-  }
+  },
 });
 
 export const { clearCurrentPromocode } = promocodesSlice.actions;
-export default promocodesSlice.reducer; 
+export default promocodesSlice.reducer;

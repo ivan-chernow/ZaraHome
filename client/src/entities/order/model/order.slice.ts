@@ -1,10 +1,10 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CartItem } from "@/entities/cart/model/cartItems.slice";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CartItem } from '@/entities/cart/model/cartItems.slice';
 
 export interface OrderItem extends CartItem {
   orderId: string;
   createdAt: string;
-  status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
+  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
 }
 
 export interface Order {
@@ -13,7 +13,7 @@ export interface Order {
   totalPrice: number;
   totalCount: number;
   createdAt: string;
-  status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
+  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
   address?: string;
 }
 
@@ -37,20 +37,23 @@ const initialState: OrderState = {
 };
 
 const orderSlice = createSlice({
-  name: "order",
+  name: 'order',
   initialState,
   reducers: {
-    createOrder: (state, action: PayloadAction<{
-      cartItems: CartItem[];
-      totalPrice: number;
-      address?: string;
-    }>) => {
+    createOrder: (
+      state,
+      action: PayloadAction<{
+        cartItems: CartItem[];
+        totalPrice: number;
+        address?: string;
+      }>
+    ) => {
       const { cartItems, totalPrice, address } = action.payload;
-      
+
       // Генерируем уникальный ID заказа
       const orderId = `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       const createdAt = new Date().toISOString();
-      
+
       // Создаём заказ
       const newOrder: Order = {
         id: orderId,
@@ -58,23 +61,26 @@ const orderSlice = createSlice({
           ...item,
           orderId,
           createdAt,
-          status: "pending" as const,
+          status: 'pending' as const,
         })),
         totalPrice,
         totalCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
         createdAt,
-        status: "pending",
+        status: 'pending',
         address,
       };
-      
+
       state.orders.unshift(newOrder); // Добавляем в начало списка
       state.currentOrder = newOrder;
     },
-    
-    updateOrderStatus: (state, action: PayloadAction<{
-      orderId: string;
-      status: Order["status"];
-    }>) => {
+
+    updateOrderStatus: (
+      state,
+      action: PayloadAction<{
+        orderId: string;
+        status: Order['status'];
+      }>
+    ) => {
       const { orderId, status } = action.payload;
       const order = state.orders.find(o => o.id === orderId);
       if (order) {
@@ -84,19 +90,19 @@ const orderSlice = createSlice({
         });
       }
     },
-    
-    clearCurrentOrder: (state) => {
+
+    clearCurrentOrder: state => {
       state.currentOrder = null;
     },
-    
+
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
-    
+
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    
+
     setCurrentOrderId: (state, action: PayloadAction<number>) => {
       state.currentOrderId = action.payload;
     },

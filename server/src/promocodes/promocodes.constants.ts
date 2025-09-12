@@ -31,11 +31,14 @@ export const PROMOCODES_CONSTANTS = {
     PROMOCODE_EXPIRED: 'Промокод истек',
     INVALID_DISCOUNT: 'Скидка должна быть от 1 до 100 процентов',
     INVALID_ORDER_AMOUNT: 'Сумма заказа должна быть больше 0',
-    INVALID_MIN_ORDER_AMOUNT: 'Минимальная сумма заказа не может быть отрицательной',
-    INVALID_MAX_USAGE: 'Максимальное количество использований должно быть больше 0',
+    INVALID_MIN_ORDER_AMOUNT:
+      'Минимальная сумма заказа не может быть отрицательной',
+    INVALID_MAX_USAGE:
+      'Максимальное количество использований должно быть больше 0',
     CURRENT_USAGE_EXCEEDS_MAX: 'Текущее использование превышает максимальное',
     USAGE_LIMIT_EXCEEDED: 'Лимит использования промокода исчерпан',
-    MIN_ORDER_AMOUNT: (amount: number) => `Минимальная сумма заказа: ${amount} руб.`,
+    MIN_ORDER_AMOUNT: (amount: number) =>
+      `Минимальная сумма заказа: ${amount} руб.`,
     INVALID_EXPIRY_DATE: 'Дата истечения должна быть в будущем',
     SEARCH_TOO_SHORT: 'Поисковый запрос должен содержать минимум 2 символа',
     NO_CODES_PROVIDED: 'Не указаны коды для деактивации',
@@ -73,7 +76,8 @@ export const PROMOCODES_CONSTANTS = {
     ALL_PROMOCODES: 'all_promocodes',
     ACTIVE_PROMOCODES: 'active_promocodes',
     PROMOCODE_BY_CODE: (code: string) => `promocode:${code}`,
-    PROMOCODES_FILTERED: (filters: any) => `promocodes:filtered:${JSON.stringify(filters)}`,
+    PROMOCODES_FILTERED: (filters: any) =>
+      `promocodes:filtered:${JSON.stringify(filters)}`,
     SEARCH_RESULTS: (query: string) => `search:${query}`,
     PROMOCODE_STATS: 'promocode_stats',
   },

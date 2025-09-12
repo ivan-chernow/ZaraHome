@@ -1,8 +1,8 @@
-"use client";
-import React from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
+'use client';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
 import {
   Slide,
   TextField,
@@ -10,26 +10,26 @@ import {
   IconButton,
   Tooltip,
   Alert,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import CloseIconCart from "@/shared/ui/CloseIcon";
-import { useClickOutside } from "@/shared/lib/hooks/useClickOutside";
-import { useForm } from "react-hook-form";
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
+import CloseIconCart from '@/shared/ui/CloseIcon';
+import { useClickOutside } from '@/shared/lib/hooks/useClickOutside';
+import { useForm } from 'react-hook-form';
 import {
   emailValidation,
   getPasswordValidation,
-} from "@/shared/lib/validation";
+} from '@/shared/lib/validation';
 import {
   closeModalAuth,
   setView,
   toggleViewPassword,
   setAuthenticating,
-} from "@/features/auth/model/auth.slice";
-import { RootState } from "@/shared/config/store/store";
-import { useLoginMutation } from "@/features/auth/api/auth.api";
-import { LoginRequest } from "@/features/auth/model/auth.types";
-import MainButton from "../../../shared/ui/Button/MainButton";
+} from '@/features/auth/model/auth.slice';
+import { RootState } from '@/shared/config/store/store';
+import { useLoginMutation } from '@/features/auth/api/auth.api';
+import { LoginRequest } from '@/features/auth/model/auth.types';
+import MainButton from '../../../shared/ui/Button/MainButton';
 
 // Тип для ошибки API
 interface ApiError {
@@ -56,10 +56,10 @@ const LoginForm = () => {
     formState: { errors },
     reset,
   } = useForm<LoginRequest>({
-    mode: "onBlur",
+    mode: 'onBlur',
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
@@ -74,11 +74,11 @@ const LoginForm = () => {
 
       // Определяем путь для перехода в зависимости от роли пользователя
       const path =
-        response.user.role === "admin"
-          ? "/profile/admin"
-          : response.user.role === "user"
-          ? "/profile"
-          : "/";
+        response.user.role === 'admin'
+          ? '/profile/admin'
+          : response.user.role === 'user'
+            ? '/profile'
+            : '/';
 
       // Переходим в личный кабинет через Next.js router
       router.push(path);
@@ -124,10 +124,10 @@ const LoginForm = () => {
             </label>
 
             <TextField
-              {...register("email", emailValidation)}
+              {...register('email', emailValidation)}
               error={!!errors.email}
               helperText={errors.email?.message}
-              sx={{ height: "48px" }}
+              sx={{ height: '48px' }}
               id="email"
               variant="outlined"
               color="primary"
@@ -143,9 +143,9 @@ const LoginForm = () => {
               Пароль
             </label>
             <TextField
-              {...register("password", getPasswordValidation())}
-              sx={{ height: "48px", marginBottom: "40px" }}
-              type={viewPassword ? "text" : "password"}
+              {...register('password', getPasswordValidation())}
+              sx={{ height: '48px', marginBottom: '40px' }}
+              type={viewPassword ? 'text' : 'password'}
               id="password"
               variant="outlined"
               fullWidth
@@ -161,9 +161,9 @@ const LoginForm = () => {
                           onClick={() => dispatch(toggleViewPassword())}
                           edge="end"
                           sx={{
-                            color: "#0000008A",
-                            "&:hover": {
-                              backgroundColor: "rgba(0, 0, 0, 0.04)",
+                            color: '#0000008A',
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.04)',
                             },
                           }}
                           disabled={isLoading}
@@ -190,17 +190,17 @@ const LoginForm = () => {
             {loginError && (
               <Alert
                 severity="error"
-                sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+                sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
               >
-                {"data" in loginError
-                  ? (loginError.data as ApiError["data"]).message
-                  : "Ошибка при входе"}
+                {'data' in loginError
+                  ? (loginError.data as ApiError['data']).message
+                  : 'Ошибка при входе'}
               </Alert>
             )}
           </form>
           <p
             className="underline mt-[13px] cursor-pointer hover:no-underline hover:text-gray-500 transition-all ease-in-out duration-200"
-            onClick={() => dispatch(setView("resetPassword"))}
+            onClick={() => dispatch(setView('resetPassword'))}
           >
             Забыли свой пароль?
           </p>
@@ -215,7 +215,7 @@ const LoginForm = () => {
             <MainButton
               text="Зарегистрироваться"
               disabled={isLoading}
-              onClick={() => dispatch(setView("signup"))}
+              onClick={() => dispatch(setView('signup'))}
               type="button"
               width="358px"
               height="56px"

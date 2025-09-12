@@ -83,9 +83,12 @@ export const useApiCache = <T>(
     return apiCache.get(key) as T | null;
   }, [key]);
 
-  const setCachedData = useCallback((data: T) => {
-    apiCache.set(key, data, options.cacheTime || options.ttl);
-  }, [key, options.cacheTime, options.ttl]);
+  const setCachedData = useCallback(
+    (data: T) => {
+      apiCache.set(key, data, options.cacheTime || options.ttl);
+    },
+    [key, options.cacheTime, options.ttl]
+  );
 
   const clearCache = useCallback(() => {
     apiCache.delete(key);
@@ -145,35 +148,38 @@ export const useDebouncedApiCall = <T extends (...args: any[]) => Promise<any>>(
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  return useCallback((...args: any[]) => {
-    return new Promise<Awaited<ReturnType<T>>>((resolve, reject) => {
-      // Отменяем предыдущий запрос
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // Очищаем предыдущий таймаут
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      // Создаем новый AbortController
-      abortControllerRef.current = new AbortController();
-
-      timeoutRef.current = setTimeout(async () => {
-        try {
-          const result = await fetcher(...args);
-          resolve(result);
-        } catch (error) {
-          if (error instanceof Error && error.name === 'AbortError') {
-            // Запрос был отменен, не обрабатываем ошибку
-            return;
-          }
-          reject(error);
+  return useCallback(
+    (...args: any[]) => {
+      return new Promise<Awaited<ReturnType<T>>>((resolve, reject) => {
+        // Отменяем предыдущий запрос
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
         }
-      }, delay);
-    });
-  }, [fetcher, delay]) as T;
+
+        // Очищаем предыдущий таймаут
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        // Создаем новый AbortController
+        abortControllerRef.current = new AbortController();
+
+        timeoutRef.current = setTimeout(async () => {
+          try {
+            const result = await fetcher(...args);
+            resolve(result);
+          } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
+              // Запрос был отменен, не обрабатываем ошибку
+              return;
+            }
+            reject(error);
+          }
+        }, delay);
+      });
+    },
+    [fetcher, delay]
+  ) as T;
 };
 
 /**
@@ -191,45 +197,48 @@ export const useBatchRequests = <T>(
   } = {}
 ) => {
   const { batchSize = 5, delay = 100, cache = true } = options;
-      // const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const cacheRef = useRef(new Map<string, T>());
 
-  const executeBatch = useCallback(async (startIndex: number = 0): Promise<T[]> => {
-    const batch = requests.slice(startIndex, startIndex + batchSize);
-    const results: T[] = [];
+  const executeBatch = useCallback(
+    async (startIndex: number = 0): Promise<T[]> => {
+      const batch = requests.slice(startIndex, startIndex + batchSize);
+      const results: T[] = [];
 
-    for (let i = 0; i < batch.length; i++) {
-      const requestIndex = startIndex + i;
-      const cacheKey = `request_${requestIndex}`;
+      for (let i = 0; i < batch.length; i++) {
+        const requestIndex = startIndex + i;
+        const cacheKey = `request_${requestIndex}`;
 
-      if (cache && cacheRef.current.has(cacheKey)) {
-        results.push(cacheRef.current.get(cacheKey)!);
-        continue;
-      }
-
-      try {
-        const result = await batch[i]();
-        if (cache) {
-          cacheRef.current.set(cacheKey, result);
+        if (cache && cacheRef.current.has(cacheKey)) {
+          results.push(cacheRef.current.get(cacheKey)!);
+          continue;
         }
-        results.push(result);
-      } catch (error) {
-        // Error handling without console logging
-        throw error;
+
+        try {
+          const result = await batch[i]();
+          if (cache) {
+            cacheRef.current.set(cacheKey, result);
+          }
+          results.push(result);
+        } catch (error) {
+          // Error handling without console logging
+          throw error;
+        }
+
+        // Добавляем задержку между запросами
+        if (i < batch.length - 1 && delay > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
       }
 
-      // Добавляем задержку между запросами
-      if (i < batch.length - 1 && delay > 0) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-
-    return results;
-  }, [requests, batchSize, delay, cache]);
+      return results;
+    },
+    [requests, batchSize, delay, cache]
+  );
 
   const executeAll = useCallback(async (): Promise<T[]> => {
     const allResults: T[] = [];
-    
+
     for (let i = 0; i < requests.length; i += batchSize) {
       const batchResults = await executeBatch(i);
       allResults.push(...batchResults);

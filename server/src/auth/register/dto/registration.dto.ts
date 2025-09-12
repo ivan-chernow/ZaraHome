@@ -26,5 +26,3 @@ export class RegistrationCompleteDto {
   @IsNotEmpty({ message: 'Пароль обязателен' })
   password: string;
 }
-
-

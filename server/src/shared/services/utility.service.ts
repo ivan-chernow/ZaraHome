@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
-import { SHARED_CONSTANTS } from '../shared.constants';
 import { IUtilityService } from '../shared.interfaces';
 
 @Injectable()
@@ -21,13 +20,14 @@ export class UtilityService implements IUtilityService {
       throw new Error('Длина не может превышать 1000 символов');
     }
 
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-    
+
     for (let i = 0; i < length; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    
+
     return result;
   }
 
@@ -92,8 +92,8 @@ export class UtilityService implements IUtilityService {
   }
 
   async retry<T>(
-    fn: () => Promise<T>, 
-    attempts: number, 
+    fn: () => Promise<T>,
+    attempts: number,
     delay: number
   ): Promise<T> {
     if (attempts < 1 || attempts > 10) {
@@ -112,14 +112,16 @@ export class UtilityService implements IUtilityService {
       } catch (error) {
         lastError = error as Error;
         this.logger.warn(`Attempt ${i + 1} failed: ${error.message}`);
-        
+
         if (i < attempts - 1) {
           await this.sleep(delay);
         }
       }
     }
 
-    throw new Error(`Все ${attempts} попыток не удались. Последняя ошибка: ${lastError?.message}`);
+    throw new Error(
+      `Все ${attempts} попыток не удались. Последняя ошибка: ${lastError?.message}`
+    );
   }
 
   // Дополнительные утилитарные методы
@@ -140,7 +142,7 @@ export class UtilityService implements IUtilityService {
     for (let i = 0; i < length; i++) {
       code += Math.floor(Math.random() * 10).toString();
     }
-    
+
     return code;
   }
 
@@ -157,7 +159,7 @@ export class UtilityService implements IUtilityService {
     if (text.length <= maxLength) {
       return text;
     }
-    
+
     return text.substring(0, maxLength).trim() + '...';
   }
 
@@ -168,13 +170,16 @@ export class UtilityService implements IUtilityService {
 
   capitalize(text: string): string {
     if (!text) return text;
-    return text.split(' ').map(word => this.capitalizeFirst(word)).join(' ');
+    return text
+      .split(' ')
+      .map(word => this.capitalizeFirst(word))
+      .join(' ');
   }
 
   formatCurrency(amount: number, currency: string = 'RUB'): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: currency
+      currency: currency,
     }).format(amount);
   }
 
@@ -218,29 +223,29 @@ export class UtilityService implements IUtilityService {
     return actualChecksum === expectedChecksum;
   }
 
-  debounce<T extends (...args: any[]) => any>(
-    func: T, 
+  debounce<T extends (...args: unknown[]) => unknown>(
+    func: T,
     wait: number
   ): (...args: Parameters<T>) => void {
     let timeout: NodeJS.Timeout;
-    
+
     return (...args: Parameters<T>) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => func(...args), wait);
     };
   }
 
-  throttle<T extends (...args: any[]) => any>(
-    func: T, 
+  throttle<T extends (...args: unknown[]) => unknown>(
+    func: T,
     limit: number
   ): (...args: Parameters<T>) => void {
     let inThrottle: boolean;
-    
+
     return (...args: Parameters<T>) => {
       if (!inThrottle) {
         func(...args);
         inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
+        setTimeout(() => (inThrottle = false), limit);
       }
     };
   }

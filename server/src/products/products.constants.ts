@@ -27,10 +27,12 @@ export const PRODUCTS_CONSTANTS = {
     CATEGORY_NOT_FOUND: 'Категория не найдена',
     SUB_CATEGORY_NOT_FOUND: 'Подкатегория не найдена',
     TYPE_NOT_FOUND: 'Тип не найден',
-    INVALID_NAME_ENG: 'Название на английском должно содержать минимум 2 символа',
+    INVALID_NAME_ENG:
+      'Название на английском должно содержать минимум 2 символа',
     INVALID_NAME_RU: 'Название на русском должно содержать минимум 2 символа',
     INVALID_SIZE: 'Размеры должны быть указаны',
-    INVALID_SIZE_ITEM: 'Каждый размер должен содержать название и цену больше 0',
+    INVALID_SIZE_ITEM:
+      'Каждый размер должен содержать название и цену больше 0',
     INVALID_COLORS: 'Цвета должны быть указаны',
     UPDATE_FAILED: 'Не удалось обновить продукт',
     NO_IDS_PROVIDED: 'Не указаны ID для удаления',
@@ -79,7 +81,8 @@ export const PRODUCTS_CONSTANTS = {
   CACHE_KEYS: {
     ALL_PRODUCTS: 'all_products',
     PRODUCT_BY_ID: (id: number) => `product:${id}`,
-    PRODUCTS_FILTERED: (filters: any) => `products:filtered:${JSON.stringify(filters)}`,
+    PRODUCTS_FILTERED: (filters: any) =>
+      `products:filtered:${JSON.stringify(filters)}`,
     SEARCH_RESULTS: (query: string) => `search:${query}`,
     PRODUCT_STATS: 'product_stats',
   },

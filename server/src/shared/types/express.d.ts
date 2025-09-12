@@ -4,4 +4,3 @@ declare namespace Express {
     uploadedFiles?: string[];
   }
 }
-

@@ -1,78 +1,94 @@
-"use client";
+'use client';
 
-import React, { useCallback, useEffect, useState } from "react";
-import MainLayout from "@/widgets/layout/MainLayout";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import Container from "@mui/material/Container";
-import MainButton from "@/shared/ui/Button/MainButton";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import React, { useCallback, useEffect, useState } from 'react';
+import MainLayout from '@/widgets/layout/MainLayout';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import Container from '@mui/material/Container';
+import MainButton from '@/shared/ui/Button/MainButton';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import {
   selectCartItems,
   selectCartTotalCount,
   selectCartTotalPrice,
-} from "@/entities/cart/model/cartItems.slice";
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import CloseIcon from "@mui/icons-material/Close";
-import { addCartItem, removeCartItem, deleteCartItem, setCartItemQuantity, type CartItem as CartItemType } from "@/entities/cart/model/cartItems.slice";
-import { useGetProductsByIdsQuery, type Product } from "@/entities/product/api/products.api";
-import { findProductById } from "@/entities/category/lib/catalog.utils";
-import { useCreateOrderMutation, useGetActiveOrderQuery } from "@/entities/order/api/orders.api";
-import { useDispatch } from "react-redux";
-import { setCurrentOrderId } from "@/entities/order/model/order.slice";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import Link from "next/link";
-import Image from "next/image";
-import { RootState } from "@/shared/config/store/store";
-import { openModalAuth, setView } from "@/features/auth/model/auth.slice";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+} from '@/entities/cart/model/cartItems.slice';
+import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import CloseIcon from '@mui/icons-material/Close';
+import {
+  addCartItem,
+  removeCartItem,
+  deleteCartItem,
+  setCartItemQuantity,
+  type CartItem as CartItemType,
+} from '@/entities/cart/model/cartItems.slice';
+import {
+  useGetProductsByIdsQuery,
+  type Product,
+} from '@/entities/product/api/products.api';
+import { findProductById } from '@/entities/category/lib/catalog.utils';
+import {
+  useCreateOrderMutation,
+  useGetActiveOrderQuery,
+} from '@/entities/order/api/orders.api';
+import { useDispatch } from 'react-redux';
+import { setCurrentOrderId } from '@/entities/order/model/order.slice';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import Link from 'next/link';
+import Image from 'next/image';
+import { RootState } from '@/shared/config/store/store';
+import { openModalAuth, setView } from '@/features/auth/model/auth.slice';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
   const [mounted, setMounted] = useState(false);
-  const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
-  
+  const [createOrder, { isLoading: isCreatingOrder }] =
+    useCreateOrderMutation();
+
   // Получаем активный заказ пользователя
   const { data: activeOrder } = useGetActiveOrderQuery();
 
   // Функция для проверки изменения товаров
-  const haveItemsChanged = useCallback((currentItems: any[], newItems: any[]): boolean => {
-    if (currentItems.length !== newItems.length) {
-      return true;
-    }
-
-    const createItemKey = (item: any) => 
-      `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
-
-    const currentItemsMap = new Map();
-    const newItemsMap = new Map();
-
-    currentItems.forEach(item => {
-      const key = createItemKey(item);
-      currentItemsMap.set(key, (currentItemsMap.get(key) || 0) + 1);
-    });
-
-    newItems.forEach(item => {
-      const key = createItemKey(item);
-      newItemsMap.set(key, (newItemsMap.get(key) || 0) + 1);
-    });
-
-    if (currentItemsMap.size !== newItemsMap.size) {
-      return true;
-    }
-
-    for (const [key, count] of currentItemsMap) {
-      if (newItemsMap.get(key) !== count) {
+  const haveItemsChanged = useCallback(
+    (currentItems: any[], newItems: any[]): boolean => {
+      if (currentItems.length !== newItems.length) {
         return true;
       }
-    }
 
-    return false;
-  }, []);
-  
+      const createItemKey = (item: any) =>
+        `${item.productId}-${item.quantity}-${item.size ?? ''}-${item.color ?? ''}`;
+
+      const currentItemsMap = new Map();
+      const newItemsMap = new Map();
+
+      currentItems.forEach(item => {
+        const key = createItemKey(item);
+        currentItemsMap.set(key, (currentItemsMap.get(key) || 0) + 1);
+      });
+
+      newItems.forEach(item => {
+        const key = createItemKey(item);
+        newItemsMap.set(key, (newItemsMap.get(key) || 0) + 1);
+      });
+
+      if (currentItemsMap.size !== newItemsMap.size) {
+        return true;
+      }
+
+      for (const [key, count] of currentItemsMap) {
+        if (newItemsMap.get(key) !== count) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+    []
+  );
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -84,13 +100,20 @@ const CartPage: React.FC = () => {
   const totalPrice = useSelector(selectCartTotalPrice);
 
   // Быстрый запрос названий товаров по id, чтобы сразу показать имена без skeleton
-  const ids = cartItems.map((i) => i.id);
-  const { data: productsByIds, isLoading: isLoadingProducts, error: productsError, isError: isProductsError } = useGetProductsByIdsQuery(ids, {
+  const ids = cartItems.map(i => i.id);
+  const {
+    data: productsByIds,
+    isLoading: isLoadingProducts,
+    error: productsError,
+    isError: isProductsError,
+  } = useGetProductsByIdsQuery(ids, {
     skip: !mounted || ids.length === 0,
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
-  const safeProducts: Product[] = Array.isArray(productsByIds) ? productsByIds : [];
+  const safeProducts: Product[] = Array.isArray(productsByIds)
+    ? productsByIds
+    : [];
   const idToProduct: Record<number, Product> = safeProducts.reduce(
     (acc, p) => {
       acc[p.id] = p;
@@ -107,29 +130,35 @@ const CartPage: React.FC = () => {
     productsError,
     productsByIds: productsByIds?.length,
     idToProduct: Object.keys(idToProduct).length,
-    categories: categories?.length
+    categories: categories?.length,
   });
 
   // Дополнительная отладка для каждого товара
   if (cartItems.length > 0) {
-    console.log('Cart items details:', cartItems.map(item => ({
-      id: item.id,
-      hasInIdToProduct: !!idToProduct[item.id],
-      foundInCategories: !!findProductById(categories, item.id)
-    })));
+    console.log(
+      'Cart items details:',
+      cartItems.map(item => ({
+        id: item.id,
+        hasInIdToProduct: !!idToProduct[item.id],
+        foundInCategories: !!findProductById(categories, item.id),
+      }))
+    );
   }
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-  
-  const getFullImageUrl = useCallback((path?: string): string | undefined => {
-    if (!path) return undefined;
-    try {
-      const cleanPath = path.replace(/^\/+/, "");
-      return `${API_URL}/${cleanPath}`;
-    } catch {
-      return path;
-    }
-  }, [API_URL]);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+  const getFullImageUrl = useCallback(
+    (path?: string): string | undefined => {
+      if (!path) return undefined;
+      try {
+        const cleanPath = path.replace(/^\/+/, '');
+        return `${API_URL}/${cleanPath}`;
+      } catch {
+        return path;
+      }
+    },
+    [API_URL]
+  );
 
   return (
     <MainLayout>
@@ -170,27 +199,71 @@ const CartPage: React.FC = () => {
                 <li className="text-[#00000080] py-10">Ваша корзина пуста</li>
               ) : (
                 (() => {
-                  const groups = cartItems.reduce((acc: Record<number, CartItemType[]>, item) => {
-                    acc[item.id] = acc[item.id] ? [...acc[item.id], item] : [item];
-                    return acc;
-                  }, {} as Record<number, CartItemType[]>);
+                  const groups = cartItems.reduce(
+                    (acc: Record<number, CartItemType[]>, item) => {
+                      acc[item.id] = acc[item.id]
+                        ? [...acc[item.id], item]
+                        : [item];
+                      return acc;
+                    },
+                    {} as Record<number, CartItemType[]>
+                  );
 
-                  const handleDec = (item: CartItemType) => dispatch(removeCartItem({ id: item.id, size: item.size, color: item.color }));
-                  const handleInc = (item: CartItemType) => dispatch(addCartItem({ id: item.id, price: item.price, img: item.img, size: item.size, color: item.color }));
-                  const handleDel = (item: CartItemType) => dispatch(deleteCartItem({ id: item.id, size: item.size, color: item.color }));
-                  const handleSetQty = (item: CartItemType, qty: number) => dispatch(setCartItemQuantity({ id: item.id, size: item.size, color: item.color, quantity: qty }));
+                  const handleDec = (item: CartItemType) =>
+                    dispatch(
+                      removeCartItem({
+                        id: item.id,
+                        size: item.size,
+                        color: item.color,
+                      })
+                    );
+                  const handleInc = (item: CartItemType) =>
+                    dispatch(
+                      addCartItem({
+                        id: item.id,
+                        price: item.price,
+                        img: item.img,
+                        size: item.size,
+                        color: item.color,
+                      })
+                    );
+                  const handleDel = (item: CartItemType) =>
+                    dispatch(
+                      deleteCartItem({
+                        id: item.id,
+                        size: item.size,
+                        color: item.color,
+                      })
+                    );
+                  const handleSetQty = (item: CartItemType, qty: number) =>
+                    dispatch(
+                      setCartItemQuantity({
+                        id: item.id,
+                        size: item.size,
+                        color: item.color,
+                        quantity: qty,
+                      })
+                    );
 
                   const groupKeys = Object.keys(groups);
                   return groupKeys.map((productIdStr, groupIdx) => {
                     const productId = Number(productIdStr);
                     const variants = groups[productId];
-                    const product = idToProduct[productId] || findProductById(categories, productId);
+                    const product =
+                      idToProduct[productId] ||
+                      findProductById(categories, productId);
                     const hasProductData = !!product;
                     // Используем названия из localStorage как fallback
                     const fallbackNameEng = variants[0]?.name_eng;
                     const fallbackNameRu = variants[0]?.name_ru;
-                    const totalForProduct = variants.reduce((sum, it) => sum + it.price * it.quantity, 0);
-                    const totalQty = variants.reduce((sum, it) => sum + it.quantity, 0);
+                    const totalForProduct = variants.reduce(
+                      (sum, it) => sum + it.price * it.quantity,
+                      0
+                    );
+                    const totalQty = variants.reduce(
+                      (sum, it) => sum + it.quantity,
+                      0
+                    );
 
                     return (
                       <React.Fragment key={`group-${productId}`}>
@@ -200,7 +273,11 @@ const CartPage: React.FC = () => {
                             <div className="flex items-center min-w-0">
                               <Image
                                 alt={product?.name_ru || `Товар ${productId}`}
-                                src={getFullImageUrl(product?.img?.[0]) || getFullImageUrl(variants[0]?.img) || "/assets/img/Catalog/product2.png"}
+                                src={
+                                  getFullImageUrl(product?.img?.[0]) ||
+                                  getFullImageUrl(variants[0]?.img) ||
+                                  '/assets/img/Catalog/product2.png'
+                                }
                                 width={79}
                                 height={79}
                                 className="mr-4 rounded object-cover"
@@ -214,41 +291,73 @@ const CartPage: React.FC = () => {
                                   </>
                                 ) : product ? (
                                   <>
-                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{product.name_eng}</h4>
-                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{product.name_ru}</p>
-                                    <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">
+                                      {product.name_eng}
+                                    </h4>
+                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
+                                      {product.name_ru}
+                                    </p>
+                                    <div className="mt-1 text-[12px] text-[#00000099]">
+                                      Всего: {totalQty} шт.
+                                    </div>
                                   </>
                                 ) : fallbackNameEng || fallbackNameRu ? (
                                   <>
-                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">{fallbackNameEng || `Товар #${productId}`}</h4>
-                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">{fallbackNameRu || 'Название недоступно'}</p>
-                                    <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">
+                                      {fallbackNameEng || `Товар #${productId}`}
+                                    </h4>
+                                    <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
+                                      {fallbackNameRu || 'Название недоступно'}
+                                    </p>
+                                    <div className="mt-1 text-[12px] text-[#00000099]">
+                                      Всего: {totalQty} шт.
+                                    </div>
                                   </>
                                 ) : (
                                   <>
-                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">Товар #{productId}</h4>
+                                    <h4 className="font-bold text-[14px] leading-4 mb-[2px] truncate uppercase">
+                                      Товар #{productId}
+                                    </h4>
                                     <p className="font-medium text-[#00000080] text-[12px] leading-4 truncate">
-                                      {isProductsError ? 'Ошибка загрузки' : 'Название недоступно'}
+                                      {isProductsError
+                                        ? 'Ошибка загрузки'
+                                        : 'Название недоступно'}
                                     </p>
-                                    <div className="mt-1 text-[12px] text-[#00000099]">Всего: {totalQty} шт.</div>
+                                    <div className="mt-1 text-[12px] text-[#00000099]">
+                                      Всего: {totalQty} шт.
+                                    </div>
                                   </>
                                 )}
                               </div>
                             </div>
                             <span className="font-medium text-[16px] font-roboto whitespace-nowrap">
-                              {totalForProduct.toLocaleString("ru-RU")} <span className="font-bold font-ysabeau text-[14px]">₽</span>
+                              {totalForProduct.toLocaleString('ru-RU')}{' '}
+                              <span className="font-bold font-ysabeau text-[14px]">
+                                ₽
+                              </span>
                             </span>
                           </div>
 
                           <div className="mt-3 ml-[95px] flex flex-col gap-3">
-                            {variants.map((v) => (
-                              <div key={`${v.id}-${v.size ?? ''}-${v.color ?? ''}`} className="flex items-center justify-between py-1">
+                            {variants.map(v => (
+                              <div
+                                key={`${v.id}-${v.size ?? ''}-${v.color ?? ''}`}
+                                className="flex items-center justify-between py-1"
+                              >
                                 <div className="text-[12px] text-[#00000099] flex items-center gap-4">
                                   <span>
                                     {(() => {
-                                      const firstSizeKey = product?.size ? Object.keys(product.size)[0] : undefined;
-                                      const resolvedKey = (v.size && v.size !== '') ? v.size! : (firstSizeKey ?? '');
-                                      const resolvedLabel = resolvedKey ? (product?.size?.[resolvedKey]?.size ?? resolvedKey) : '-';
+                                      const firstSizeKey = product?.size
+                                        ? Object.keys(product.size)[0]
+                                        : undefined;
+                                      const resolvedKey =
+                                        v.size && v.size !== ''
+                                          ? v.size!
+                                          : (firstSizeKey ?? '');
+                                      const resolvedLabel = resolvedKey
+                                        ? (product?.size?.[resolvedKey]?.size ??
+                                          resolvedKey)
+                                        : '-';
                                       return <>Размер: {resolvedLabel}</>;
                                     })()}
                                   </span>
@@ -256,7 +365,13 @@ const CartPage: React.FC = () => {
                                     Цвет:
                                     <span
                                       className="inline-block w-3 h-3 rounded-full border"
-                                      style={{ backgroundColor: (product?.colors?.[v.color ?? ''] ?? v.color ?? 'transparent') as string }}
+                                      style={{
+                                        backgroundColor: (product?.colors?.[
+                                          v.color ?? ''
+                                        ] ??
+                                          v.color ??
+                                          'transparent') as string,
+                                      }}
                                     />
                                   </span>
                                 </div>
@@ -273,10 +388,16 @@ const CartPage: React.FC = () => {
                                     inputMode="numeric"
                                     pattern="[0-9]*"
                                     value={String(v.quantity)}
-                                    onChange={(e) => {
-                                      const raw = e.target.value.replace(/\D+/g, "");
+                                    onChange={e => {
+                                      const raw = e.target.value.replace(
+                                        /\D+/g,
+                                        ''
+                                      );
                                       const numeric = parseInt(raw, 10);
-                                      if (Number.isFinite(numeric) && numeric > 0) {
+                                      if (
+                                        Number.isFinite(numeric) &&
+                                        numeric > 0
+                                      ) {
                                         handleSetQty(v, numeric);
                                       }
                                     }}
@@ -300,7 +421,9 @@ const CartPage: React.FC = () => {
                             ))}
                           </div>
                         </li>
-                        {groupIdx === groupKeys.length - 1 && <HorizontalLine width="720px" />}
+                        {groupIdx === groupKeys.length - 1 && (
+                          <HorizontalLine width="720px" />
+                        )}
                       </React.Fragment>
                     );
                   });
@@ -324,95 +447,126 @@ const CartPage: React.FC = () => {
               ) : (
                 <>
                   <p className="font-medium text-[32px] font-inter">
-                    {totalPrice.toLocaleString("ru-RU")}{" "}
+                    {totalPrice.toLocaleString('ru-RU')}{' '}
                     <span className="text-[24px] font-bold">₽</span>
                   </p>
                   <p className="font-medium mb-[28px]">
-                    {totalCount}{" "}
+                    {totalCount}{' '}
                     {totalCount === 1
-                      ? "товар"
+                      ? 'товар'
                       : totalCount >= 2 && totalCount <= 4
-                      ? "товара"
-                      : "товаров"}
+                        ? 'товара'
+                        : 'товаров'}
                   </p>
                   <div>
                     {!isAuthenticated && (
                       <div className="w-full bg-gray-50 border border-gray-200 rounded p-3 mb-3 text-center">
                         <div className="flex items-center justify-center text-[#00000099] mb-1">
                           <LockOutlinedIcon fontSize="small" className="mr-1" />
-                          <span className="text-sm">Войдите, чтобы оформить заказ</span>
+                          <span className="text-sm">
+                            Войдите, чтобы оформить заказ
+                          </span>
                         </div>
-                        <div className="text-xs text-[#6b7280]">Если у вас нет аккаунта — можно зарегистрироваться за минуту</div>
+                        <div className="text-xs text-[#6b7280]">
+                          Если у вас нет аккаунта — можно зарегистрироваться за
+                          минуту
+                        </div>
                       </div>
                     )}
                     <MainButton
-                      text={isAuthenticated ? "Перейти к оформлению" : "Войти, чтобы оформить"}
+                      text={
+                        isAuthenticated
+                          ? 'Перейти к оформлению'
+                          : 'Войти, чтобы оформить'
+                      }
                       disabled={cartItems.length === 0 || isCreatingOrder}
                       type="button"
-                                        onClick={async () => {
-                    if (!isAuthenticated) {
-                      dispatch(setView('login'));
-                      dispatch(openModalAuth());
-                      return;
-                    }
-                    try {
-                      // Если у пользователя уже есть активный заказ, проверяем, изменились ли товары
-                      if (activeOrder && activeOrder.items) {
-                        const currentItems = activeOrder.items;
-                        const newItems = cartItems.map(item => ({
-                          productId: item.id,
-                          quantity: item.quantity,
-                          size: item.size,
-                          color: item.color,
-                        }));
-                        
-                        // Проверяем, одинаковые ли товары и количества
-                        const itemsChanged = haveItemsChanged(currentItems, newItems);
-                        
-                        // Если товары не изменились, используем существующий заказ
-                        if (!itemsChanged) {
-                          dispatch(setCurrentOrderId(activeOrder.id));
-                          router.push("/order");
+                      onClick={async () => {
+                        if (!isAuthenticated) {
+                          dispatch(setView('login'));
+                          dispatch(openModalAuth());
                           return;
                         }
-                        
-                        // Если товары изменились, создаем новый заказ (старый будет отменен на бэкенде)
-                      }
+                        try {
+                          // Если у пользователя уже есть активный заказ, проверяем, изменились ли товары
+                          if (activeOrder && activeOrder.items) {
+                            const currentItems = activeOrder.items;
+                            const newItems = cartItems.map(item => ({
+                              productId: item.id,
+                              quantity: item.quantity,
+                              size: item.size,
+                              color: item.color,
+                            }));
 
-                      // Создаем новый заказ со статусом "ожидает оплаты"
-                      const orderData = {
-                        items: cartItems.map(item => {
-                          const product = idToProduct[item.id] || findProductById(categories, item.id);
-                          const productName = (product?.name_ru || product?.name_eng || `Товар #${item.id}`).toString();
-                          let price = Number(item.price);
-                          if (!Number.isFinite(price) || price <= 0) {
-                            const sizeKey = item.size && product?.size ? item.size : (product?.size ? Object.keys(product.size)[0] : undefined);
-                            const fallback = sizeKey && product?.size ? product.size[sizeKey]?.price : undefined;
-                            price = Number(fallback) > 0 ? Number(fallback) : 1;
+                            // Проверяем, одинаковые ли товары и количества
+                            const itemsChanged = haveItemsChanged(
+                              currentItems,
+                              newItems
+                            );
+
+                            // Если товары не изменились, используем существующий заказ
+                            if (!itemsChanged) {
+                              dispatch(setCurrentOrderId(activeOrder.id));
+                              router.push('/order');
+                              return;
+                            }
+
+                            // Если товары изменились, создаем новый заказ (старый будет отменен на бэкенде)
                           }
-                          return {
-                            productId: item.id,
-                            productName,
-                            quantity: Math.max(1, Math.floor(item.quantity || 1)),
-                            price,
-                            size: item.size,
-                            color: item.color,
-                          };
-                        }),
-                      } as const;
 
-                      const createdOrder = await createOrder(orderData).unwrap();
-                      
-                      // Сохраняем ID созданного заказа в Redux store
-                      dispatch(setCurrentOrderId(createdOrder.id));
-                      
-                      // После успешного создания заказа переходим к оформлению
-                      router.push("/order");
-                    } catch (error: any) {
-                      const payload = error?.data || error;
-                      console.error('Ошибка при создании заказа:', payload);
-                    }
-                  }}
+                          // Создаем новый заказ со статусом "ожидает оплаты"
+                          const orderData = {
+                            items: cartItems.map(item => {
+                              const product =
+                                idToProduct[item.id] ||
+                                findProductById(categories, item.id);
+                              const productName = (
+                                product?.name_ru ||
+                                product?.name_eng ||
+                                `Товар #${item.id}`
+                              ).toString();
+                              let price = Number(item.price);
+                              if (!Number.isFinite(price) || price <= 0) {
+                                const sizeKey =
+                                  item.size && product?.size
+                                    ? item.size
+                                    : product?.size
+                                      ? Object.keys(product.size)[0]
+                                      : undefined;
+                                const fallback =
+                                  sizeKey && product?.size
+                                    ? product.size[sizeKey]?.price
+                                    : undefined;
+                                price =
+                                  Number(fallback) > 0 ? Number(fallback) : 1;
+                              }
+                              return {
+                                productId: item.id,
+                                productName,
+                                quantity: Math.max(
+                                  1,
+                                  Math.floor(item.quantity || 1)
+                                ),
+                                price,
+                                size: item.size,
+                                color: item.color,
+                              };
+                            }),
+                          } as const;
+
+                          const createdOrder =
+                            await createOrder(orderData).unwrap();
+
+                          // Сохраняем ID созданного заказа в Redux store
+                          dispatch(setCurrentOrderId(createdOrder.id));
+
+                          // После успешного создания заказа переходим к оформлению
+                          router.push('/order');
+                        } catch (error: any) {
+                          const payload = error?.data || error;
+                          console.error('Ошибка при создании заказа:', payload);
+                        }
+                      }}
                       width="358px"
                       height="56px"
                     />

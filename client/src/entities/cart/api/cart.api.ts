@@ -6,27 +6,27 @@ export const cartApi = createApi({
   reducerPath: 'cartApi',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Cart'],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     getCart: builder.query<Product[], number | undefined>({
       query: () => '/cart',
       providesTags: ['Cart'],
     }),
     addToCart: builder.mutation<void, number>({
-      query: (productId) => ({
+      query: productId => ({
         url: `/cart/${productId}`,
         method: 'POST',
       }),
       invalidatesTags: ['Cart'],
     }),
     removeFromCart: builder.mutation<void, number>({
-      query: (productId) => ({
+      query: productId => ({
         url: `/cart/${productId}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Cart'],
     }),
     getCartStatus: builder.query<Record<number, boolean>, number[]>({
-      query: (productIds) => `/cart/status?productIds=${productIds.join(',')}`,
+      query: productIds => `/cart/status?productIds=${productIds.join(',')}`,
     }),
   }),
 });
@@ -36,4 +36,4 @@ export const {
   useAddToCartMutation,
   useRemoveFromCartMutation,
   useLazyGetCartStatusQuery,
-} = cartApi; 
+} = cartApi;

@@ -1,26 +1,26 @@
-"use client";
-import React, { useEffect, useMemo } from "react";
-import HorizontalLine from "@/shared/ui/HorizontalLine";
-import { AnimatePresence, motion } from "framer-motion";
+'use client';
+import React, { useEffect, useMemo } from 'react';
+import HorizontalLine from '@/shared/ui/HorizontalLine';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   toggleCategory,
   toggleSubCategory,
   expandCategory,
   expandSubCategory,
-} from "@/entities/category/model/catalog.slice";
-import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
+} from '@/entities/category/model/catalog.slice';
+import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
 import {
   categoryAnimation,
   productAnimation,
   subCategoryAnimation,
-} from "@/shared/lib/animation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/shared/config/store/store";
-import { useGetCatalogQuery } from "@/entities/product/api/products.api";
-import Link from "next/link";
-import slugify from "slugify";
-import Skeleton from "@mui/material/Skeleton";
-import { usePathname } from "next/navigation";
+} from '@/shared/lib/animation';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/shared/config/store/store';
+import { useGetCatalogQuery } from '@/entities/product/api/products.api';
+import Link from 'next/link';
+import slugify from 'slugify';
+import Skeleton from '@mui/material/Skeleton';
+import { usePathname } from 'next/navigation';
 
 const CatalogAccordion = () => {
   const { expandedCategories, expandedSubCategories } = useSelector(
@@ -30,7 +30,7 @@ const CatalogAccordion = () => {
   const { data: categories, isLoading } = useGetCatalogQuery();
 
   const customSlugify = (text: string) =>
-    slugify(text.replace(/й/g, "y").replace(/и$/g, "i"), {
+    slugify(text.replace(/й/g, 'y').replace(/и$/g, 'i'), {
       lower: true,
       strict: true,
     });
@@ -38,17 +38,17 @@ const CatalogAccordion = () => {
   // Автораскрытие категории/подкатегории по URL
   const pathname = usePathname();
   const urlParts = useMemo(
-    () => decodeURI(pathname).split("/").filter(Boolean),
+    () => decodeURI(pathname).split('/').filter(Boolean),
     [pathname]
   );
 
   useEffect(() => {
     if (!categories || isLoading) return;
-    if (urlParts[0] !== "products" || urlParts[1] !== "category") return;
+    if (urlParts[0] !== 'products' || urlParts[1] !== 'category') return;
     const categorySlug = urlParts[2];
     if (!categorySlug) return;
     const category = categories.find(
-      (c) => customSlugify(c.name) === categorySlug
+      c => customSlugify(c.name) === categorySlug
     );
     if (!category) return;
 
@@ -60,7 +60,7 @@ const CatalogAccordion = () => {
     const subSlug = urlParts[3];
     if (subSlug) {
       const sub = category.subCategories.find(
-        (s) => customSlugify(s.name) === subSlug
+        s => customSlugify(s.name) === subSlug
       );
       if (sub && !expandedSubCategories[sub.id]) {
         dispatch(expandSubCategory(sub.id.toString()));
@@ -102,10 +102,10 @@ const CatalogAccordion = () => {
           {!isLoading &&
             categories
               ?.filter(
-                (category) =>
-                  category.name !== "Новинки" && category.name !== "Скидки"
+                category =>
+                  category.name !== 'Новинки' && category.name !== 'Скидки'
               )
-              .map((category) => (
+              .map(category => (
                 <li key={category.id} className="mb-[35px]">
                   <div
                     className="flex items-center cursor-pointer font-medium text-[18px]"
@@ -119,14 +119,14 @@ const CatalogAccordion = () => {
                         rotate: expandedCategories[category.id] ? 90 : 0,
                       }}
                       transition={{
-                        type: "spring",
+                        type: 'spring',
                         stiffness: 300,
                         damping: 20,
                       }}
                     >
                       <KeyboardArrowRightOutlinedIcon
                         fontSize="small"
-                        sx={{ color: "white" }}
+                        sx={{ color: 'white' }}
                       />
                     </motion.div>
                     <span className="flex-grow">{category.name}</span>
@@ -151,10 +151,10 @@ const CatalogAccordion = () => {
                             return aHasTypes === bHasTypes
                               ? 0
                               : aHasTypes
-                              ? -1
-                              : 1;
+                                ? -1
+                                : 1;
                           })
-                          .map((subCategory) => {
+                          .map(subCategory => {
                             const categorySlug = customSlugify(category.name);
                             const subCategorySlug = customSlugify(
                               subCategory.name
@@ -185,20 +185,20 @@ const CatalogAccordion = () => {
                                             : -90,
                                         }}
                                         transition={{
-                                          type: "spring",
+                                          type: 'spring',
                                           stiffness: 300,
                                         }}
                                       >
                                         <KeyboardArrowRightOutlinedIcon
                                           fontSize="small"
                                           sx={{
-                                            color: "black",
+                                            color: 'black',
                                             transform: `rotate(${
                                               expandedSubCategories[
                                                 subCategory.id
                                               ]
-                                                ? "90deg"
-                                                : "0deg"
+                                                ? '90deg'
+                                                : '0deg'
                                             })`,
                                           }}
                                         />
@@ -230,7 +230,7 @@ const CatalogAccordion = () => {
                                           exit="exit"
                                           variants={subCategoryAnimation}
                                         >
-                                          {subCategory.types.map((type) => {
+                                          {subCategory.types.map(type => {
                                             const typeSlug = customSlugify(
                                               type.name
                                             );

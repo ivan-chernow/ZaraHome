@@ -4,7 +4,7 @@ import { useMemo } from 'react';
  * Хук для работы с изображениями
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 /**
  * Создает полный URL для изображения
@@ -14,9 +14,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 export const useImageUrl = (path?: string): string | undefined => {
   return useMemo(() => {
     if (!path) return undefined;
-    
+
     try {
-      const cleanPath = path.replace(/^\/+/, "");
+      const cleanPath = path.replace(/^\/+/, '');
       return `${API_URL}/${cleanPath}`;
     } catch {
       return path;
@@ -32,12 +32,12 @@ export const useImageUrl = (path?: string): string | undefined => {
 export const useImageUrls = (paths?: string[]): string[] => {
   return useMemo(() => {
     if (!Array.isArray(paths)) return [];
-    
+
     return paths
       .map(path => {
         if (!path) return undefined;
         try {
-          const cleanPath = path.replace(/^\/+/, "");
+          const cleanPath = path.replace(/^\/+/, '');
           return `${API_URL}/${cleanPath}`;
         } catch {
           return path;
@@ -53,19 +53,22 @@ export const useImageUrls = (paths?: string[]): string[] => {
  * @param fallback - резервный путь
  * @returns URL первого изображения или fallback
  */
-export const useFirstImageUrl = (paths?: string[], fallback?: string): string => {
+export const useFirstImageUrl = (
+  paths?: string[],
+  fallback?: string
+): string => {
   return useMemo(() => {
     if (!Array.isArray(paths) || paths.length === 0) {
-      return fallback || "/assets/img/Catalog/product2.png";
+      return fallback || '/assets/img/Catalog/product2.png';
     }
-    
+
     const firstPath = paths[0];
     if (!firstPath) {
-      return fallback || "/assets/img/Catalog/product2.png";
+      return fallback || '/assets/img/Catalog/product2.png';
     }
-    
+
     try {
-      const cleanPath = firstPath.replace(/^\/+/, "");
+      const cleanPath = firstPath.replace(/^\/+/, '');
       return `${API_URL}/${cleanPath}`;
     } catch {
       return firstPath;

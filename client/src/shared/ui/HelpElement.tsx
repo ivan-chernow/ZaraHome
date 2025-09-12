@@ -1,11 +1,11 @@
-"use client";
-import React, { useState } from "react";
-import Image from "next/image";
+'use client';
+import React, { useState } from 'react';
+import Image from 'next/image';
 
 const HelpElement = ({ svgPath, width, height, title, subtitle, link }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const handleClick = (e) => {
-    window.open(link, "_blank");
+  const handleClick = e => {
+    window.open(link, '_blank');
   };
 
   return (
@@ -19,7 +19,7 @@ const HelpElement = ({ svgPath, width, height, title, subtitle, link }) => {
         className={`
           absolute right-[11px] top-[11px]
           transition-all duration-300 ease-in-out
-          ${isHovered ? "opacity-100" : "opacity-0"}
+          ${isHovered ? 'opacity-100' : 'opacity-0'}
         `}
       >
         <Image

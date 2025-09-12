@@ -1,13 +1,13 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import type { Product } from "@/entities/product/api/products.api";
-import { useDispatch } from "react-redux";
-import { closeAllMenus } from "@/widgets/nav-menu/model/navMenu.slice";
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import type { Product } from '@/entities/product/api/products.api';
+import { useDispatch } from 'react-redux';
+import { closeAllMenus } from '@/widgets/nav-menu/model/navMenu.slice';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface SearchResultProductCardProps {
   product: Product;
@@ -23,7 +23,7 @@ const SearchResultProductCard: React.FC<SearchResultProductCardProps> = ({
     if (!highlight.trim()) {
       return <span>{text}</span>;
     }
-    const words = text.split(" ");
+    const words = text.split(' ');
     const lowercasedHighlight = highlight.toLowerCase();
 
     return (
@@ -36,14 +36,14 @@ const SearchResultProductCard: React.FC<SearchResultProductCardProps> = ({
               <React.Fragment key={i}>
                 <span className="bg-black text-white px-1">{matchedPart}</span>
                 <span>{restOfWord}</span>
-                {i < words.length - 1 && " "}
+                {i < words.length - 1 && ' '}
               </React.Fragment>
             );
           }
           return (
             <React.Fragment key={i}>
               {word}
-              {i < words.length - 1 && " "}
+              {i < words.length - 1 && ' '}
             </React.Fragment>
           );
         })}
@@ -82,8 +82,8 @@ const SearchResultProductCard: React.FC<SearchResultProductCardProps> = ({
             <div className="mt-2">
               <span className="text-lg font-bold text-gray-900">
                 {Object.values(product.size)
-                  .find((s) => s.price)
-                  ?.price?.toLocaleString("ru-RU")}{" "}
+                  .find(s => s.price)
+                  ?.price?.toLocaleString('ru-RU')}{' '}
                 ₽
               </span>
             </div>

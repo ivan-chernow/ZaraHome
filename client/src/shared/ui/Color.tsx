@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 interface ColorsProps {
   display?: string;
@@ -17,9 +17,9 @@ const Color = ({ display, color, onClick, isActive }: ColorsProps) => {
       onClick={onClick}
       className={`
         flex items-center mb-1 mr-2 transition-all duration-300 ease-in-out ${display}
-        ${isActive ? "ring-2 ring-black scale-110 drop-shadow-lg" : ""}
+        ${isActive ? 'ring-2 ring-black scale-110 drop-shadow-lg' : ''}
       `}
-      style={{ borderRadius: "100%" }}
+      style={{ borderRadius: '100%' }}
     >
       <div
         className="relative w-[18px] h-[18px] cursor-pointer"
@@ -28,7 +28,7 @@ const Color = ({ display, color, onClick, isActive }: ColorsProps) => {
       >
         <div
           className={`absolute   rounded-full shadow-md ${
-            isHoveredColor ? "opacity-100" : "opacity-0"
+            isHoveredColor ? 'opacity-100' : 'opacity-0'
           }`}
         ></div>
         <div

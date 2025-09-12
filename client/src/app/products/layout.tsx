@@ -1,6 +1,6 @@
-import CatalogAccordion from "@/entities/catalog/ui/CatalogAccordion";
-import MainLayout from "@/widgets/layout/MainLayout";
-import Container from "@mui/material/Container";
+import CatalogAccordion from '@/entities/catalog/ui/CatalogAccordion';
+import MainLayout from '@/widgets/layout/MainLayout';
+import Container from '@mui/material/Container';
 
 interface ProductsLayoutProps {
   children: React.ReactNode;

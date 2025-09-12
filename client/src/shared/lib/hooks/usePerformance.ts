@@ -11,21 +11,25 @@ import { useEffect, useRef, useCallback, useState } from 'react';
  * @returns функция с измерением времени выполнения
  */
 export const usePerformanceMeasure = <T extends (...args: any[]) => any>(
-  fn: T,
+  fn: T
 ): T => {
+  return useCallback(
+    (...args: Parameters<T>) => {
+      const startTime = performance.now();
+      const result = fn(...args);
+      const endTime = performance.now();
 
-  return useCallback((...args: Parameters<T>) => {
-    const startTime = performance.now();
-    const result = fn(...args);
-    const endTime = performance.now();
-    
-    // Log only in development to avoid noise in production
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Function ${fn.name || 'anonymous'} took ${endTime - startTime} ms`);
-    }
-    
-    return result;
-  }, [fn]) as T;
+      // Log only in development to avoid noise in production
+      if (process.env.NODE_ENV === 'development') {
+        console.log(
+          `Function ${fn.name || 'anonymous'} took ${endTime - startTime} ms`
+        );
+      }
+
+      return result;
+    },
+    [fn]
+  ) as T;
 };
 
 /**
@@ -45,11 +49,15 @@ export const useFPSMonitor = (threshold: number = 30) => {
       frameCountRef.current++;
 
       if (now - lastTimeRef.current >= 1000) {
-        const currentFPS = Math.round((frameCountRef.current * 1000) / (now - lastTimeRef.current));
+        const currentFPS = Math.round(
+          (frameCountRef.current * 1000) / (now - lastTimeRef.current)
+        );
         setFps(currentFPS);
 
         if (currentFPS < threshold && process.env.NODE_ENV === 'development') {
-          console.warn(`Low FPS detected: ${currentFPS} (threshold: ${threshold})`);
+          console.warn(
+            `Low FPS detected: ${currentFPS} (threshold: ${threshold})`
+          );
         }
 
         frameCountRef.current = 0;
@@ -174,11 +182,11 @@ export const useLazyComponent = <T extends React.ComponentType<any>>(
 
   useEffect(() => {
     importFn()
-      .then((module) => {
+      .then(module => {
         setComponent(() => module.default);
         setIsLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         setError(err);
         setIsLoading(false);
       });
@@ -197,20 +205,21 @@ export const useLazyComponent = <T extends React.ComponentType<any>>(
  * @param deps - зависимости
  * @returns функция для запуска анимации
  */
-export const useAnimationFrame = (
-  callback: (time: number) => void,
-) => {
+export const useAnimationFrame = (callback: (time: number) => void) => {
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
 
-  const animate = useCallback((time: number) => {
-    if (previousTimeRef.current !== null) {
-      const deltaTime = time - previousTimeRef.current;
-      callback(deltaTime);
-    }
-    previousTimeRef.current = time;
-    requestRef.current = requestAnimationFrame(animate);
-  }, [callback]);
+  const animate = useCallback(
+    (time: number) => {
+      if (previousTimeRef.current !== null) {
+        const deltaTime = time - previousTimeRef.current;
+        callback(deltaTime);
+      }
+      previousTimeRef.current = time;
+      requestRef.current = requestAnimationFrame(animate);
+    },
+    [callback]
+  );
 
   const startAnimation = useCallback(() => {
     if (requestRef.current !== null) {

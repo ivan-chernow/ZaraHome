@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useMemo, useState } from "react";
-import Container from "@mui/material/Container";
-import Skeleton from "@mui/material/Skeleton";
-import Rating from "@mui/material/Rating";
-import Avatar from "@mui/material/Avatar";
-import MainLayout from "@/widgets/layout/MainLayout";
-import MainButton from "@/shared/ui/Button/MainButton";
+import React, { useMemo, useState } from 'react';
+import Container from '@mui/material/Container';
+import Skeleton from '@mui/material/Skeleton';
+import Rating from '@mui/material/Rating';
+import Avatar from '@mui/material/Avatar';
+import MainLayout from '@/widgets/layout/MainLayout';
+import MainButton from '@/shared/ui/Button/MainButton';
 
 // Тип отзыва
 interface Review {
@@ -22,27 +22,27 @@ interface Review {
 const MOCK_REVIEWS: Review[] = [
   {
     id: 1,
-    name: "Анна",
+    name: 'Анна',
     avatar: undefined,
     rating: 5,
-    date: "2024-06-01",
-    text: "Очень понравился сервис и качество товаров!",
+    date: '2024-06-01',
+    text: 'Очень понравился сервис и качество товаров!',
   },
   {
     id: 2,
-    name: "Иван",
+    name: 'Иван',
     avatar: undefined,
     rating: 4,
-    date: "2024-05-28",
-    text: "Быстрая доставка, всё понравилось.",
+    date: '2024-05-28',
+    text: 'Быстрая доставка, всё понравилось.',
   },
   {
     id: 3,
-    name: "Мария",
+    name: 'Мария',
     avatar: undefined,
     rating: 5,
-    date: "2024-05-20",
-    text: "Отличный магазин, буду заказывать ещё!",
+    date: '2024-05-20',
+    text: 'Отличный магазин, буду заказывать ещё!',
   },
 ];
 
@@ -89,12 +89,15 @@ const ReviewsPage: React.FC = () => {
 
   const totalReviews = reviews.length;
   const averageRating = useMemo(
-    () => (totalReviews ? reviews.reduce((s, r) => s + r.rating, 0) / totalReviews : 0),
+    () =>
+      totalReviews
+        ? reviews.reduce((s, r) => s + r.rating, 0) / totalReviews
+        : 0,
     [reviews, totalReviews]
   );
   const ratingCounts = useMemo(() => {
     const counts = [0, 0, 0, 0, 0];
-    reviews.forEach((r) => {
+    reviews.forEach(r => {
       const idx = Math.min(5, Math.max(1, r.rating)) - 1;
       counts[idx] += 1;
     });
@@ -116,22 +119,37 @@ const ReviewsPage: React.FC = () => {
               <div className="text-5xl font-ysabeau font-semibold mb-2">
                 {averageRating.toFixed(1)}
               </div>
-              <Rating value={averageRating} precision={0.1} readOnly size="large" />
+              <Rating
+                value={averageRating}
+                precision={0.1}
+                readOnly
+                size="large"
+              />
               <div className="text-gray-500 text-sm mt-2">
                 {totalReviews} отзывов
               </div>
             </div>
             <div className="md:col-span-2 bg-white rounded-xl shadow p-6">
-              {([5, 4, 3, 2, 1] as const).map((stars) => {
+              {([5, 4, 3, 2, 1] as const).map(stars => {
                 const count = ratingCounts[stars - 1];
-                const percent = totalReviews ? Math.round((count / totalReviews) * 100) : 0;
+                const percent = totalReviews
+                  ? Math.round((count / totalReviews) * 100)
+                  : 0;
                 return (
-                  <div key={stars} className="flex items-center gap-3 mb-3 last:mb-0">
+                  <div
+                    key={stars}
+                    className="flex items-center gap-3 mb-3 last:mb-0"
+                  >
                     <div className="w-10 text-sm text-gray-600">{stars}★</div>
                     <div className="flex-1 h-2 bg-gray-100 rounded">
-                      <div className="h-2 bg-black rounded" style={{ width: `${percent}%` }} />
+                      <div
+                        className="h-2 bg-black rounded"
+                        style={{ width: `${percent}%` }}
+                      />
                     </div>
-                    <div className="w-14 text-right text-sm text-gray-600">{percent}%</div>
+                    <div className="w-14 text-right text-sm text-gray-600">
+                      {percent}%
+                    </div>
                   </div>
                 );
               })}
@@ -146,7 +164,7 @@ const ReviewsPage: React.FC = () => {
             ))
           ) : reviews.length > 0 ? (
             <>
-              {visibleReviews.map((review) => (
+              {visibleReviews.map(review => (
                 <ReviewCard key={review.id} review={review} />
               ))}
               {reviews.length > REVIEWS_TO_SHOW && !showAll && (

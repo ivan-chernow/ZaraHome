@@ -1,22 +1,52 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { PromocodesService } from './promocodes.service';
 import { ResponseService } from 'src/shared/services/response.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/login/jwt/jwt-auth.guard';
 import { UserRole } from 'src/shared/shared.interfaces';
-import { CreatePromocodeDto, ValidatePromocodeDto, UpdatePromocodeDto } from './dto';
+import {
+  CreatePromocodeDto,
+  ValidatePromocodeDto,
+  UpdatePromocodeDto,
+} from './dto';
 import { PromocodeCodeDto } from './dto/promocode-code.dto';
-import { ApiTags, ApiOperation, ApiOkResponse, ApiQuery, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiQuery,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PROMOCODES_CONSTANTS } from './promocodes.constants';
 
 @ApiTags('promocodes')
 @Controller('promocodes')
 export class PromocodesController {
+  private readonly promocodesService: PromocodesService;
+  private readonly responseService: ResponseService;
+
   constructor(
-    private readonly promocodesService: PromocodesService,
-    private readonly responseService: ResponseService,
-  ) { }
+    promocodesService: PromocodesService,
+    responseService: ResponseService
+  ) {
+    this.promocodesService = promocodesService;
+    this.responseService = responseService;
+  }
 
   // Создание промокода (только для админа)
   @Post()
@@ -32,11 +62,16 @@ export class PromocodesController {
       {
         maxUsage: createPromocodeDto.maxUsage,
         minOrderAmount: createPromocodeDto.minOrderAmount,
-        expiresAt: createPromocodeDto.expiresAt ? new Date(createPromocodeDto.expiresAt) : undefined,
-        description: createPromocodeDto.description
+        expiresAt: createPromocodeDto.expiresAt
+          ? new Date(createPromocodeDto.expiresAt)
+          : undefined,
+        description: createPromocodeDto.description,
       }
     );
-    return this.responseService.success(promocode, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_CREATED);
+    return this.responseService.success(
+      promocode,
+      PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_CREATED
+    );
   }
 
   // Обновление промокода (только для админа)
@@ -53,10 +88,18 @@ export class PromocodesController {
   ) {
     const updateData = {
       ...updatePromocodeDto,
-      expiresAt: updatePromocodeDto.expiresAt ? new Date(updatePromocodeDto.expiresAt) : undefined
+      expiresAt: updatePromocodeDto.expiresAt
+        ? new Date(updatePromocodeDto.expiresAt)
+        : undefined,
     };
-    const promocode = await this.promocodesService.update(params.code, updateData);
-    return this.responseService.success(promocode, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_UPDATED);
+    const promocode = await this.promocodesService.update(
+      params.code,
+      updateData
+    );
+    return this.responseService.success(
+      promocode,
+      PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_UPDATED
+    );
   }
 
   // Деактивация промокода (только для админа)
@@ -69,7 +112,10 @@ export class PromocodesController {
   @ApiParam({ name: 'code', description: 'Код промокода' })
   async deactivatePromocode(@Param() params: PromocodeCodeDto) {
     await this.promocodesService.deactivate(params.code);
-    return this.responseService.success(undefined, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_DEACTIVATED);
+    return this.responseService.success(
+      undefined,
+      PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_DEACTIVATED
+    );
   }
 
   // Массовая деактивация промокодов (только для админа)
@@ -88,14 +134,17 @@ export class PromocodesController {
         codes: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Массив кодов промокодов'
-        }
-      }
-    }
+          description: 'Массив кодов промокодов',
+        },
+      },
+    },
   })
   async deactivateMultiplePromocodes(@Body() body: { codes: string[] }) {
     const result = await this.promocodesService.deactivateMultiple(body.codes);
-    return this.responseService.success(result, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODES_DEACTIVATED);
+    return this.responseService.success(
+      result,
+      PROMOCODES_CONSTANTS.SUCCESS.PROMOCODES_DEACTIVATED
+    );
   }
 
   // Применение промокода (доступно всем пользователям)
@@ -108,7 +157,10 @@ export class PromocodesController {
       applyPromocodeDto.orderAmount,
       applyPromocodeDto.userId
     );
-    return this.responseService.success(result, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_APPLIED);
+    return this.responseService.success(
+      result,
+      PROMOCODES_CONSTANTS.SUCCESS.PROMOCODE_APPLIED
+    );
   }
 
   // Получение всех промокодов с пагинацией (только для админа)
@@ -118,8 +170,18 @@ export class PromocodesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Получить все промокоды с пагинацией' })
   @ApiOkResponse({ description: 'Промокоды успешно загружены' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов на странице' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов на странице',
+  })
   async getAllPromocodes(
     @Query('page') page?: number,
     @Query('limit') limit?: number
@@ -128,15 +190,28 @@ export class PromocodesController {
       page || 1,
       limit || PROMOCODES_CONSTANTS.DEFAULT_PAGE_SIZE
     );
-    return this.responseService.success(result, PROMOCODES_CONSTANTS.SUCCESS.PROMOCODES_LOADED);
+    return this.responseService.success(
+      result,
+      PROMOCODES_CONSTANTS.SUCCESS.PROMOCODES_LOADED
+    );
   }
 
   // Получение активных промокодов с пагинацией
   @Get('active')
   @ApiOperation({ summary: 'Получить активные промокоды с пагинацией' })
   @ApiOkResponse({ description: 'Активные промокоды загружены' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов на странице' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов на странице',
+  })
   async getActivePromocodes(
     @Query('page') page?: number,
     @Query('limit') limit?: number
@@ -155,9 +230,24 @@ export class PromocodesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Поиск промокодов' })
   @ApiOkResponse({ description: 'Поиск завершен' })
-  @ApiQuery({ name: 'q', required: true, type: String, description: 'Поисковый запрос' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество результатов' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    type: String,
+    description: 'Поисковый запрос',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество результатов',
+  })
   async searchPromocodes(
     @Query('q') query: string,
     @Query('page') page?: number,
@@ -168,7 +258,10 @@ export class PromocodesController {
       page || 1,
       limit || PROMOCODES_CONSTANTS.DEFAULT_PAGE_SIZE
     );
-    return this.responseService.success(result, PROMOCODES_CONSTANTS.SUCCESS.SEARCH_COMPLETED);
+    return this.responseService.success(
+      result,
+      PROMOCODES_CONSTANTS.SUCCESS.SEARCH_COMPLETED
+    );
   }
 
   // Получение статистики промокодов (только для админа)
@@ -180,7 +273,10 @@ export class PromocodesController {
   @ApiOkResponse({ description: 'Статистика получена' })
   async getPromocodeStats() {
     const stats = await this.promocodesService.getPromocodeStats();
-    return this.responseService.success(stats, 'Статистика промокодов получена');
+    return this.responseService.success(
+      stats,
+      'Статистика промокодов получена'
+    );
   }
 
   // Получение промокода по коду
@@ -189,7 +285,9 @@ export class PromocodesController {
   @ApiOkResponse({ description: 'Промокод найден' })
   @ApiParam({ name: 'code', description: 'Код промокода' })
   async getPromocodeByCode(@Param() params: PromocodeCodeDto) {
-    const promocode = await this.promocodesService['promocodesRepository'].findByCode(params.code);
+    const promocode = await this.promocodesService[
+      'promocodesRepository'
+    ].findByCode(params.code);
     if (!promocode) {
       return this.responseService.success(null, 'Промокод не найден');
     }
@@ -203,23 +301,48 @@ export class PromocodesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Получить промокоды по диапазону скидок' })
   @ApiOkResponse({ description: 'Промокоды по диапазону скидок загружены' })
-  @ApiQuery({ name: 'minDiscount', required: true, type: Number, description: 'Минимальная скидка' })
-  @ApiQuery({ name: 'maxDiscount', required: true, type: Number, description: 'Максимальная скидка' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов' })
+  @ApiQuery({
+    name: 'minDiscount',
+    required: true,
+    type: Number,
+    description: 'Минимальная скидка',
+  })
+  @ApiQuery({
+    name: 'maxDiscount',
+    required: true,
+    type: Number,
+    description: 'Максимальная скидка',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов',
+  })
   async getPromocodesByDiscountRange(
     @Query('minDiscount') minDiscount: number,
     @Query('maxDiscount') maxDiscount: number,
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ) {
-    const result = await this.promocodesService['promocodesRepository'].getPromocodesByDiscountRange(
+    const result = await this.promocodesService[
+      'promocodesRepository'
+    ].getPromocodesByDiscountRange(
       minDiscount,
       maxDiscount,
       page || 1,
       limit || PROMOCODES_CONSTANTS.DEFAULT_PAGE_SIZE
     );
-    return this.responseService.success(result, 'Промокоды по диапазону скидок загружены');
+    return this.responseService.success(
+      result,
+      'Промокоды по диапазону скидок загружены'
+    );
   }
 
   // Получение промокодов по диапазону дат (только для админа)
@@ -229,22 +352,47 @@ export class PromocodesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Получить промокоды по диапазону дат' })
   @ApiOkResponse({ description: 'Промокоды по диапазону дат загружены' })
-  @ApiQuery({ name: 'startDate', required: true, type: String, description: 'Начальная дата (YYYY-MM-DD)' })
-  @ApiQuery({ name: 'endDate', required: true, type: String, description: 'Конечная дата (YYYY-MM-DD)' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Номер страницы' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Количество элементов' })
+  @ApiQuery({
+    name: 'startDate',
+    required: true,
+    type: String,
+    description: 'Начальная дата (YYYY-MM-DD)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: true,
+    type: String,
+    description: 'Конечная дата (YYYY-MM-DD)',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Номер страницы',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Количество элементов',
+  })
   async getPromocodesByDateRange(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ) {
-    const result = await this.promocodesService['promocodesRepository'].getPromocodesByDateRange(
+    const result = await this.promocodesService[
+      'promocodesRepository'
+    ].getPromocodesByDateRange(
       new Date(startDate),
       new Date(endDate),
       page || 1,
       limit || PROMOCODES_CONSTANTS.DEFAULT_PAGE_SIZE
     );
-    return this.responseService.success(result, 'Промокоды по диапазону дат загружены');
+    return this.responseService.success(
+      result,
+      'Промокоды по диапазону дат загружены'
+    );
   }
-} 
+}

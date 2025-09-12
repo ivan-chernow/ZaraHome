@@ -13,15 +13,14 @@ import { SharedModule } from '../shared/modules/shared.module';
 import { AppCacheModule } from '../shared/cache/cache.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([User, DeliveryAddress, Product]),
-        ProductsModule,
-        SharedModule,
-        AppCacheModule
-    ],
-    controllers: [UserController, AdminController],
-    providers: [UserService, UserRepository, AdminService],
-    exports: [UserService, AdminService]
+  imports: [
+    TypeOrmModule.forFeature([User, DeliveryAddress, Product]),
+    ProductsModule,
+    SharedModule,
+    AppCacheModule,
+  ],
+  controllers: [UserController, AdminController],
+  providers: [UserService, UserRepository, AdminService],
+  exports: [UserService, AdminService],
 })
-export class UsersModule { }
-
+export class UsersModule {}
