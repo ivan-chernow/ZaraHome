@@ -22,7 +22,7 @@ module.exports = {
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  // setupFilesAfterEnv: ['<rootDir>/test/setup.ts'], // Removed - no longer needed
   testTimeout: 30000,
   verbose: true,
   detectOpenHandles: true,

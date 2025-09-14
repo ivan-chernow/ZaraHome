@@ -1,20 +1,18 @@
-# ===========================================
-# ROOT PROJECT .GITIGNORE
-# ===========================================
-
 # Node.js dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-package-lock.json
 
 # Build outputs
 dist/
 build/
-.next/
-out/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
 
 # Environment files
 .env
@@ -23,14 +21,6 @@ out/
 .env.test
 .env.production
 .env.*.local
-
-# Logs
-logs/
-*.log
-
-# Test coverage
-coverage/
-.nyc_output/
 
 # Database files
 *.db
@@ -42,11 +32,17 @@ uploads/
 temp/
 tmp/
 
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+.parcel-cache/
+
 # IDE and editor files
 .vscode/
 .idea/
-.cursor/
-/.cursor/
 *.swp
 *.swo
 *~
@@ -59,23 +55,25 @@ tmp/
 .Trashes
 ehthumbs.db
 Thumbs.db
-Icon?
 Desktop.ini
-
-# TypeScript
-*.tsbuildinfo
-
-# Cache
-.cache/
-.parcel-cache/
-.jest/
-.eslintcache
 
 # Docker
 .dockerignore
 
 # PM2
 .pm2/
+
+# TypeScript
+*.tsbuildinfo
+
+# Jest
+.jest/
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettierignore
 
 # Local development
 .local/
@@ -95,6 +93,9 @@ pids/
 # Optional npm cache directory
 .npm
 
+# Optional eslint cache
+.eslintcache
+
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
@@ -110,14 +111,22 @@ pids/
 # Yarn Integrity file
 .yarn-integrity
 
-# parcel-bundler cache
+# dotenv environment variables file
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
 
+# Next.js build output
+.next
+
 # Nuxt.js build / generate output
 .nuxt
+dist
 
 # Gatsby files
+.cache/
 public
 
 # Storybook build outputs
@@ -127,8 +136,3 @@ public
 # Temporary folders
 tmp/
 temp/
-
-# ===========================================
-# SERVER SPECIFIC (inherits from server/.gitignore)
-# ===========================================
-# Server-specific ignores are handled by server/.gitignore
