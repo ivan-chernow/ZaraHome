@@ -15,10 +15,12 @@
     "migration:generate": "typeorm migration:generate -d src/app.module.ts",
     "migration:run": "typeorm migration:run -d src/app.module.ts",
     "migration:revert": "typeorm migration:revert -d src/app.module.ts",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:all": "npm run test && npm run test:e2e",
+    "test:ci": "npm run test:cov && npm run test:e2e"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^3.0.1",
@@ -82,6 +84,7 @@
     "globals": "^16.0.0",
     "jest": "^30.1.0",
     "source-map-support": "^0.5.21",
+    "sqlite3": "^5.1.7",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.1",
     "ts-loader": "^9.5.2",
@@ -89,22 +92,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }
