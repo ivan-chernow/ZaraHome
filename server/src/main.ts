@@ -5,6 +5,8 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import helmet from 'helmet';
+import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -36,6 +38,10 @@ async function bootstrap() {
   validateCriticalConfig(config);
   logServerConfig(config);
 
+  // Security middleware
+  app.use(helmet());
+  app.use(compression());
+
   app.enableCors(config.cors);
 
   app.useStaticAssets(join(__dirname, '..', '..', 'uploads'), {
@@ -56,6 +62,9 @@ async function bootstrap() {
   if (config.app.isDevelopment) {
     setupSwagger(app);
   }
+
+  // Health check endpoint
+  setupHealthCheck(app);
 
   await app.listen(config.app.port);
 
@@ -123,6 +132,18 @@ function logDevelopmentInfo(config: any) {
     `📊 Database sync: ${config.database.synchronize ? 'ON' : 'OFF'}`
   );
   console.log(`📝 Database logging: ${config.database.logging ? 'ON' : 'OFF'}`);
+}
+
+function setupHealthCheck(app: NestExpressApplication) {
+  app.use('/health', (req, res) => {
+    res.status(200).json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      version: '1.0.0',
+    });
+  });
 }
 
 bootstrap().catch(error => {
