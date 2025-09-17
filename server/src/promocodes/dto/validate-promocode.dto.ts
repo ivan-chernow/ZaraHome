@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsPositive } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsPositive, MinLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -8,6 +8,7 @@ export class ValidatePromocodeDto {
     example: 'SUMMER15',
   })
   @IsString({ message: 'Код промокода должен быть строкой' })
+  @MinLength(1, { message: 'Код промокода не может быть пустым' })
   code: string;
 
   @ApiProperty({

@@ -1,10 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsArray,
-  IsNumber,
-  ArrayMaxSize,
-} from 'class-validator';
+import { IsOptional, IsArray, IsNumber, ArrayMaxSize } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -16,12 +10,12 @@ export class ProductIdsQueryDto {
     maxItems: 50,
   })
   @IsOptional()
-  @IsString({ message: 'productIds должен быть строкой' })
   @Transform(({ value }) => {
-    if (!value) return [];
-    const ids = value
+    if (value == null || value === '') return [];
+    const stringValue = Array.isArray(value) ? String(value.join(',')) : String(value);
+    const ids = stringValue
       .split(',')
-      .map((id: string) => Number(id.trim()))
+      .map((id: string) => Number(String(id).trim()))
       .filter((n: number) => !Number.isNaN(n) && n > 0);
 
     // Удаляем дубликаты

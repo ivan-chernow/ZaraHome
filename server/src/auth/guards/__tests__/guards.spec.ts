@@ -10,7 +10,7 @@ describe('Guards (unit)', () => {
       getClass: () => ({}),
     } as any);
 
-    it('пропускает, если роли не требуются', () => {
+    it('пропускает,  если роли не требуются', () => {
       const reflector = { getAllAndOverride: jest.fn().mockReturnValue(undefined) } as unknown as Reflector;
       const guard = new RolesGuard(reflector);
       expect(guard.canActivate(createContext({ role: 'user' }))).toBe(true);
