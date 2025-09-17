@@ -1,13 +1,11 @@
 import React from 'react';
-import DeliveryTimeline from '@/shared/ui/DeliveryTimeline';
 import MainLayout from '@/widgets/layout/MainLayout';
+import { InfoPageContent } from '@/widgets/info/ui/InfoPageContent';
 
-const InfoPage: React.FC = () => {
-  return (
-    <MainLayout>
-      <DeliveryTimeline />
-    </MainLayout>
-  );
-};
+const InfoPage: React.FC = () => (
+  <MainLayout>
+    <InfoPageContent />
+  </MainLayout>
+);
 
 export default InfoPage;

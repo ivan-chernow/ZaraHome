@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import NewClothes from '@/widgets/new-clothes/ui/NewClothes';
 import Catalog from '@/widgets/catalog/ui/Catalog';
@@ -7,7 +5,7 @@ import WhyUs from '@/widgets/why-us/ui/WhyUs';
 import Question from '@/widgets/Question';
 import Help from '@/widgets/help/ui/Help';
 
-const App: React.FC = () => {
+export const HomePageContent: React.FC = () => {
   return (
     <>
       <NewClothes />
@@ -21,4 +19,4 @@ const App: React.FC = () => {
   );
 };
 
-export { App };
+export default HomePageContent;
