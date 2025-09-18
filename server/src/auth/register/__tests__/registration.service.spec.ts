@@ -99,7 +99,7 @@ describe('RegistrationService (unit)', () => {
       verificationRepository.remove.mockResolvedValue(undefined);
       jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashed' as never);
 
-      const user = await service.completeRegistration('t', 'pass');
+      const _user = await service.completeRegistration('t', 'pass');
       expect(bcrypt.hash).toHaveBeenCalled();
       expect(userRepository.create).toHaveBeenCalledWith(expect.objectContaining({ email: 'john@example.com', password: 'hashed' }));
       expect(emailService.sendWelcomeUser).toHaveBeenCalledWith('john@example.com');

@@ -114,7 +114,7 @@ export class RequestBodyLoggingMiddleware implements NestMiddleware {
       return next();
     }
 
-    const { method, originalUrl, body, query, params } = req;
+    const { method, originalUrl: _originalUrl, body, query, params } = req;
     const requestId = (req as any).requestId || 'unknown';
 
     // Логируем параметры запроса
@@ -183,7 +183,7 @@ export class HeadersLoggingMiddleware implements NestMiddleware {
       return next();
     }
 
-    const { method, originalUrl, headers } = req;
+    const { method: _method, originalUrl: _originalUrl2, headers } = req;
     const requestId = (req as any).requestId || 'unknown';
 
     // Логируем важные заголовки

@@ -24,7 +24,7 @@ const mockResponseService = () => ({
 describe('OrdersController', () => {
 	let controller: OrdersController;
 	let ordersService: ReturnType<typeof mockOrdersService>;
-	let responseService: ReturnType<typeof mockResponseService>;
+	let _responseService: ReturnType<typeof mockResponseService>;
 	const req = { user: { id: 10 } } as any;
 
 	beforeEach(async () => {
@@ -38,7 +38,7 @@ describe('OrdersController', () => {
 
 		controller = module.get(OrdersController);
 		ordersService = module.get(OrdersService);
-		responseService = module.get(ResponseService);
+		_responseService = module.get(ResponseService);
 	});
 
 	it('createOrder', async () => {

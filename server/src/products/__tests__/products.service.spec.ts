@@ -8,8 +8,8 @@ import { CacheService } from '../../shared/cache/cache.service';
 describe('ProductsService (unit)', () => {
   let service: ProductsService;
   let productsRepository: jest.Mocked<ProductsRepository>;
-  let imageOptimizationService: jest.Mocked<ImageOptimizationService>;
-  let errorHandlerService: jest.Mocked<FileUploadErrorHandlerService>;
+  let _imageOptimizationService: jest.Mocked<ImageOptimizationService>;
+  let _errorHandlerService: jest.Mocked<FileUploadErrorHandlerService>;
   let cacheService: jest.Mocked<CacheService>;
 
   beforeEach(async () => {
@@ -61,8 +61,8 @@ describe('ProductsService (unit)', () => {
 
     service = module.get<ProductsService>(ProductsService);
     productsRepository = module.get(ProductsRepository);
-    imageOptimizationService = module.get(ImageOptimizationService);
-    errorHandlerService = module.get(FileUploadErrorHandlerService);
+    _imageOptimizationService = module.get(ImageOptimizationService);
+    _errorHandlerService = module.get(FileUploadErrorHandlerService);
     cacheService = module.get(CacheService);
   });
 
