@@ -23,6 +23,7 @@ module.exports = {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
   // setupFilesAfterEnv: ['<rootDir>/test/setup.ts'], // Removed - no longer needed
+  // setupFilesAfterEnv: ['<rootDir>/test/setup-containers.ts'],
   testTimeout: 30000,
   verbose: true,
   detectOpenHandles: true,
