@@ -19,10 +19,7 @@
     "migration:generate": "typeorm migration:generate -d src/app.module.ts",
     "migration:run": "typeorm migration:run -d src/app.module.ts",
     "migration:revert": "typeorm migration:revert -d src/app.module.ts",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:ci": "npm run test:cov"
+    "test": "jest"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^3.0.1",
