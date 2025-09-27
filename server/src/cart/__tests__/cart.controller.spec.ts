@@ -51,13 +51,26 @@ describe('CartController (unit)', () => {
       const mockResult = { id: 1, productId: 1, quantity: 1, userId: 1 };
 
       cartService.addToCart.mockResolvedValue(mockResult as any);
-      responseService.success.mockReturnValue({ success: true, data: mockResult, message: 'Товар добавлен в корзину' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: mockResult,
+        message: 'Товар добавлен в корзину',
+      });
 
-      const result = await controller.add({ user: { id: userId } } as any, { productId });
+      const result = await controller.add({ user: { id: userId } } as any, {
+        productId,
+      });
 
       expect(cartService.addToCart).toHaveBeenCalledWith(userId, productId);
-      expect(responseService.success).toHaveBeenCalledWith(mockResult, 'Товар добавлен в корзину');
-      expect(result).toEqual({ success: true, data: mockResult, message: 'Товар добавлен в корзину' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        mockResult,
+        'Товар добавлен в корзину'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: mockResult,
+        message: 'Товар добавлен в корзину',
+      });
     });
   });
 
@@ -67,13 +80,26 @@ describe('CartController (unit)', () => {
       const mockCart = [{ id: 1, productId: 1, quantity: 2 }];
 
       cartService.getUserCart.mockResolvedValue(mockCart as any);
-      responseService.success.mockReturnValue({ success: true, data: mockCart, message: 'Корзина загружена' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: mockCart,
+        message: 'Корзина загружена',
+      });
 
-      const result = await controller.getUserCart({ user: { id: userId } } as any);
+      const result = await controller.getUserCart({
+        user: { id: userId },
+      } as any);
 
       expect(cartService.getUserCart).toHaveBeenCalledWith(userId);
-      expect(responseService.success).toHaveBeenCalledWith(mockCart, 'Корзина загружена');
-      expect(result).toEqual({ success: true, data: mockCart, message: 'Корзина загружена' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        mockCart,
+        'Корзина загружена'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: mockCart,
+        message: 'Корзина загружена',
+      });
     });
   });
 
@@ -83,13 +109,29 @@ describe('CartController (unit)', () => {
       const userId = 1;
 
       cartService.removeFromCart.mockResolvedValue(undefined);
-      responseService.success.mockReturnValue({ success: true, data: undefined, message: 'Товар удален из корзины' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: undefined,
+        message: 'Товар удален из корзины',
+      });
 
-      const result = await controller.remove({ user: { id: userId } } as any, { productId });
+      const result = await controller.remove({ user: { id: userId } } as any, {
+        productId,
+      });
 
-      expect(cartService.removeFromCart).toHaveBeenCalledWith(userId, productId);
-      expect(responseService.success).toHaveBeenCalledWith(undefined, 'Товар удален из корзины');
-      expect(result).toEqual({ success: true, data: undefined, message: 'Товар удален из корзины' });
+      expect(cartService.removeFromCart).toHaveBeenCalledWith(
+        userId,
+        productId
+      );
+      expect(responseService.success).toHaveBeenCalledWith(
+        undefined,
+        'Товар удален из корзины'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: undefined,
+        message: 'Товар удален из корзины',
+      });
     });
   });
 
@@ -98,13 +140,26 @@ describe('CartController (unit)', () => {
       const userId = 1;
 
       cartService.clearCart.mockResolvedValue(undefined);
-      responseService.success.mockReturnValue({ success: true, data: undefined, message: 'Корзина очищена' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: undefined,
+        message: 'Корзина очищена',
+      });
 
-      const result = await controller.clearCart({ user: { id: userId } } as any);
+      const result = await controller.clearCart({
+        user: { id: userId },
+      } as any);
 
       expect(cartService.clearCart).toHaveBeenCalledWith(userId);
-      expect(responseService.success).toHaveBeenCalledWith(undefined, 'Корзина очищена');
-      expect(result).toEqual({ success: true, data: undefined, message: 'Корзина очищена' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        undefined,
+        'Корзина очищена'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: undefined,
+        message: 'Корзина очищена',
+      });
     });
   });
 });

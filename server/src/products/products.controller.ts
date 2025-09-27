@@ -86,9 +86,7 @@ export class ProductsController {
   @Get()
   @ApiOperation({ summary: 'Получить все продукты с фильтрацией и пагинацией' })
   @ApiOkResponse({ description: 'Продукты успешно загружены' })
-  async findAll(
-    @Query() query: FindProductsQueryDto
-  ): Promise<
+  async findAll(@Query() query: FindProductsQueryDto): Promise<
     ApiResponse<{
       products: Product[];
       total: number;

@@ -51,29 +51,55 @@ describe('FavoritesController (unit)', () => {
       const mockResult = { id: 1, productId: 1, userId: 1 };
 
       favoritesService.add.mockResolvedValue(mockResult as any);
-      responseService.success.mockReturnValue({ success: true, data: mockResult, message: 'Товар добавлен в избранное' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: mockResult,
+        message: 'Товар добавлен в избранное',
+      });
 
-      const result = await controller.add({ productId }, { user: { id: userId } } as any);
+      const result = await controller.add({ productId }, {
+        user: { id: userId },
+      } as any);
 
       expect(favoritesService.add).toHaveBeenCalledWith(userId, productId);
-      expect(responseService.success).toHaveBeenCalledWith(mockResult, 'Товар добавлен в избранное');
-      expect(result).toEqual({ success: true, data: mockResult, message: 'Товар добавлен в избранное' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        mockResult,
+        'Товар добавлен в избранное'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: mockResult,
+        message: 'Товар добавлен в избранное',
+      });
     });
   });
 
   describe('findAll', () => {
     it('должен получить избранные товары пользователя', async () => {
       const userId = 1;
-      const mockFavorites = [{ id: 1, productId: 1, product: { name: 'Test Product' } }];
+      const mockFavorites = [
+        { id: 1, productId: 1, product: { name: 'Test Product' } },
+      ];
 
       favoritesService.findAll.mockResolvedValue(mockFavorites as any);
-      responseService.success.mockReturnValue({ success: true, data: mockFavorites, message: 'Избранное загружено' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: mockFavorites,
+        message: 'Избранное загружено',
+      });
 
       const result = await controller.findAll({ user: { id: userId } } as any);
 
       expect(favoritesService.findAll).toHaveBeenCalledWith(userId);
-      expect(responseService.success).toHaveBeenCalledWith(mockFavorites, 'Избранное загружено');
-      expect(result).toEqual({ success: true, data: mockFavorites, message: 'Избранное загружено' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        mockFavorites,
+        'Избранное загружено'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: mockFavorites,
+        message: 'Избранное загружено',
+      });
     });
   });
 
@@ -83,13 +109,26 @@ describe('FavoritesController (unit)', () => {
       const userId = 1;
 
       favoritesService.remove.mockResolvedValue(undefined);
-      responseService.success.mockReturnValue({ success: true, data: undefined, message: 'Товар удален из избранного' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: undefined,
+        message: 'Товар удален из избранного',
+      });
 
-      const result = await controller.remove({ productId }, { user: { id: userId } } as any);
+      const result = await controller.remove({ productId }, {
+        user: { id: userId },
+      } as any);
 
       expect(favoritesService.remove).toHaveBeenCalledWith(userId, productId);
-      expect(responseService.success).toHaveBeenCalledWith(undefined, 'Товар удален из избранного');
-      expect(result).toEqual({ success: true, data: undefined, message: 'Товар удален из избранного' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        undefined,
+        'Товар удален из избранного'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: undefined,
+        message: 'Товар удален из избранного',
+      });
     });
   });
 
@@ -98,13 +137,26 @@ describe('FavoritesController (unit)', () => {
       const userId = 1;
 
       favoritesService.clearFavorites.mockResolvedValue(undefined);
-      responseService.success.mockReturnValue({ success: true, data: undefined, message: 'Избранное очищено' });
+      responseService.success.mockReturnValue({
+        success: true,
+        data: undefined,
+        message: 'Избранное очищено',
+      });
 
-      const result = await controller.clearFavorites({ user: { id: userId } } as any);
+      const result = await controller.clearFavorites({
+        user: { id: userId },
+      } as any);
 
       expect(favoritesService.clearFavorites).toHaveBeenCalledWith(userId);
-      expect(responseService.success).toHaveBeenCalledWith(undefined, 'Избранное очищено');
-      expect(result).toEqual({ success: true, data: undefined, message: 'Избранное очищено' });
+      expect(responseService.success).toHaveBeenCalledWith(
+        undefined,
+        'Избранное очищено'
+      );
+      expect(result).toEqual({
+        success: true,
+        data: undefined,
+        message: 'Избранное очищено',
+      });
     });
   });
 });

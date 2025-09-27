@@ -50,12 +50,18 @@ describe('UserController (unit)', () => {
       const mockReq = { user: { id: 1 } } as any;
 
       userService.getProfile.mockResolvedValue(user as any);
-      responseService.success.mockReturnValue({ success: true, message: 'test' });
+      responseService.success.mockReturnValue({
+        success: true,
+        message: 'test',
+      });
 
       const result = await controller.getProfile(mockReq);
 
       expect(userService.getProfile).toHaveBeenCalledWith(1);
-      expect(responseService.success).toHaveBeenCalledWith(user, 'Профиль пользователя загружен');
+      expect(responseService.success).toHaveBeenCalledWith(
+        user,
+        'Профиль пользователя загружен'
+      );
       expect(result).toEqual({ success: true, message: 'test' });
     });
   });
@@ -67,37 +73,52 @@ describe('UserController (unit)', () => {
       const mockReq = { user: { id: 1 } } as any;
 
       userService.changePassword.mockResolvedValue(result as any);
-      responseService.success.mockReturnValue({ success: true, message: 'test' });
+      responseService.success.mockReturnValue({
+        success: true,
+        message: 'test',
+      });
 
       const response = await controller.changePassword(mockReq, passwordData);
 
       expect(userService.changePassword).toHaveBeenCalledWith(1, passwordData);
-      expect(responseService.success).toHaveBeenCalledWith(result, 'Пароль успешно изменен');
+      expect(responseService.success).toHaveBeenCalledWith(
+        result,
+        'Пароль успешно изменен'
+      );
       expect(response).toEqual({ success: true, message: 'test' });
     });
   });
 
   describe('addDeliveryAddress', () => {
     it('добавление адреса доставки', async () => {
-      const addressData = { 
-        firstName: 'John', 
-        lastName: 'Doe', 
+      const addressData = {
+        firstName: 'John',
+        lastName: 'Doe',
         phone: '+1234567890',
         region: 'Test Region',
         city: 'Test City',
         street: 'Test Street',
-        house: '123'
+        house: '123',
       };
       const newAddress = { id: 1, ...addressData };
       const mockReq = { user: { id: 1 } } as any;
 
       userService.addDeliveryAddress.mockResolvedValue(newAddress as any);
-      responseService.success.mockReturnValue({ success: true, message: 'test' });
+      responseService.success.mockReturnValue({
+        success: true,
+        message: 'test',
+      });
 
       const result = await controller.addDeliveryAddress(mockReq, addressData);
 
-      expect(userService.addDeliveryAddress).toHaveBeenCalledWith(1, addressData);
-      expect(responseService.success).toHaveBeenCalledWith(newAddress, 'Адрес доставки успешно добавлен');
+      expect(userService.addDeliveryAddress).toHaveBeenCalledWith(
+        1,
+        addressData
+      );
+      expect(responseService.success).toHaveBeenCalledWith(
+        newAddress,
+        'Адрес доставки успешно добавлен'
+      );
       expect(result).toEqual({ success: true, message: 'test' });
     });
   });

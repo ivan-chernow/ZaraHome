@@ -4,10 +4,18 @@ describe('DatabaseSeeder (unit)', () => {
   it('run: вызывает последовательность сидов (smoke)', async () => {
     const ds: any = {};
     const seeder = new DatabaseSeeder(ds);
-    const runCategoriesSeed = jest.spyOn<any, any>(seeder as any, 'runCategoriesSeed').mockResolvedValue(undefined);
-    const runSubCategoriesSeed = jest.spyOn<any, any>(seeder as any, 'runSubCategoriesSeed').mockResolvedValue([]);
-    const runTypesSeed = jest.spyOn<any, any>(seeder as any, 'runTypesSeed').mockResolvedValue(undefined);
-    const runPromocodesSeed = jest.spyOn<any, any>(seeder as any, 'runPromocodesSeed').mockResolvedValue(undefined);
+    const runCategoriesSeed = jest
+      .spyOn<any, any>(seeder as any, 'runCategoriesSeed')
+      .mockResolvedValue(undefined);
+    const runSubCategoriesSeed = jest
+      .spyOn<any, any>(seeder as any, 'runSubCategoriesSeed')
+      .mockResolvedValue([]);
+    const runTypesSeed = jest
+      .spyOn<any, any>(seeder as any, 'runTypesSeed')
+      .mockResolvedValue(undefined);
+    const runPromocodesSeed = jest
+      .spyOn<any, any>(seeder as any, 'runPromocodesSeed')
+      .mockResolvedValue(undefined);
 
     await seeder.run();
 
@@ -17,6 +25,3 @@ describe('DatabaseSeeder (unit)', () => {
     expect(runPromocodesSeed).toHaveBeenCalled();
   });
 });
-
-
-

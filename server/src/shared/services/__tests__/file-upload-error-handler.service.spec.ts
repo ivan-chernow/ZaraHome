@@ -4,7 +4,9 @@ describe('FileUploadErrorHandlerService (unit)', () => {
   let service: FileUploadErrorHandlerService;
 
   beforeEach(() => {
-    service = new FileUploadErrorHandlerService({ deleteImage: jest.fn() } as any);
+    service = new FileUploadErrorHandlerService({
+      deleteImage: jest.fn(),
+    } as any);
   });
 
   it('processWithRetry: успех со второй попытки', async () => {
@@ -29,6 +31,3 @@ describe('FileUploadErrorHandlerService (unit)', () => {
     expect(res.error).toMatch(/Критическая ошибка/);
   });
 });
-
-
-

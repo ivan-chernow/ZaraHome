@@ -9,8 +9,22 @@ describe('CacheService (unit)', () => {
 
   it('getOrSet: кэширует и возвращает из кеша', async () => {
     let calls = 0;
-    const value1 = await cache.getOrSet('k', async () => { calls++; return 42; }, { ttl: 1, prefix: 'p' });
-    const value2 = await cache.getOrSet('k', async () => { calls++; return 99; }, { ttl: 1, prefix: 'p' });
+    const value1 = await cache.getOrSet(
+      'k',
+      async () => {
+        calls++;
+        return 42;
+      },
+      { ttl: 1, prefix: 'p' }
+    );
+    const value2 = await cache.getOrSet(
+      'k',
+      async () => {
+        calls++;
+        return 99;
+      },
+      { ttl: 1, prefix: 'p' }
+    );
     expect(value1).toBe(42);
     expect(value2).toBe(42);
     expect(calls).toBe(1);
@@ -24,6 +38,3 @@ describe('CacheService (unit)', () => {
     expect(await cache.get('b', 'x')).toBeNull();
   });
 });
-
-
-

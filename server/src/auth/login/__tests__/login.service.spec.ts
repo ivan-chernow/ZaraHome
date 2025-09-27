@@ -36,7 +36,10 @@ describe('LoginService (unit)', () => {
       verify: jest.fn(),
     } as unknown as Mock<JwtService>;
 
-    service = new LoginService(authRepository as unknown as AuthRepository, jwtService as unknown as JwtService);
+    service = new LoginService(
+      authRepository as unknown as AuthRepository,
+      jwtService as unknown as JwtService
+    );
   });
 
   describe('validateUser', () => {
@@ -46,37 +49,50 @@ describe('LoginService (unit)', () => {
 
       const result = await service.validateUser('john@example.com', 'password');
       expect(result).toBe(user);
-      expect(authRepository.findUserByEmail).toHaveBeenCalledWith('john@example.com');
+      expect(authRepository.findUserByEmail).toHaveBeenCalledWith(
+        'john@example.com'
+      );
     });
 
     it('ошибка: пустые email/пароль', async () => {
-      await expect(service.validateUser('', ''))
-        .rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.validateUser('', '')).rejects.toBeInstanceOf(
+        UnauthorizedException
+      );
     });
 
     it('ошибка: несуществующий email', async () => {
       authRepository.findUserByEmail.mockResolvedValue(null);
-      await expect(service.validateUser('no@ex.com', 'x'))
-        .rejects.toThrow('Пользователь не найден');
+      await expect(service.validateUser('no@ex.com', 'x')).rejects.toThrow(
+        'Пользователь не найден'
+      );
     });
 
     it('ошибка: неподтвержденный email', async () => {
-      authRepository.findUserByEmail.mockResolvedValue({ ...user, isEmailVerified: false });
-      await expect(service.validateUser('john@example.com', 'x'))
-        .rejects.toThrow('Email не подтвержден');
+      authRepository.findUserByEmail.mockResolvedValue({
+        ...user,
+        isEmailVerified: false,
+      });
+      await expect(
+        service.validateUser('john@example.com', 'x')
+      ).rejects.toThrow('Email не подтвержден');
     });
 
     it('ошибка: пароль не установлен', async () => {
-      authRepository.findUserByEmail.mockResolvedValue({ ...user, password: null });
-      await expect(service.validateUser('john@example.com', 'x'))
-        .rejects.toThrow('Пароль не установлен');
+      authRepository.findUserByEmail.mockResolvedValue({
+        ...user,
+        password: null,
+      });
+      await expect(
+        service.validateUser('john@example.com', 'x')
+      ).rejects.toThrow('Пароль не установлен');
     });
 
     it('ошибка: неверный пароль', async () => {
       authRepository.findUserByEmail.mockResolvedValue(user);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
-      await expect(service.validateUser('john@example.com', 'bad'))
-        .rejects.toThrow('Неверный пароль');
+      await expect(
+        service.validateUser('john@example.com', 'bad')
+      ).rejects.toThrow('Неверный пароль');
     });
   });
 
@@ -108,9 +124,16 @@ describe('LoginService (unit)', () => {
 
   describe('refreshTokens', () => {
     it('валидный refresh: ротация и новый access', async () => {
-      jwtService.verify.mockReturnValue({ sub: 1, email: user.email, role: user.role });
+      jwtService.verify.mockReturnValue({
+        sub: 1,
+        email: user.email,
+        role: user.role,
+      });
       authRepository.findUserById.mockResolvedValue(user);
-      authRepository.findRefreshTokenByToken.mockResolvedValue({ token: 'old', userId: 1 });
+      authRepository.findRefreshTokenByToken.mockResolvedValue({
+        token: 'old',
+        userId: 1,
+      });
       jwtService.sign
         .mockReturnValueOnce('newRefresh')
         .mockReturnValueOnce('newAccess');
@@ -118,29 +141,43 @@ describe('LoginService (unit)', () => {
       const res = { cookie: jest.fn() } as any;
       const result = await service.refreshTokens('oldRefresh', res);
 
-      expect(authRepository.deleteRefreshTokenByToken).toHaveBeenCalledWith('oldRefresh');
+      expect(authRepository.deleteRefreshTokenByToken).toHaveBeenCalledWith(
+        'oldRefresh'
+      );
       expect(authRepository.saveRefreshToken).toHaveBeenCalled();
       expect(res.cookie).toHaveBeenCalled();
       expect(result.accessToken).toBe('newAccess');
-      expect(result.user).toEqual({ id: 1, email: user.email, role: user.role });
+      expect(result.user).toEqual({
+        id: 1,
+        email: user.email,
+        role: user.role,
+      });
     });
 
     it('ошибка: verify бросает (просрочен/невалиден)', async () => {
-      jwtService.verify.mockImplementation(() => { throw new Error('expired'); });
-      await expect(service.refreshTokens('bad')).rejects.toThrow('Невалидный refresh token');
+      jwtService.verify.mockImplementation(() => {
+        throw new Error('expired');
+      });
+      await expect(service.refreshTokens('bad')).rejects.toThrow(
+        'Невалидный refresh token'
+      );
     });
 
     it('ошибка: пользователь не найден', async () => {
       jwtService.verify.mockReturnValue({ sub: 999 });
       authRepository.findUserById.mockResolvedValue(null);
-      await expect(service.refreshTokens('some')).rejects.toThrow('Невалидный refresh token');
+      await expect(service.refreshTokens('some')).rejects.toThrow(
+        'Невалидный refresh token'
+      );
     });
 
     it('ошибка: токен не найден в БД', async () => {
       jwtService.verify.mockReturnValue({ sub: 1 });
       authRepository.findUserById.mockResolvedValue(user);
       authRepository.findRefreshTokenByToken.mockResolvedValue(null);
-      await expect(service.refreshTokens('some')).rejects.toThrow('Невалидный refresh token');
+      await expect(service.refreshTokens('some')).rejects.toThrow(
+        'Невалидный refresh token'
+      );
     });
   });
 
@@ -153,7 +190,10 @@ describe('LoginService (unit)', () => {
         'refreshToken',
         expect.objectContaining({ httpOnly: true })
       );
-      expect(result).toEqual({ success: true, message: 'Вы успешно вышли из системы' });
+      expect(result).toEqual({
+        success: true,
+        message: 'Вы успешно вышли из системы',
+      });
     });
 
     it('работает без res (cookie не трогаем)', async () => {
@@ -163,6 +203,3 @@ describe('LoginService (unit)', () => {
     });
   });
 });
-
-
-

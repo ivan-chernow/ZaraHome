@@ -24,10 +24,7 @@ export class AdminController {
   private readonly _adminService: AdminService;
   private readonly _responseService: ResponseService;
 
-  constructor(
-    adminService: AdminService,
-    responseService: ResponseService
-  ) {
+  constructor(adminService: AdminService, responseService: ResponseService) {
     this._adminService = adminService;
     this._responseService = responseService;
   }

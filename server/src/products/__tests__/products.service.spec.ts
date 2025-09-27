@@ -68,19 +68,37 @@ describe('ProductsService (unit)', () => {
 
   describe('findAll', () => {
     it('получение всех товаров', async () => {
-      const products = [{ id: 1, name_ru: 'Product 1' }, { id: 2, name_ru: 'Product 2' }];
+      const products = [
+        { id: 1, name_ru: 'Product 1' },
+        { id: 2, name_ru: 'Product 2' },
+      ];
       const filters = { categoryId: 1 };
       const sort = { field: 'price' as const, order: 'ASC' as const };
       const pagination = { page: 1, limit: 10 };
-      const expectedResult = { products, total: 2, page: 1, limit: 10, totalPages: 1, hasNext: false, hasPrev: false };
-      
+      const expectedResult = {
+        products,
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      };
+
       cacheService.get.mockResolvedValue(null);
-      productsRepository.findProductsWithFilters.mockResolvedValue(expectedResult as any);
+      productsRepository.findProductsWithFilters.mockResolvedValue(
+        expectedResult as any
+      );
       cacheService.set.mockResolvedValue(undefined);
 
       const result = await service.findAll(filters, sort, pagination);
 
-      expect(productsRepository.findProductsWithFilters).toHaveBeenCalledWith(filters, sort, 1, 10);
+      expect(productsRepository.findProductsWithFilters).toHaveBeenCalledWith(
+        filters,
+        sort,
+        1,
+        10
+      );
       expect(result).toEqual(expectedResult);
     });
   });
@@ -107,8 +125,8 @@ describe('ProductsService (unit)', () => {
 
   describe('create', () => {
     it('создание товара', async () => {
-      const productData = { 
-        name_eng: 'New Product', 
+      const productData = {
+        name_eng: 'New Product',
         name_ru: 'Новый товар',
         description: 'Description',
         colors: ['red'],
@@ -120,13 +138,15 @@ describe('ProductsService (unit)', () => {
         isAvailable: true,
       } as any;
       const createdProduct = { id: 1, ...productData };
-      
+
       productsRepository.createProduct.mockResolvedValue(createdProduct as any);
       cacheService.deleteByPrefix.mockResolvedValue(undefined);
 
       const result = await service.create(productData);
 
-      expect(productsRepository.createProduct).toHaveBeenCalledWith(productData);
+      expect(productsRepository.createProduct).toHaveBeenCalledWith(
+        productData
+      );
       expect(result).toEqual(createdProduct);
     });
   });
@@ -137,15 +157,20 @@ describe('ProductsService (unit)', () => {
       const updateData = { name_ru: 'Updated Product' };
       const existingProduct = { id: 1, name_ru: 'Old Product' };
       const updatedProduct = { id: 1, ...updateData };
-      
-      productsRepository.findProductById.mockResolvedValue(existingProduct as any);
+
+      productsRepository.findProductById.mockResolvedValue(
+        existingProduct as any
+      );
       productsRepository.updateProduct.mockResolvedValue(updatedProduct as any);
       cacheService.deleteByPrefix.mockResolvedValue(undefined);
 
       const result = await service.update(id, updateData);
 
       expect(productsRepository.findProductById).toHaveBeenCalledWith(id);
-      expect(productsRepository.updateProduct).toHaveBeenCalledWith(id, updateData);
+      expect(productsRepository.updateProduct).toHaveBeenCalledWith(
+        id,
+        updateData
+      );
       expect(result).toEqual(updatedProduct);
     });
   });
@@ -154,8 +179,10 @@ describe('ProductsService (unit)', () => {
     it('удаление товара', async () => {
       const id = 1;
       const existingProduct = { id: 1, name_ru: 'Product' };
-      
-      productsRepository.findProductById.mockResolvedValue(existingProduct as any);
+
+      productsRepository.findProductById.mockResolvedValue(
+        existingProduct as any
+      );
       productsRepository.removeProduct.mockResolvedValue(undefined);
       cacheService.deleteByPrefix.mockResolvedValue(undefined);
 
@@ -171,7 +198,7 @@ describe('ProductsService (unit)', () => {
       const searchResults = [{ id: 1, name_ru: 'Found Product' }];
       const query = 'search term';
       const limit = 10;
-      
+
       cacheService.getOrSet.mockResolvedValue(searchResults as any);
 
       const result = await service.searchProducts(query, limit);
@@ -183,10 +210,22 @@ describe('ProductsService (unit)', () => {
 
   it('findAll: должен вернуть продукты с фильтрами и пагинацией', async () => {
     const mockProducts = [
-      { id: 1, name_ru: 'Товар 1', name_eng: 'Product 1', price: 100, isAvailable: true } as any,
-      { id: 2, name_ru: 'Товар 2', name_eng: 'Product 2', price: 200, isAvailable: true } as any
+      {
+        id: 1,
+        name_ru: 'Товар 1',
+        name_eng: 'Product 1',
+        price: 100,
+        isAvailable: true,
+      } as any,
+      {
+        id: 2,
+        name_ru: 'Товар 2',
+        name_eng: 'Product 2',
+        price: 200,
+        isAvailable: true,
+      } as any,
     ];
-    
+
     productsRepository.findProductsWithFilters.mockResolvedValue({
       products: mockProducts,
       total: 2,
@@ -194,23 +233,28 @@ describe('ProductsService (unit)', () => {
       limit: 10,
       totalPages: 1,
       hasNext: false,
-      hasPrev: false
+      hasPrev: false,
     });
 
     const result = await service.findAll({} as any);
-    
+
     expect(result.products).toHaveLength(2);
     expect(result.total).toBe(2);
     expect(productsRepository.findProductsWithFilters).toHaveBeenCalled();
   });
 
   it('findOne: должен вернуть продукт по ID', async () => {
-    const mockProduct = { id: 1, name_ru: 'Товар 1', price: 100, isAvailable: true } as any;
+    const mockProduct = {
+      id: 1,
+      name_ru: 'Товар 1',
+      price: 100,
+      isAvailable: true,
+    } as any;
     productsRepository.findProductById.mockResolvedValue(mockProduct);
     cacheService.getOrSet.mockImplementation((key, fn) => fn());
 
     const result = await service.findOne(1);
-    
+
     expect(result).toEqual(mockProduct);
     expect(productsRepository.findProductById).toHaveBeenCalledWith(1);
   });
@@ -235,14 +279,14 @@ describe('ProductsService (unit)', () => {
       size: [{ size: 'M', price: 150 }],
       deliveryDate: '2024-12-31',
       description: 'Описание товара',
-      isAvailable: true
+      isAvailable: true,
     };
 
     const createdProduct = { id: 1, ...productData } as any;
     productsRepository.createProduct.mockResolvedValue(createdProduct);
 
     const result = await service.create(productData);
-    
+
     expect(result).toEqual(createdProduct);
     expect(productsRepository.createProduct).toHaveBeenCalledWith(productData);
   });
@@ -250,22 +294,31 @@ describe('ProductsService (unit)', () => {
   it('update: должен обновить продукт', async () => {
     const updateData = { name_ru: 'Обновленный товар', price: 200 };
     const updatedProduct = { id: 1, ...updateData } as any;
-    
-    productsRepository.findProductById.mockResolvedValue({ id: 1, name_ru: 'Старый товар' } as any);
+
+    productsRepository.findProductById.mockResolvedValue({
+      id: 1,
+      name_ru: 'Старый товар',
+    } as any);
     productsRepository.updateProduct.mockResolvedValue(updatedProduct);
 
     const result = await service.update(1, updateData);
-    
+
     expect(result).toEqual(updatedProduct);
-    expect(productsRepository.updateProduct).toHaveBeenCalledWith(1, updateData);
+    expect(productsRepository.updateProduct).toHaveBeenCalledWith(
+      1,
+      updateData
+    );
   });
 
   it('delete: должен удалить продукт', async () => {
-    productsRepository.findProductById.mockResolvedValue({ id: 1, name_ru: 'Товар' } as any);
+    productsRepository.findProductById.mockResolvedValue({
+      id: 1,
+      name_ru: 'Товар',
+    } as any);
     productsRepository.removeProduct.mockResolvedValue(undefined);
 
     await service.delete(1);
-    
+
     expect(productsRepository.removeProduct).toHaveBeenCalledWith(1);
   });
 });

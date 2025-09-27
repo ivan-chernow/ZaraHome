@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PromocodesService } from '../promocodes.service';
 
 type Mock<T> = { [K in keyof T]: jest.Mock<any, any> };
@@ -30,7 +34,9 @@ describe('PromocodesService (unit)', () => {
   describe('create', () => {
     it('ошибка при дублировании кода', async () => {
       repo.findByCode.mockResolvedValue({ code: 'TEST' });
-      await expect(service.create('TEST', 10)).rejects.toBeInstanceOf(ConflictException);
+      await expect(service.create('TEST', 10)).rejects.toBeInstanceOf(
+        ConflictException
+      );
     });
 
     it('успех: создаёт и инвалидирует кеш', async () => {
@@ -43,15 +49,23 @@ describe('PromocodesService (unit)', () => {
 
   describe('validateAndApply', () => {
     it('некорректные входные', async () => {
-      expect(await service.validateAndApply('', 100)).toEqual({ isValid: false, message: expect.any(String) });
-      expect(await service.validateAndApply('A', 0)).toEqual({ isValid: false, message: expect.any(String) });
+      expect(await service.validateAndApply('', 100)).toEqual({
+        isValid: false,
+        message: expect.any(String),
+      });
+      expect(await service.validateAndApply('A', 0)).toEqual({
+        isValid: false,
+        message: expect.any(String),
+      });
     });
 
     it('ошибки условий: не найден, просрочен, minOrderAmount, usage, >100%', async () => {
       repo.findActiveByCode.mockResolvedValue(null);
       expect((await service.validateAndApply('A', 100)).isValid).toBe(false);
 
-      repo.findActiveByCode.mockResolvedValue({ expiresAt: new Date(Date.now() - 1000) });
+      repo.findActiveByCode.mockResolvedValue({
+        expiresAt: new Date(Date.now() - 1000),
+      });
       expect((await service.validateAndApply('A', 100)).isValid).toBe(false);
 
       repo.findActiveByCode.mockResolvedValue({ minOrderAmount: 200 });
@@ -76,21 +90,26 @@ describe('PromocodesService (unit)', () => {
   describe('update/deactivate', () => {
     it('update: 404 если не найден', async () => {
       repo.findByCode.mockResolvedValue(null);
-      await expect(service.update('A', { discount: 10 })).rejects.toBeInstanceOf(NotFoundException);
+      await expect(
+        service.update('A', { discount: 10 })
+      ).rejects.toBeInstanceOf(NotFoundException);
     });
 
     it('update: валидация discount/maxUsage', async () => {
       repo.findByCode.mockResolvedValue({ code: 'A', currentUsage: 0 });
-      await expect(service.update('A', { discount: 0 })).rejects.toBeInstanceOf(BadRequestException);
-      await expect(service.update('A', { maxUsage: 0 })).rejects.toBeInstanceOf(BadRequestException);
+      await expect(service.update('A', { discount: 0 })).rejects.toBeInstanceOf(
+        BadRequestException
+      );
+      await expect(service.update('A', { maxUsage: 0 })).rejects.toBeInstanceOf(
+        BadRequestException
+      );
     });
 
     it('deactivate: 404 если не найден', async () => {
       repo.findByCode.mockResolvedValue(null);
-      await expect(service.deactivate('A')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.deactivate('A')).rejects.toBeInstanceOf(
+        NotFoundException
+      );
     });
   });
 });
-
-
-

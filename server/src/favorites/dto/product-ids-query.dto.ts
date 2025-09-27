@@ -12,7 +12,9 @@ export class ProductIdsQueryDto {
   @IsOptional()
   @Transform(({ value }) => {
     if (value == null || value === '') return [];
-    const stringValue = Array.isArray(value) ? String(value.join(',')) : String(value);
+    const stringValue = Array.isArray(value)
+      ? String(value.join(','))
+      : String(value);
     const ids = stringValue
       .split(',')
       .map((id: string) => Number(String(id).trim()))

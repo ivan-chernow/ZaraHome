@@ -2,7 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ResetPasswordController } from '../reset-password.controller';
 import { ResetPasswordService } from '../reset-password.service';
 import { ResponseService } from 'src/shared/services/response.service';
-import { ResetRequestDto, ResetSetDto, ResetVerifyDto } from '../dto/reset-password.dto';
+import {
+  ResetRequestDto,
+  ResetSetDto,
+  ResetVerifyDto,
+} from '../dto/reset-password.dto';
 
 describe('ResetPasswordController', () => {
   let controller: ResetPasswordController;
@@ -50,7 +54,9 @@ describe('ResetPasswordController', () => {
   describe('request', () => {
     it('should request password reset successfully', async () => {
       const dto: ResetRequestDto = { email: 'test@example.com' };
-      const expectedResponse = { message: 'Код для сброса пароля отправлен на email test@example.com' };
+      const expectedResponse = {
+        message: 'Код для сброса пароля отправлен на email test@example.com',
+      };
 
       mockResetService.requestReset.mockResolvedValue(undefined);
       mockResponseService.success.mockReturnValue(expectedResponse);
@@ -131,7 +137,10 @@ describe('ResetPasswordController', () => {
 
   describe('set', () => {
     it('should set new password successfully', async () => {
-      const dto: ResetSetDto = { token: 'valid-token', password: 'newPassword123' };
+      const dto: ResetSetDto = {
+        token: 'valid-token',
+        password: 'newPassword123',
+      };
       const expectedResponse = { message: 'Пароль успешно изменен' };
 
       mockResetService.setNewPassword.mockResolvedValue(undefined);
@@ -139,7 +148,10 @@ describe('ResetPasswordController', () => {
 
       const result = await controller.set(dto);
 
-      expect(mockResetService.setNewPassword).toHaveBeenCalledWith(dto.token, dto.password);
+      expect(mockResetService.setNewPassword).toHaveBeenCalledWith(
+        dto.token,
+        dto.password
+      );
       expect(mockResponseService.success).toHaveBeenCalledWith(
         undefined,
         'Пароль успешно изменен'

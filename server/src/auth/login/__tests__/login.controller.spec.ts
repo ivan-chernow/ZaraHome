@@ -41,20 +41,32 @@ describe('LoginController (unit)', () => {
 
   describe('login', () => {
     it('успешный логин', async () => {
-      const loginDto: LoginDto = { email: 'test@test.com', password: 'password' };
+      const loginDto: LoginDto = {
+        email: 'test@test.com',
+        password: 'password',
+      };
       const user = { id: 1, email: 'test@test.com' };
       const loginResult = { accessToken: 'token', user };
       const mockRes = { json: jest.fn() } as unknown as Response;
 
       loginService.validateUser.mockResolvedValue(user as any);
       loginService.login.mockResolvedValue(loginResult as any);
-      responseService.success.mockReturnValue({ success: true, message: 'test' });
+      responseService.success.mockReturnValue({
+        success: true,
+        message: 'test',
+      });
 
       await controller.login(loginDto, mockRes);
 
-      expect(loginService.validateUser).toHaveBeenCalledWith('test@test.com', 'password');
+      expect(loginService.validateUser).toHaveBeenCalledWith(
+        'test@test.com',
+        'password'
+      );
       expect(loginService.login).toHaveBeenCalledWith(user, mockRes);
-      expect(responseService.success).toHaveBeenCalledWith(loginResult, 'Успешная авторизация');
+      expect(responseService.success).toHaveBeenCalledWith(
+        loginResult,
+        'Успешная авторизация'
+      );
       expect(mockRes.json).toHaveBeenCalled();
     });
   });
@@ -67,25 +79,42 @@ describe('LoginController (unit)', () => {
       const refreshResult = { accessToken: 'new-token' };
 
       loginService.refreshTokens.mockResolvedValue(refreshResult as any);
-      responseService.success.mockReturnValue({ success: true, message: 'test' });
+      responseService.success.mockReturnValue({
+        success: true,
+        message: 'test',
+      });
 
       await controller.refresh(mockReq, refreshDto, mockRes);
 
-      expect(loginService.refreshTokens).toHaveBeenCalledWith('refresh-token', mockRes);
-      expect(responseService.success).toHaveBeenCalledWith(refreshResult, 'Токены обновлены');
+      expect(loginService.refreshTokens).toHaveBeenCalledWith(
+        'refresh-token',
+        mockRes
+      );
+      expect(responseService.success).toHaveBeenCalledWith(
+        refreshResult,
+        'Токены обновлены'
+      );
     });
 
     it('ошибка при отсутствии refresh token', async () => {
       const refreshDto: RefreshTokenDto = {};
       const mockReq = { cookies: {} } as Request;
-      const mockRes = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
 
-      responseService.error.mockReturnValue({ success: false, message: 'Refresh token is required' });
+      responseService.error.mockReturnValue({
+        success: false,
+        message: 'Refresh token is required',
+      });
 
       await controller.refresh(mockReq, refreshDto, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(responseService.error).toHaveBeenCalledWith('Refresh token is required');
+      expect(responseService.error).toHaveBeenCalledWith(
+        'Refresh token is required'
+      );
     });
   });
 
@@ -95,12 +124,18 @@ describe('LoginController (unit)', () => {
       const mockRes = { json: jest.fn() } as unknown as Response;
 
       loginService.logout.mockResolvedValue({ success: true, message: 'test' });
-      responseService.success.mockReturnValue({ success: true, message: 'test' });
+      responseService.success.mockReturnValue({
+        success: true,
+        message: 'test',
+      });
 
       await controller.logout(mockReq, mockRes);
 
       expect(loginService.logout).toHaveBeenCalledWith(1, mockRes);
-      expect(responseService.success).toHaveBeenCalledWith(undefined, 'Успешный выход');
+      expect(responseService.success).toHaveBeenCalledWith(
+        undefined,
+        'Успешный выход'
+      );
     });
   });
 });
