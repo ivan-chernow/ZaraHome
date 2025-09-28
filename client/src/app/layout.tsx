@@ -3,7 +3,7 @@ import '../../public/assets/styles/globals.css';
 import React from 'react';
 import { Providers } from '@/shared/providers/StoreProvider';
 import { Metadata } from 'next';
-import ClientLayoutWrapper from './ClientLayoutWrapper';
+import ClientLayoutWrapper from '../processes/app/ui/ClientLayoutWrapper';
 
 const inter = Inter({
   subsets: ['latin'],

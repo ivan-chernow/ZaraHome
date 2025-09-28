@@ -2,11 +2,11 @@
 
 import React from 'react';
 import MainLayout from '@/widgets/layout/MainLayout';
-import { HomePageContent } from '@/widgets/home/ui/HomePageContent';
+import { App } from '@/widgets/home/ui/App';
 
 const Home: React.FC = () => (
   <MainLayout>
-    <HomePageContent />
+    <App />
   </MainLayout>
 );
 
