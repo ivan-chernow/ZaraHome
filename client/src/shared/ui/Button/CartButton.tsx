@@ -186,6 +186,9 @@ const CartButton = ({
       onClick={handleClick}
       variant="outlined"
       disabled={false}
+      aria-label={isInCart ? 'Удалить из корзины' : 'Добавить в корзину'}
+      aria-pressed={isInCart}
+      aria-disabled={false}
       sx={{
         backgroundColor: isInCart ? 'white' : 'black',
         borderColor: 'black',
@@ -222,6 +225,7 @@ const CartButton = ({
             src="/assets/img/New%20Clothes/cart.svg"
             width={23}
             height={21}
+            role="presentation"
           />
         ) : undefined
       }

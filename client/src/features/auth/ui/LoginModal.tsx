@@ -10,7 +10,12 @@ const LoginModal = () => {
   const { view } = useSelector((state: RootState) => state.auth);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-[#FFFFFFF2] backdrop-blur-sm ">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 bg-[#FFFFFFF2] backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
       <div>
         {view === 'login' && <LoginForm />}
         {view === 'signup' && <RegisterForm />}

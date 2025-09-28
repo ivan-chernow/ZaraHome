@@ -65,10 +65,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
       hover:-translate-y-1"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      role="article"
+      aria-label={`Товар: ${product.name_ru}`}
     >
       <div
         className="mb-[18px] relative overflow-hidden"
         style={{ width: 'auto', height: 326, background: 'transparent' }}
+        role="img"
+        aria-label={`Изображения товара ${product.name_ru}`}
       >
         <SliderSwiper product={product} isHovered={isHovered} quantity={3} />
         <div
@@ -86,7 +90,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
       </div>
 
-      <div className="flex px-[10px]">
+      <div
+        className="flex px-[10px]"
+        role="group"
+        aria-label="Выбор цвета товара"
+      >
         {Object.entries(product.colors).map(([key, color]) => (
           <Color
             display={isHovered ? 'opacity-100' : 'opacity-0'}
@@ -112,6 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         cursor-pointer
         px-[10px]
       "
+        aria-label={`Перейти к товару ${product.name_ru}`}
       >
         {product.name_eng}
       </Link>
@@ -137,6 +146,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         mt-4
         px-[10px]
       "
+        role="group"
+        aria-label="Цена и действия с товаром"
       >
         <p
           className="
@@ -146,6 +157,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           flex
           items-baseline
         "
+          aria-label={`Цена: ${Object.values(product.size)[0]?.price?.toLocaleString('ru-RU') || '-'} рублей`}
         >
           {Object.values(product.size)[0]?.price?.toLocaleString('ru-RU') ||
             '-'}{' '}

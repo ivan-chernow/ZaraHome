@@ -98,6 +98,9 @@ const LoginForm = () => {
         <div
           className={`w-[413px] pb-[28px] bg-white drop-shadow-lg inset-0 relative flex flex-col items-center justify-start pt-[31px]`}
           ref={modalRef}
+          id="modal-title"
+          role="document"
+          aria-labelledby="login-title"
         >
           <CloseIconCart />
           <Image
@@ -106,15 +109,23 @@ const LoginForm = () => {
             width={19}
             height={20}
             className="mb-[20px]"
+            role="presentation"
           />
           <div className="mb-[25px] flex items-center justify-center">
             <HorizontalLine width="125px" />
-            <p className="font-medium text-[#0000004D] px-[12px]">Войти</p>
+            <p
+              className="font-medium text-[#0000004D] px-[12px]"
+              id="login-title"
+            >
+              Войти
+            </p>
             <HorizontalLine width="125px" />
           </div>
           <form
             className="flex flex-col w-[359px]"
             onSubmit={handleSubmit(onSubmit)}
+            role="form"
+            aria-label="Форма входа"
           >
             <label
               htmlFor="email"
@@ -134,6 +145,8 @@ const LoginForm = () => {
               fullWidth
               margin="normal"
               disabled={isLoading}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              aria-invalid={!!errors.email}
             />
 
             <label
@@ -151,6 +164,8 @@ const LoginForm = () => {
               fullWidth
               margin="normal"
               disabled={isLoading}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              aria-invalid={!!errors.password}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -201,6 +216,15 @@ const LoginForm = () => {
           <p
             className="underline mt-[13px] cursor-pointer hover:no-underline hover:text-gray-500 transition-all ease-in-out duration-200"
             onClick={() => dispatch(setView('resetPassword'))}
+            role="button"
+            tabIndex={0}
+            aria-label="Забыли свой пароль? Перейти к восстановлению пароля"
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                dispatch(setView('resetPassword'));
+              }
+            }}
           >
             Забыли свой пароль?
           </p>

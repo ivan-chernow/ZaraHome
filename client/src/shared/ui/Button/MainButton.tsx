@@ -27,6 +27,9 @@ const MainButton: React.FC<MainButtonProps> = ({
       onClick={onClick}
       type={type}
       fullWidth
+      aria-label={text}
+      aria-pressed={active}
+      aria-disabled={disabled}
       sx={{
         color: active ? 'black' : 'white',
         backgroundColor: active ? 'white' : 'black',

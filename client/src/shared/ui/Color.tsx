@@ -20,6 +20,16 @@ const Color = ({ display, color, onClick, isActive }: ColorsProps) => {
         ${isActive ? 'ring-2 ring-black scale-110 drop-shadow-lg' : ''}
       `}
       style={{ borderRadius: '100%' }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Выбрать цвет ${color}`}
+      aria-pressed={isActive}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
     >
       <div
         className="relative w-[18px] h-[18px] cursor-pointer"

@@ -37,11 +37,22 @@ const NavMenu = () => {
     <div className="relative" onMouseLeave={handleMouseLeave}>
       <section className="py-[20px]">
         <Container maxWidth="lg">
-          <nav>
-            <ul className="flex items-center justify-center">
+          <nav role="navigation" aria-label="Главное меню">
+            <ul className="flex items-center justify-center" role="menubar">
               <li
                 className="mr-[15px] cursor-pointer hover:text-[#00000080] hover:duration-200 hover:ease-in"
                 onMouseEnter={() => dispatch(toggleAllProducts(true))}
+                role="menuitem"
+                aria-haspopup="true"
+                aria-expanded={isOpenAllProducts}
+                tabIndex={0}
+                aria-label="Все товары"
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dispatch(toggleAllProducts(true));
+                  }
+                }}
               >
                 <p className="text-[18px] cursor-pointer">Все товары</p>
               </li>
@@ -49,18 +60,51 @@ const NavMenu = () => {
               <li
                 className="mr-[15px] cursor-pointer hover:text-[#00000080] hover:duration-200 hover:ease-in"
                 onMouseEnter={() => dispatch(toggleDiscounts(true))}
+                role="menuitem"
+                aria-haspopup="true"
+                aria-expanded={isOpenDiscounts}
+                tabIndex={0}
+                aria-label="Скидки"
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dispatch(toggleDiscounts(true));
+                  }
+                }}
               >
                 <p className="text-[18px] cursor-pointer">Скидки</p>
               </li>
               <li
                 className="mr-[15px] cursor-pointer hover:text-[#00000080] hover:duration-200 hover:ease-in"
                 onMouseEnter={() => dispatch(toggleNewProducts(true))}
+                role="menuitem"
+                aria-haspopup="true"
+                aria-expanded={isOpenNewProducts}
+                tabIndex={0}
+                aria-label="Новинки"
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dispatch(toggleNewProducts(true));
+                  }
+                }}
               >
                 <p className="text-[18px] cursor-pointer">Новинки</p>
               </li>
               <li
                 className="mr-[15px] cursor-pointer hover:text-[#00000080] hover:duration-200 hover:ease-in"
                 onMouseEnter={() => dispatch(toggleInformation(true))}
+                role="menuitem"
+                aria-haspopup="true"
+                aria-expanded={isOpenInformation}
+                tabIndex={0}
+                aria-label="Информация"
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dispatch(toggleInformation(true));
+                  }
+                }}
               >
                 <p className="text-[18px] cursor-pointer">Информация</p>
               </li>
@@ -70,7 +114,11 @@ const NavMenu = () => {
       </section>
 
       {/* Выпадающее меню */}
-      <div className="absolute left-0 w-full z-50">
+      <div
+        className="absolute left-0 w-full z-50"
+        role="menu"
+        aria-label="Подменю"
+      >
         {isOpenAllProducts && (
           <div
             className="w-full"

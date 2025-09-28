@@ -24,7 +24,11 @@ const PaginationBlock: React.FC<PaginationBlockProps> = ({
   }
 
   return (
-    <div className={`flex justify-center mt-8 ${className}`}>
+    <div
+      className={`flex justify-center mt-8 ${className}`}
+      role="navigation"
+      aria-label="Пагинация"
+    >
       <Pagination
         count={count}
         page={page}
@@ -34,6 +38,7 @@ const PaginationBlock: React.FC<PaginationBlockProps> = ({
         variant={variant}
         siblingCount={1}
         boundaryCount={1}
+        aria-label="Навигация по страницам"
         sx={{
           '& .MuiPagination-ul': {
             justifyContent: 'center',
