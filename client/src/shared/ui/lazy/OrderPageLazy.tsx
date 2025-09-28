@@ -5,9 +5,9 @@ import LazyPage from '../LazyPage';
 import MainLayout from '@/widgets/layout/MainLayout';
 
 // Ленивая загрузка тяжелого компонента заказов
-const OrderPageContent = lazy(() => 
+const OrderPageContent = lazy(() =>
   import('@/widgets/order/ui/OrderPageContent').then(module => ({
-    default: module.OrderPageContent
+    default: module.OrderPageContent,
   }))
 );
 

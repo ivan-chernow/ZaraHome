@@ -10,7 +10,7 @@ export const usePreloadPage = () => {
     link.rel = 'prefetch';
     link.href = pagePath;
     link.as = 'document';
-    
+
     // Добавляем в head только если еще не добавлен
     if (!document.querySelector(`link[href="${pagePath}"]`)) {
       document.head.appendChild(link);
@@ -36,11 +36,14 @@ export const usePreloadPage = () => {
 export const useNavigationPreload = () => {
   const { preloadPage, preloadComponent } = usePreloadPage();
 
-  const preloadProductPage = useCallback((productId: string) => {
-    preloadPage(`/products/${productId}`);
-    // Предзагружаем компонент страницы товара
-    preloadComponent(() => import('@/shared/ui/lazy/ProductPageLazy'));
-  }, [preloadPage, preloadComponent]);
+  const preloadProductPage = useCallback(
+    (productId: string) => {
+      preloadPage(`/products/${productId}`);
+      // Предзагружаем компонент страницы товара
+      preloadComponent(() => import('@/shared/ui/lazy/ProductPageLazy'));
+    },
+    [preloadPage, preloadComponent]
+  );
 
   const preloadCartPage = useCallback(() => {
     preloadPage('/cart');

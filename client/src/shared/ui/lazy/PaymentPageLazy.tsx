@@ -5,9 +5,9 @@ import LazyPage from '../LazyPage';
 import MainLayout from '@/widgets/layout/MainLayout';
 
 // Ленивая загрузка тяжелого компонента оплаты
-const PaymentPageContent = lazy(() => 
+const PaymentPageContent = lazy(() =>
   import('@/widgets/payment/ui/PaymentPageContent').then(module => ({
-    default: module.PaymentPageContent
+    default: module.PaymentPageContent,
   }))
 );
 

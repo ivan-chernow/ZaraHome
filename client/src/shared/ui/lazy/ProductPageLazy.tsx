@@ -4,9 +4,9 @@ import { lazy } from 'react';
 import LazyPage from '../LazyPage';
 
 // Ленивая загрузка тяжелого компонента страницы товара
-const ProductPageContent = lazy(() => 
+const ProductPageContent = lazy(() =>
   import('@/widgets/product/ui/ProductPageContent').then(module => ({
-    default: module.ProductPageContent
+    default: module.ProductPageContent,
   }))
 );
 

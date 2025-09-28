@@ -11,15 +11,11 @@ interface LazyPageProps {
 /**
  * Компонент для ленивой загрузки страниц с fallback
  */
-const LazyPage: React.FC<LazyPageProps> = ({ 
-  children, 
-  fallback = <PageSkeleton /> 
+const LazyPage: React.FC<LazyPageProps> = ({
+  children,
+  fallback = <PageSkeleton />,
 }) => {
-  return (
-    <Suspense fallback={fallback}>
-      {children}
-    </Suspense>
-  );
+  return <Suspense fallback={fallback}>{children}</Suspense>;
 };
 
 /**

@@ -5,9 +5,9 @@ import LazyPage from '../LazyPage';
 import MainLayout from '@/widgets/layout/MainLayout';
 
 // Ленивая загрузка тяжелого компонента корзины
-const CartPageContent = lazy(() => 
+const CartPageContent = lazy(() =>
   import('@/widgets/cart/ui/CartPageContent').then(module => ({
-    default: module.CartPageContent
+    default: module.CartPageContent,
   }))
 );
 
