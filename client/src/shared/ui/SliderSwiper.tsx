@@ -83,6 +83,7 @@ const SliderSwiper: React.FC<SliderSwiperProps> = ({
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               draggable={false}
               priority={idx === 0}
+              loading={idx === 0 ? 'eager' : 'lazy'}
             />
             <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
           </div>

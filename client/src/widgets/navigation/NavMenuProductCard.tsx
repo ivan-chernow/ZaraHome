@@ -35,6 +35,7 @@ const NavMenuProductCard: React.FC<NavMenuProductCardProps> = ({ product }) => {
               width={300}
               height={300}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
             />
           </div>
 

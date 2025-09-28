@@ -226,6 +226,7 @@ const CartButton = ({
             width={23}
             height={21}
             role="presentation"
+            loading="lazy"
           />
         ) : undefined
       }

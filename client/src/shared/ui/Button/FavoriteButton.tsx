@@ -108,6 +108,7 @@ const FavoriteIcon: React.FC<{ size: number }> = React.memo(({ size }) => (
     width={size}
     height={size}
     className="transition-transform duration-200 hover:scale-110"
+    loading="lazy"
   />
 ));
 

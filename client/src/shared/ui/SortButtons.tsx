@@ -35,6 +35,7 @@ const SortButtons: React.FC<SortButtonsProps> = ({
           width={24}
           height={24}
           role="presentation"
+          loading="lazy"
         />
         <p className="text-[14px] font-semibold mr-[3px]">Сначала дешевые</p>
       </button>
@@ -52,6 +53,7 @@ const SortButtons: React.FC<SortButtonsProps> = ({
           width={24}
           height={24}
           role="presentation"
+          loading="lazy"
         />
         <p className="text-[14px] font-semibold mr-[5px]">Добавлены позже</p>
       </button>

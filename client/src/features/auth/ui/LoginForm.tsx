@@ -110,6 +110,7 @@ const LoginForm = () => {
             height={20}
             className="mb-[20px]"
             role="presentation"
+            loading="lazy"
           />
           <div className="mb-[25px] flex items-center justify-center">
             <HorizontalLine width="125px" />
