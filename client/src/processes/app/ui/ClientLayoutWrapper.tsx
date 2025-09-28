@@ -5,6 +5,7 @@ import NavigationProgress from '@/shared/ui/NavigationProgress';
 import AuthCheck from '@/processes/session/init-auth-check/ui/AuthCheck';
 import { useSelector } from 'react-redux';
 import LoginModal from '@/features/auth/ui/LoginModal';
+import MainLayout from '@/widgets/layout/MainLayout';
 import { RootState } from '@/shared/config/store/store';
 
 interface ClientLayoutWrapperProps {
@@ -21,7 +22,9 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({
       {isOpenAuth && <LoginModal />}
       <NavigationProgress />
       <AuthCheck />
-      {children}
+      <MainLayout>
+        {children}
+      </MainLayout>
     </>
   );
 };

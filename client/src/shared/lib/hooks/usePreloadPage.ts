@@ -40,24 +40,24 @@ export const useNavigationPreload = () => {
     (productId: string) => {
       preloadPage(`/products/${productId}`);
       // Предзагружаем компонент страницы товара
-      preloadComponent(() => import('@/shared/ui/lazy/ProductPageLazy'));
+      preloadComponent(() => import('@/widgets/product/ui/ProductPageContent'));
     },
     [preloadPage, preloadComponent]
   );
 
   const preloadCartPage = useCallback(() => {
     preloadPage('/cart');
-    preloadComponent(() => import('@/shared/ui/lazy/CartPageLazy'));
+    preloadComponent(() => import('@/widgets/cart/ui/CartPageContent'));
   }, [preloadPage, preloadComponent]);
 
   const preloadProfilePage = useCallback(() => {
     preloadPage('/profile');
-    preloadComponent(() => import('@/shared/ui/lazy/ProfilePageLazy'));
+    preloadComponent(() => import('@/widgets/profile/ui/ProfilePageContent'));
   }, [preloadPage, preloadComponent]);
 
   const preloadOrderPage = useCallback(() => {
     preloadPage('/order');
-    preloadComponent(() => import('@/shared/ui/lazy/OrderPageLazy'));
+    preloadComponent(() => import('@/widgets/order/ui/OrderPageContent'));
   }, [preloadPage, preloadComponent]);
 
   return {

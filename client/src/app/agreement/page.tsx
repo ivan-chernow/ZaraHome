@@ -1,13 +1,33 @@
 'use client';
 
-import React from 'react';
-import MainLayout from '@/widgets/layout/MainLayout';
-import { TermsOfService } from '@/widgets/agreement/ui/TermsOfService';
+import React, { lazy, Suspense } from 'react';
+import { Skeleton } from '@mui/material';
+
+// Ленивая загрузка страницы соглашения
+const TermsOfService = lazy(() => 
+  import('@/widgets/agreement/ui/TermsOfService').then(module => ({ 
+    default: module.TermsOfService 
+  }))
+);
+
+// Скелетон для загрузки
+const AgreementSkeleton = () => (
+  <div className="min-h-screen bg-gray-50">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Skeleton variant="text" width="50%" height={60} className="mb-6" />
+      <div className="space-y-4">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} variant="text" width="100%" height={20} />
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const TermsOfServicePage: React.FC = () => (
-  <MainLayout>
+  <Suspense fallback={<AgreementSkeleton />}>
     <TermsOfService />
-  </MainLayout>
+  </Suspense>
 );
 
 export default TermsOfServicePage;
