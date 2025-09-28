@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { setView } from '@/features/auth/model/auth.slice';
 
-const ArrowBackIconCart: React.FC = () => {
+const ArrowBackIconCart: React.FC = React.memo(() => {
   const dispatch = useDispatch();
   return (
     <div
@@ -22,6 +22,8 @@ const ArrowBackIconCart: React.FC = () => {
       <ArrowBackIcon fontSize="small" />
     </div>
   );
-};
+});
+
+ArrowBackIconCart.displayName = 'ArrowBackIconCart';
 
 export default ArrowBackIconCart;

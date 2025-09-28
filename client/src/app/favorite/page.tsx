@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы избранного
-const FavoritePageContent = lazy(() => 
-  import('@/widgets/favorite/ui/FavoritePageContent').then(module => ({ 
-    default: module.FavoritePageContent 
+const FavoritePageContent = lazy(() =>
+  import('@/widgets/favorite/ui/FavoritePageContent').then(module => ({
+    default: module.FavoritePageContent,
   }))
 );
 

@@ -60,9 +60,10 @@ const MyOrders: React.FC = () => {
     }
 
     // Очистка при размонтировании компонента
+    const timers = timersRef.current;
     return () => {
-      timersRef.current.forEach(timer => clearTimeout(timer));
-      timersRef.current.clear();
+      timers.forEach(timer => clearTimeout(timer));
+      timers.clear();
     };
   }, [orders, currentTime]);
 

@@ -1,6 +1,7 @@
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-const HomeIcon: React.FC = () => {
+const HomeIcon: React.FC = React.memo(() => {
   const router = useRouter();
   return (
     <HomeOutlinedIcon
@@ -18,6 +19,8 @@ const HomeIcon: React.FC = () => {
       }}
     />
   );
-};
+});
+
+HomeIcon.displayName = 'HomeIcon';
 
 export default HomeIcon;

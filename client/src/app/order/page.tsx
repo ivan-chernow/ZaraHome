@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы заказа
-const OrderPageContent = lazy(() => 
-  import('@/widgets/order/ui/OrderPageContent').then(module => ({ 
-    default: module.OrderPageContent 
+const OrderPageContent = lazy(() =>
+  import('@/widgets/order/ui/OrderPageContent').then(module => ({
+    default: module.OrderPageContent,
   }))
 );
 

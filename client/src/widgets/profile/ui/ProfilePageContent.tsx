@@ -16,7 +16,7 @@ import { RootState } from '@/shared/config/store/store';
 import { setActiveView } from '@/features/profile/model/profile.slice';
 import { useRestoreActiveView } from '@/shared/lib/hooks/useRestoreActiveView';
 
-export const ProfilePageContent: React.FC = () => {
+export const ProfilePageContent: React.FC = React.memo(() => {
   const dispatch = useDispatch();
   const { activeView } = useSelector((state: RootState) => state.profile);
   const router = useRouter();
@@ -128,6 +128,8 @@ export const ProfilePageContent: React.FC = () => {
       </div>
     </Container>
   );
-};
+});
+
+ProfilePageContent.displayName = 'ProfilePageContent';
 
 export default ProfilePageContent;

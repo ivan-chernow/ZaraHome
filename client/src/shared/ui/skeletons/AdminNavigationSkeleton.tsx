@@ -3,7 +3,7 @@ import HomeIcon from '@/shared/ui/HomeIcon';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 
-const AdminNavigationSkeleton: React.FC = () => {
+const AdminNavigationSkeleton: React.FC = React.memo(() => {
   return (
     <div>
       {/* Breadcrumb - отображаем сразу, без скелетона */}
@@ -63,6 +63,8 @@ const AdminNavigationSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+AdminNavigationSkeleton.displayName = 'AdminNavigationSkeleton';
 
 export default AdminNavigationSkeleton;

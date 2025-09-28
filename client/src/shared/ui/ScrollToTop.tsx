@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const ScrollToTop: React.FC = () => {
+const ScrollToTop: React.FC = React.memo(() => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -78,6 +78,8 @@ const ScrollToTop: React.FC = () => {
       )}
     </AnimatePresence>
   );
-};
+});
+
+ScrollToTop.displayName = 'ScrollToTop';
 
 export default ScrollToTop;

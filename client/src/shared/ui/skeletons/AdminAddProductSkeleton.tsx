@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AdminAddProductSkeleton: React.FC = () => {
+const AdminAddProductSkeleton: React.FC = React.memo(() => {
   return (
     <div className="animate-pulse">
       <div className="max-w-[1200px] mx-auto p-6">
@@ -67,6 +67,8 @@ const AdminAddProductSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+AdminAddProductSkeleton.displayName = 'AdminAddProductSkeleton';
 
 export default AdminAddProductSkeleton;

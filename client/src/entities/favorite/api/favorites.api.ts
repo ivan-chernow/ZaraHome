@@ -30,15 +30,7 @@ export const favoritesApi = createApi({
       query: productIds =>
         `/favorites/status?productIds=${productIds.join(',')}`,
     }),
-    getProductsByIds: builder.query<Product[], number[]>({
-      query: ids => {
-        if (!ids || ids.length === 0) {
-          return '/products?ids=empty';
-        }
-        return `/products?ids=${ids.join(',')}`;
-      },
-      keepUnusedDataFor: 300,
-    }),
+    // Удален дублированный endpoint - используем productsApi
   }),
 });
 
@@ -47,5 +39,4 @@ export const {
   useAddToFavoritesMutation,
   useRemoveFromFavoritesMutation,
   useLazyGetFavoriteStatusQuery,
-  useGetProductsByIdsQuery,
 } = favoritesApi;

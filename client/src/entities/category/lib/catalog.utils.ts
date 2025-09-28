@@ -38,26 +38,58 @@ export function getProductsByType(type?: Type): Product[] {
   return type?.products || [];
 }
 
+// Кеш для всех товаров
+let productsCache: Product[] | null = null;
+let categoriesCache: Category[] | null = null;
+
 export function getAllProducts(categories?: Category[]): Product[] {
   if (!categories || !Array.isArray(categories)) {
     return [];
+  }
+
+  // Проверяем кеш
+  if (productsCache && categoriesCache === categories) {
+    return productsCache;
   }
 
   const allProducts = categories.reduce<Product[]>((acc, category) => {
     return [...acc, ...getProductsByCategory(category)];
   }, []);
 
-  return allProducts.filter(
+  const uniqueProducts = allProducts.filter(
     (product, index, self) => index === self.findIndex(p => p.id === product.id)
   );
+
+  // Обновляем кеш
+  productsCache = uniqueProducts;
+  categoriesCache = categories;
+
+  return uniqueProducts;
 }
+
+// Кеш для поиска товаров по ID
+const productByIdCache = new Map<string, Product>();
 
 export function findProductById(
   categories: Category[] = [],
   id: number | string
 ): Product | undefined {
+  const idStr = id.toString();
+
+  // Проверяем кеш
+  if (productByIdCache.has(idStr)) {
+    return productByIdCache.get(idStr);
+  }
+
   const allProducts = getAllProducts(categories);
-  return allProducts.find(product => product.id.toString() === id.toString());
+  const product = allProducts.find(product => product.id.toString() === idStr);
+
+  // Сохраняем в кеш
+  if (product) {
+    productByIdCache.set(idStr, product);
+  }
+
+  return product;
 }
 
 export const findProductPathById = (

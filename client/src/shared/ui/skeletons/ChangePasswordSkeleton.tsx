@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChangePasswordSkeleton: React.FC = () => {
+const ChangePasswordSkeleton: React.FC = React.memo(() => {
   return (
     <div className="animate-pulse">
       <div className="max-w-[1200px] mx-auto p-6">
@@ -37,6 +37,8 @@ const ChangePasswordSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+ChangePasswordSkeleton.displayName = 'ChangePasswordSkeleton';
 
 export default ChangePasswordSkeleton;

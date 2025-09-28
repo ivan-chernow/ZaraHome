@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-const NavMenuProductCardSkeleton: React.FC = () => {
+const NavMenuProductCardSkeleton: React.FC = React.memo(() => {
   return (
     <div className="animate-pulse">
       <div className="aspect-square w-full rounded-lg bg-gray-200" />
@@ -13,6 +13,8 @@ const NavMenuProductCardSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+NavMenuProductCardSkeleton.displayName = 'NavMenuProductCardSkeleton';
 
 export default NavMenuProductCardSkeleton;

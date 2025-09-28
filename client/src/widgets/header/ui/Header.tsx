@@ -22,7 +22,7 @@ import {
 import { useGetCartQuery } from '@/entities/cart/api/cart.api';
 import { setCartItems } from '@/entities/cart/model/cartItems.slice';
 
-const Header: React.FC = () => {
+const Header: React.FC = React.memo(() => {
   const pathname = usePathname();
   const dispatch: AppDispatch = useDispatch();
   const { isOpenCart } = useSelector((state: RootState) => state.cart);
@@ -50,10 +50,10 @@ const Header: React.FC = () => {
       const toItems = serverCart.map(p => ({
         id: p.id,
         price: (() => {
-          const sizes = p.size as any;
+          const sizes = p.size as Record<string, { price: number }> | undefined;
           const first =
             sizes && typeof sizes === 'object'
-              ? (Object.values(sizes)[0] as any)
+              ? (Object.values(sizes)[0] as { price: number } | undefined)
               : null;
           return first && typeof first.price === 'number' ? first.price : 0;
         })(),
@@ -229,6 +229,8 @@ const Header: React.FC = () => {
       </div>
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';
 
 export default Header;

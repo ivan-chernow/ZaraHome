@@ -8,24 +8,22 @@ interface PaginationStatsProps {
   className?: string;
 }
 
-const PaginationStats: React.FC<PaginationStatsProps> = ({
-  currentPage,
-  totalPages,
-  totalItems,
-  pageSize,
-  className = '',
-}) => {
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(currentPage * pageSize, totalItems);
+const PaginationStats: React.FC<PaginationStatsProps> = React.memo(
+  ({ currentPage, totalPages, totalItems, pageSize, className = '' }) => {
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
 
-  return (
-    <div className={`text-center text-sm text-gray-600 ${className}`}>
-      <p>
-        Показано {startItem}-{endItem} из {totalItems} товаров
-        {totalPages > 1 && ` (страница ${currentPage} из ${totalPages})`}
-      </p>
-    </div>
-  );
-};
+    return (
+      <div className={`text-center text-sm text-gray-600 ${className}`}>
+        <p>
+          Показано {startItem}-{endItem} из {totalItems} товаров
+          {totalPages > 1 && ` (страница ${currentPage} из ${totalPages})`}
+        </p>
+      </div>
+    );
+  }
+);
+
+PaginationStats.displayName = 'PaginationStats';
 
 export default PaginationStats;

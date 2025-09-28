@@ -96,7 +96,7 @@ const CartPageItem: React.FC<CartPageItemProps> = ({
       })
     );
     setInputValue(String(numeric));
-  }, [dispatch, inputValue, item.id, item.quantity]);
+  }, [dispatch, inputValue, item.id, item.quantity, item.color, item.size]);
 
   return (
     <li className="flex items-center justify-between py-4">

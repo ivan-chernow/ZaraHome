@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, memo, useMemo } from 'react';
 import Image from 'next/image';
 import CloseIcon from '@mui/icons-material/Close';
 import { CartItem as CartItemType } from '@/entities/cart/model/cartItems.slice';
@@ -29,7 +29,7 @@ const getFullImageUrl = (path?: string): string | undefined => {
   }
 };
 
-const CartItem = ({ item, isLast }: CartItemProps) => {
+const CartItem = memo(({ item, isLast }: CartItemProps) => {
   const dispatch = useDispatch();
   const categories = useSelector(
     (state: RootState) => state.catalog.categories
@@ -37,9 +37,14 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
-  const product = findProductById(categories, item.id);
   const [removeFromCart] = useRemoveFromCartMutation();
   const cartItems = useSelector((state: RootState) => state.cartItems.items);
+
+  // Мемоизируем поиск продукта
+  const product = useMemo(
+    () => findProductById(categories, item.id),
+    [categories, item.id]
+  );
 
   const handleDelete = useCallback(async () => {
     // Оптимистично удаляем конкретную вариацию из Redux
@@ -158,6 +163,8 @@ const CartItem = ({ item, isLast }: CartItemProps) => {
       )}
     </li>
   );
-};
+});
+
+CartItem.displayName = 'CartItem';
 
 export default CartItem;

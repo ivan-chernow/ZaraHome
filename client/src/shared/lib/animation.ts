@@ -5,7 +5,6 @@ export const categoryAnimation = {
     height: 'auto',
     transition: {
       duration: 0.3,
-      ease: 'easeInOut',
     },
   },
   exit: {
@@ -13,7 +12,6 @@ export const categoryAnimation = {
     height: 0,
     transition: {
       duration: 0.2,
-      ease: 'easeIn',
     },
   },
 };
@@ -25,7 +23,6 @@ export const subCategoryAnimation = {
     height: 'auto',
     transition: {
       duration: 0.25,
-      ease: 'easeOut',
     },
   },
   exit: {
@@ -33,7 +30,6 @@ export const subCategoryAnimation = {
     height: 0,
     transition: {
       duration: 0.15,
-      ease: 'easeIn',
     },
   },
 };

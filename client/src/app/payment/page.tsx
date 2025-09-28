@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы платежа
-const PaymentPageContent = lazy(() => 
-  import('@/widgets/payment/ui/PaymentPageContent').then(module => ({ 
-    default: module.PaymentPageContent 
+const PaymentPageContent = lazy(() =>
+  import('@/widgets/payment/ui/PaymentPageContent').then(module => ({
+    default: module.PaymentPageContent,
   }))
 );
 

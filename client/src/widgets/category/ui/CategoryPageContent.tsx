@@ -1,5 +1,6 @@
 'use client';
 import React, { use, useEffect, useMemo, useRef } from 'react';
+import Image from 'next/image';
 import ProductCard from '@/entities/product/ui/ProductCard';
 import HomeIcon from '@/shared/ui/HomeIcon';
 import { useGetCatalogQuery } from '@/entities/product/api/products.api';
@@ -192,7 +193,7 @@ export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({
                 }`}
                 onClick={handleSortByPrice}
               >
-                <img
+                <Image
                   src="/assets/img/Catalog/cheap.png"
                   alt="cheap"
                   width={24}
@@ -210,7 +211,7 @@ export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({
                 }`}
                 onClick={handleSortByDate}
               >
-                <img
+                <Image
                   src="/assets/img/Catalog/Time_later.svg"
                   alt="later"
                   width={24}

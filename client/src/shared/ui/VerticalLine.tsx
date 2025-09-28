@@ -4,7 +4,7 @@ interface VerticalLineProps {
   height: string | number;
 }
 
-const VerticalLine: React.FC<VerticalLineProps> = ({ height }) => {
+const VerticalLine: React.FC<VerticalLineProps> = React.memo(({ height }) => {
   return (
     <span
       style={{ height }}
@@ -12,6 +12,8 @@ const VerticalLine: React.FC<VerticalLineProps> = ({ height }) => {
       aria-hidden="true"
     />
   );
-};
+});
+
+VerticalLine.displayName = 'VerticalLine';
 
 export default VerticalLine;

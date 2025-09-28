@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { getProductsBySubCategory } from '@/entities/category/lib/catalog.utils';
 import { useSorting } from '@/shared/lib/hooks/useSorting';
 import SortButtons from '@/shared/ui/SortButtons';
-import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSceleton';
+import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSkeleton';
 
 interface SubCategoryPageContentProps {
   params: Promise<{ category: string; subCategory: string }>;

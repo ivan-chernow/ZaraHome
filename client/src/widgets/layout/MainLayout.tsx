@@ -10,7 +10,7 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC<MainLayoutProps> = React.memo(({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -22,6 +22,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <ScrollToTop />
     </div>
   );
-};
+});
+
+MainLayout.displayName = 'MainLayout';
 
 export default MainLayout;

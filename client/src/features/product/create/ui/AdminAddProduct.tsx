@@ -85,7 +85,7 @@ const _unused_compressImage = (file: File): Promise<string> => {
   });
 };
 
-const AdminAddProduct = () => {
+const AdminAddProduct = React.memo(() => {
   const { data: catalog, isLoading: isCatalogLoading } = useGetCatalogQuery();
   const [category, setCategory] = useState<string>('');
   const [subCategory, setSubCategory] = useState<string>('');
@@ -340,7 +340,7 @@ const AdminAddProduct = () => {
         formData.append('images', file);
       });
 
-      await addProduct(formData).unwrap();
+      await addProduct(formData as any).unwrap();
 
       setSnackbar({
         open: true,
@@ -886,6 +886,8 @@ const AdminAddProduct = () => {
       </div>
     </Fade>
   );
-};
+});
+
+AdminAddProduct.displayName = 'AdminAddProduct';
 
 export default AdminAddProduct;

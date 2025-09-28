@@ -66,7 +66,14 @@ const CatalogAccordion = () => {
         dispatch(expandSubCategory(sub.id.toString()));
       }
     }
-  }, [categories, isLoading, urlParts, dispatch]); // Убрали expandedCategories и expandedSubCategories из зависимостей
+  }, [
+    categories,
+    isLoading,
+    urlParts,
+    dispatch,
+    expandedCategories,
+    expandedSubCategories,
+  ]);
 
   return (
     <div className="max-w-[294px] relative">

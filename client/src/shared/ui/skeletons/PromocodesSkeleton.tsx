@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PromocodesSkeleton: React.FC = () => {
+const PromocodesSkeleton: React.FC = React.memo(() => {
   return (
     <div className="animate-pulse">
       <div className="max-w-[1200px] mx-auto p-6">
@@ -67,6 +67,8 @@ const PromocodesSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+PromocodesSkeleton.displayName = 'PromocodesSkeleton';
 
 export default PromocodesSkeleton;

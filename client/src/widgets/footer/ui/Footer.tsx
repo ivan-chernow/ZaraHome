@@ -9,7 +9,7 @@ import { catalog } from 'public/assets/data/catalog';
 import Link from 'next/link';
 import slugify from 'slugify';
 
-const Footer: React.FC = () => {
+const Footer: React.FC = React.memo(() => {
   const router = useRouter();
 
   const customSlugify = (text: string) =>
@@ -109,6 +109,8 @@ const Footer: React.FC = () => {
       </Container>
     </footer>
   );
-};
+});
+
+Footer.displayName = 'Footer';
 
 export default Footer;

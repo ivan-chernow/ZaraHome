@@ -10,7 +10,7 @@ interface FormInputs {
   newEmail: string;
 }
 
-const ChangeEmail = () => {
+const ChangeEmail = React.memo(() => {
   const {
     register,
     handleSubmit,
@@ -25,7 +25,6 @@ const ChangeEmail = () => {
 
   const onSubmit = async (data: FormInputs) => {
     await changeEmail({
-      email: data.email,
       newEmail: data.newEmail,
     });
   };
@@ -105,6 +104,8 @@ const ChangeEmail = () => {
       </div>
     </Fade>
   );
-};
+});
+
+ChangeEmail.displayName = 'ChangeEmail';
 
 export default ChangeEmail;

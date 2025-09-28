@@ -5,7 +5,7 @@ import Container from '@mui/material/Container';
 import { useGetCatalogQuery } from '@/entities/product/api/products.api';
 import { getAllProducts } from '@/entities/category/lib/catalog.utils';
 import slugify from 'slugify';
-import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSceleton';
+import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSkeleton';
 
 const NewClothes: React.FC = () => {
   const { data: categories, isLoading } = useGetCatalogQuery();

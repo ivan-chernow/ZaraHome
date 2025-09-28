@@ -8,7 +8,7 @@ import { RootState } from '@/shared/config/store/store';
 import { useGetFavoritesQuery } from '@/entities/favorite/api/favorites.api';
 import { useGetCatalogQuery } from '@/entities/product/api/products.api';
 import { getAllProducts } from '@/entities/category/lib/catalog.utils';
-import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSceleton';
+import { ProductCardSkeleton } from '@/entities/product/ui/ProductCardSkeleton';
 import { getLocalStorage } from '@/shared/lib/storage';
 import { setFavorites } from '@/entities/favorite/model/favorites.slice';
 

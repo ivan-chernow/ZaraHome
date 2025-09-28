@@ -1,7 +1,7 @@
 'use client';
 
 // Импортируем необходимые хуки и экшены
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/shared/config/store/store';
 import { setFavorites } from '@/entities/favorite/model/favorites.slice';
@@ -22,7 +22,7 @@ import type { Product } from '@/entities/product/api/products.api';
  * - Не выполняет автоматическую авторизацию
  * - Только инициализирует локальные состояния в redux для гостей
  */
-const AuthCheck: React.FC = () => {
+const AuthCheck: React.FC = React.memo(() => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth
@@ -91,10 +91,10 @@ const AuthCheck: React.FC = () => {
         id: p.id,
         // Берем первую цену из size, если есть
         price: (() => {
-          const sizes = p.size as any;
+          const sizes = p.size as Record<string, { price: number }> | undefined;
           const first =
             sizes && typeof sizes === 'object'
-              ? (Object.values(sizes)[0] as any)
+              ? (Object.values(sizes)[0] as { price: number } | undefined)
               : null;
           return first && typeof first.price === 'number' ? first.price : 0;
         })(),
@@ -117,7 +117,14 @@ const AuthCheck: React.FC = () => {
       ? Array.from(
           new Set(
             guestCart
-              .map((i: any) => (i && typeof i.id === 'number' ? i.id : null))
+              .map((i: unknown) =>
+                i &&
+                typeof i === 'object' &&
+                'id' in i &&
+                typeof i.id === 'number'
+                  ? i.id
+                  : null
+              )
               .filter((v: number | null): v is number => v !== null)
           )
         )
@@ -131,11 +138,20 @@ const AuthCheck: React.FC = () => {
     (async () => {
       try {
         setIsMerging(true);
-        await Promise.allSettled(
+        const results = await Promise.allSettled(
           idsFromLocal.map(pid => addToCart(pid).unwrap())
         );
-      } catch {
-        // Игнорируем частичные ошибки: добавление идемпотентно на бэке
+
+        // Логируем ошибки для отладки
+        const errors = results.filter(result => result.status === 'rejected');
+        if (errors.length > 0) {
+          console.warn(
+            'Некоторые товары не удалось добавить в корзину:',
+            errors
+          );
+        }
+      } catch (error) {
+        console.error('Ошибка при слиянии корзины:', error);
       } finally {
         mergedUserRef.current = userId;
         // Очищаем гостевую корзину после переноса
@@ -159,6 +175,8 @@ const AuthCheck: React.FC = () => {
   }, [isAuthenticated, dispatch]);
 
   return null;
-};
+});
+
+AuthCheck.displayName = 'AuthCheck';
 
 export default AuthCheck;

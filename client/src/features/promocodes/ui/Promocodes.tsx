@@ -11,7 +11,7 @@ import MainButton from '@/shared/ui/Button/MainButton';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/shared/config/store/store';
 
-const Promocodes = () => {
+const Promocodes = React.memo(() => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [code, setCode] = useState('');
   const [discount, setDiscount] = useState('');
@@ -294,6 +294,8 @@ const Promocodes = () => {
       </div>
     </Fade>
   );
-};
+});
+
+Promocodes.displayName = 'Promocodes';
 
 export default Promocodes;

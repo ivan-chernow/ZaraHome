@@ -73,8 +73,7 @@ export const productsApi = createApi({
         return response.data;
       },
       providesTags: ['Products'],
-      keepUnusedDataFor: 300, // Кешируем на 5 минут
-      staleTime: 300000, // Данные считаются свежими 5 минут
+      keepUnusedDataFor: 600, // Кешируем на 10 минут
     }),
     getProductsByIds: builder.query<Product[], number[]>({
       query: (ids: number[]) => ({
@@ -88,6 +87,7 @@ export const productsApi = createApi({
       }) => {
         return response.data;
       },
+      keepUnusedDataFor: 300, // Кешируем на 5 минут
     }),
     addProduct: builder.mutation<Product, CreateProductDto>({
       query: (product: CreateProductDto) => ({

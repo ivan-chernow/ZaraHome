@@ -6,7 +6,7 @@ import { RootState } from '@/shared/config/store/store';
 import RecoveryForm from '@/features/auth/ui/RecoveryForm';
 import { useSelector } from 'react-redux';
 
-const LoginModal = () => {
+const LoginModal = React.memo(() => {
   const { view } = useSelector((state: RootState) => state.auth);
 
   return (
@@ -23,6 +23,8 @@ const LoginModal = () => {
       </div>
     </div>
   );
-};
+});
+
+LoginModal.displayName = 'LoginModal';
 
 export default LoginModal;

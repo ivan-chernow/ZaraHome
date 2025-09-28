@@ -13,7 +13,7 @@ const Column = () => (
   </div>
 );
 
-const NavMenuAccordionSkeleton: React.FC = () => {
+const NavMenuAccordionSkeleton: React.FC = React.memo(() => {
   return (
     <div className="flex w-full px-6 pb-[70px]">
       {Array.from({ length: 4 }).map((_, i) => (
@@ -21,6 +21,8 @@ const NavMenuAccordionSkeleton: React.FC = () => {
       ))}
     </div>
   );
-};
+});
+
+NavMenuAccordionSkeleton.displayName = 'NavMenuAccordionSkeleton';
 
 export default NavMenuAccordionSkeleton;

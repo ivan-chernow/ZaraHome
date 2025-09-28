@@ -36,7 +36,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Container from '@mui/material/Container';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-export const CartPageContent: React.FC = () => {
+export const CartPageContent: React.FC = React.memo(() => {
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -529,6 +529,8 @@ export const CartPageContent: React.FC = () => {
       </Container>
     </section>
   );
-};
+});
+
+CartPageContent.displayName = 'CartPageContent';
 
 export default CartPageContent;

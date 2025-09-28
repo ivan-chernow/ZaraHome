@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка админ страницы
-const AdminPageContent = lazy(() => 
-  import('@/widgets/admin/ui/AdminPageContent').then(module => ({ 
-    default: module.AdminPageContent 
+const AdminPageContent = lazy(() =>
+  import('@/widgets/admin/ui/AdminPageContent').then(module => ({
+    default: module.AdminPageContent,
   }))
 );
 

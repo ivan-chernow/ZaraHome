@@ -11,32 +11,29 @@ interface NewsBlockSectionProps {
   categorySlug: string;
 }
 
-const NewsBlockSection: React.FC<NewsBlockSectionProps> = ({
-  title,
-  subtitle,
-  btnText,
-  bgImg,
-  margin,
-  categorySlug,
-}) => {
-  return (
-    <div
-      style={{ backgroundImage: `url(${bgImg})`, marginTop: margin }}
-      className="bg-no-repeat bg-center  h-[430px] flex items-center justify-center "
-    >
-      <Container
-        maxWidth="lg"
-        className="flex flex-col items-center mt-[340px]"
+const NewsBlockSection: React.FC<NewsBlockSectionProps> = React.memo(
+  ({ title, subtitle, btnText, bgImg, margin, categorySlug }) => {
+    return (
+      <div
+        style={{ backgroundImage: `url(${bgImg})`, marginTop: margin }}
+        className="bg-no-repeat bg-center  h-[430px] flex items-center justify-center "
       >
-        <NewsBlock
-          title={title}
-          subtitle={subtitle}
-          btnText={btnText}
-          categorySlug={categorySlug}
-        />
-      </Container>
-    </div>
-  );
-};
+        <Container
+          maxWidth="lg"
+          className="flex flex-col items-center mt-[340px]"
+        >
+          <NewsBlock
+            title={title}
+            subtitle={subtitle}
+            btnText={btnText}
+            categorySlug={categorySlug}
+          />
+        </Container>
+      </div>
+    );
+  }
+);
+
+NewsBlockSection.displayName = 'NewsBlockSection';
 
 export default NewsBlockSection;

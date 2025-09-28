@@ -13,7 +13,10 @@ import { useCallback, useRef } from 'react';
 export const useClickHandler = <T extends (...args: any[]) => any>(
   handler: T
 ): T => {
-  return useCallback((...args: Parameters<T>) => handler(...args), [handler]);
+  return useCallback(
+    (...args: Parameters<T>) => handler(...args),
+    [handler]
+  ) as T;
 };
 
 /**

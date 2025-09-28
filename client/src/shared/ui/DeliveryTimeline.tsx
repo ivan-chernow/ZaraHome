@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { deliveryOptions } from '../../../public/assets/data/deliveryOptions';
 
-const DeliveryTimeline = () => {
+const DeliveryTimeline = React.memo(() => {
   return (
     <>
       <div className="h-auto bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 bg-white">
@@ -48,6 +48,8 @@ const DeliveryTimeline = () => {
       </div>
     </>
   );
-};
+});
+
+DeliveryTimeline.displayName = 'DeliveryTimeline';
 
 export default DeliveryTimeline;

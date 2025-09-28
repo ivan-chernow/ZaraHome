@@ -38,7 +38,7 @@ interface ApiError {
   };
 }
 
-const LoginForm = () => {
+const LoginForm = React.memo(() => {
   const dispatch = useDispatch();
   const router = useRouter();
   const viewPassword = useSelector(
@@ -250,6 +250,8 @@ const LoginForm = () => {
       </div>
     </Slide>
   );
-};
+});
+
+LoginForm.displayName = 'LoginForm';
 
 export default LoginForm;

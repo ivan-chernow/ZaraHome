@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const Logo: React.FC = () => {
+const Logo: React.FC = React.memo(() => {
   return (
     <div className="text-center">
       <Link href="/" className="inline-block ">
@@ -15,6 +15,8 @@ const Logo: React.FC = () => {
       </Link>
     </div>
   );
-};
+});
+
+Logo.displayName = 'Logo';
 
 export default Logo;

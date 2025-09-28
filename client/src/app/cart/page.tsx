@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы корзины
-const CartPageContent = lazy(() => 
-  import('@/widgets/cart/ui/CartPageContent').then(module => ({ 
-    default: module.CartPageContent 
+const CartPageContent = lazy(() =>
+  import('@/widgets/cart/ui/CartPageContent').then(module => ({
+    default: module.CartPageContent,
   }))
 );
 

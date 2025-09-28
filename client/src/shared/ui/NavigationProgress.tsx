@@ -1,10 +1,9 @@
 'use client';
+import React, { useEffect, useState } from 'react';
 import { LinearProgress } from '@mui/material';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 
-const NavigationProgress: React.FC = () => {
+const NavigationProgress: React.FC = React.memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
@@ -106,6 +105,8 @@ const NavigationProgress: React.FC = () => {
       }}
     />
   );
-};
+});
+
+NavigationProgress.displayName = 'NavigationProgress';
 
 export default NavigationProgress;

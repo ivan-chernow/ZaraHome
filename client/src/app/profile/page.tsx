@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы профиля
-const ProfilePageContent = lazy(() => 
-  import('@/widgets/profile/ui/ProfilePageContent').then(module => ({ 
-    default: module.ProfilePageContent 
+const ProfilePageContent = lazy(() =>
+  import('@/widgets/profile/ui/ProfilePageContent').then(module => ({
+    default: module.ProfilePageContent,
   }))
 );
 

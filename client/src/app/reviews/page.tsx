@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы отзывов
-const ReviewsPageContent = lazy(() => 
-  import('@/widgets/reviews/ui/ReviewsPageContent').then(module => ({ 
-    default: module.ReviewsPageContent 
+const ReviewsPageContent = lazy(() =>
+  import('@/widgets/reviews/ui/ReviewsPageContent').then(module => ({
+    default: module.ReviewsPageContent,
   }))
 );
 
@@ -19,7 +19,12 @@ const ReviewsSkeleton = () => (
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="border rounded-lg p-4">
             <div className="flex items-center mb-2">
-              <Skeleton variant="circular" width={40} height={40} className="mr-3" />
+              <Skeleton
+                variant="circular"
+                width={40}
+                height={40}
+                className="mr-3"
+              />
               <Skeleton variant="text" width="20%" height={20} />
             </div>
             <Skeleton variant="text" width="100%" height={20} />

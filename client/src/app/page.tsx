@@ -4,7 +4,7 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка главной страницы
-const App = lazy(() => 
+const App = lazy(() =>
   import('@/widgets/home/ui/App').then(module => ({ default: module.App }))
 );
 

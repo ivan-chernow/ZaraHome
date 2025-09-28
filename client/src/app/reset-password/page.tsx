@@ -4,10 +4,12 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы сброса пароля
-const ResetPasswordPageContent = lazy(() => 
-  import('@/widgets/reset-password/ui/ResetPasswordPageContent').then(module => ({ 
-    default: module.ResetPasswordPageContent 
-  }))
+const ResetPasswordPageContent = lazy(() =>
+  import('@/widgets/reset-password/ui/ResetPasswordPageContent').then(
+    module => ({
+      default: module.ResetPasswordPageContent,
+    })
+  )
 );
 
 // Скелетон для загрузки

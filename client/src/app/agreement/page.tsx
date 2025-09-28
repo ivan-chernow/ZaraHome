@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы соглашения
-const TermsOfService = lazy(() => 
-  import('@/widgets/agreement/ui/TermsOfService').then(module => ({ 
-    default: module.TermsOfService 
+const TermsOfService = lazy(() =>
+  import('@/widgets/agreement/ui/TermsOfService').then(module => ({
+    default: module.TermsOfService,
   }))
 );
 

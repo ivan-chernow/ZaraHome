@@ -9,27 +9,26 @@ interface NewsBlockProps {
   categorySlug: string;
 }
 
-const NewsBlock: React.FC<NewsBlockProps> = ({
-  title,
-  subtitle,
-  btnText,
-  categorySlug,
-}) => {
-  return (
-    <div className="bg-white py-[22px] px-[120px] flex flex-col items-center">
-      <h2 className="text-[44px] ">{title}</h2>
-      <p className=" text-[18px] mb-[14px]">{subtitle}</p>
-      <Link href={`/products/category/${categorySlug}`}>
-        <MainButton
-          text={btnText}
-          disabled={false}
-          type="button"
-          height="56px"
-          width="249px"
-        />
-      </Link>
-    </div>
-  );
-};
+const NewsBlock: React.FC<NewsBlockProps> = React.memo(
+  ({ title, subtitle, btnText, categorySlug }) => {
+    return (
+      <div className="bg-white py-[22px] px-[120px] flex flex-col items-center">
+        <h2 className="text-[44px] ">{title}</h2>
+        <p className=" text-[18px] mb-[14px]">{subtitle}</p>
+        <Link href={`/products/category/${categorySlug}`}>
+          <MainButton
+            text={btnText}
+            disabled={false}
+            type="button"
+            height="56px"
+            width="249px"
+          />
+        </Link>
+      </div>
+    );
+  }
+);
+
+NewsBlock.displayName = 'NewsBlock';
 
 export default NewsBlock;

@@ -32,7 +32,7 @@ interface ErrorData {
   message: string;
 }
 
-const RegisterForm = () => {
+const RegisterForm = React.memo(() => {
   const dispatch = useDispatch();
   const {
     code,
@@ -331,6 +331,8 @@ const RegisterForm = () => {
       </div>
     </Fade>
   );
-};
+});
+
+RegisterForm.displayName = 'RegisterForm';
 
 export default RegisterForm;

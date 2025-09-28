@@ -5,7 +5,7 @@ import WhyUs from '@/widgets/why-us/ui/WhyUs';
 import Question from '@/widgets/Question';
 import Help from '@/widgets/help/ui/Help';
 
-export const HomePageContent: React.FC = () => {
+export const HomePageContent: React.FC = React.memo(() => {
   return (
     <>
       <NewClothes />
@@ -17,6 +17,8 @@ export const HomePageContent: React.FC = () => {
       </div>
     </>
   );
-};
+});
+
+HomePageContent.displayName = 'HomePageContent';
 
 export default HomePageContent;

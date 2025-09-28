@@ -14,7 +14,7 @@ interface FormInputs {
   confirmPassword: string;
 }
 
-const ChangePassword = () => {
+const ChangePassword = React.memo(() => {
   const {
     register,
     handleSubmit,
@@ -132,5 +132,8 @@ const ChangePassword = () => {
       </div>
     </Fade>
   );
-};
+});
+
+ChangePassword.displayName = 'ChangePassword';
+
 export default ChangePassword;

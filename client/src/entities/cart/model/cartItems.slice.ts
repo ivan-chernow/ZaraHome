@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { getLocalStorage } from '@/shared/lib/storage';
 
 // Тип для элемента корзины
@@ -17,26 +17,50 @@ interface CartItemsState {
   items: CartItem[];
 }
 
+// Валидация элемента корзины
+const isValidCartItem = (item: any): item is CartItem => {
+  return (
+    item &&
+    typeof item === 'object' &&
+    typeof item.id === 'number' &&
+    Number.isInteger(item.id) &&
+    item.id > 0 &&
+    typeof item.price === 'number' &&
+    Number.isFinite(item.price) &&
+    item.price >= 0 &&
+    typeof item.quantity === 'number' &&
+    Number.isFinite(item.quantity) &&
+    item.quantity > 0 &&
+    Number.isInteger(item.quantity)
+  );
+};
+
 const loadInitialCartItems = (): CartItem[] => {
-  const raw = getLocalStorage('cart', []);
-  if (!Array.isArray(raw)) return [];
-  return raw
-    .filter(i => i && typeof i.id === 'number' && typeof i.price === 'number')
-    .map(i => ({
+  try {
+    const raw = getLocalStorage('cart', []);
+    if (!Array.isArray(raw)) return [];
+
+    return raw.filter(isValidCartItem).map(i => ({
       id: i.id,
       price: i.price,
-      img: typeof i.img === 'string' ? i.img : undefined,
-      size: typeof i.size === 'string' ? i.size : undefined,
-      color: typeof i.color === 'string' ? i.color : undefined,
-      name_eng: typeof i.name_eng === 'string' ? i.name_eng : undefined,
-      name_ru: typeof i.name_ru === 'string' ? i.name_ru : undefined,
-      quantity:
-        typeof i.quantity === 'number' &&
-        Number.isFinite(i.quantity) &&
-        i.quantity > 0
-          ? Math.floor(i.quantity)
-          : 1,
+      quantity: Math.floor(i.quantity),
+      img: typeof i.img === 'string' && i.img.trim() ? i.img : undefined,
+      size: typeof i.size === 'string' && i.size.trim() ? i.size : undefined,
+      color:
+        typeof i.color === 'string' && i.color.trim() ? i.color : undefined,
+      name_eng:
+        typeof i.name_eng === 'string' && i.name_eng.trim()
+          ? i.name_eng
+          : undefined,
+      name_ru:
+        typeof i.name_ru === 'string' && i.name_ru.trim()
+          ? i.name_ru
+          : undefined,
     }));
+  } catch (error) {
+    console.error('Ошибка загрузки корзины из localStorage:', error);
+    return [];
+  }
 };
 
 const initialState: CartItemsState = {
@@ -159,16 +183,29 @@ const cartItemsSlice = createSlice({
   },
 });
 
-// Селекторы
+// Селекторы с мемоизацией
+
 export const selectCartItems = (state: { cartItems: CartItemsState }) =>
   state.cartItems.items;
-export const selectCartTotalCount = (state: { cartItems: CartItemsState }) =>
-  state.cartItems.items.reduce((sum, item) => sum + item.quantity, 0);
-export const selectCartTotalPrice = (state: { cartItems: CartItemsState }) =>
-  state.cartItems.items.reduce(
-    (sum, item) => sum + item.quantity * item.price,
-    0
-  );
+
+export const selectCartTotalCount = createSelector([selectCartItems], items =>
+  items.reduce((sum, item) => sum + item.quantity, 0)
+);
+
+export const selectCartTotalPrice = createSelector([selectCartItems], items =>
+  items.reduce((sum, item) => sum + item.quantity * item.price, 0)
+);
+
+// Дополнительные селекторы для оптимизации
+export const selectCartItemById = createSelector(
+  [selectCartItems, (state: any, id: number) => id],
+  (items, id) => items.find(item => item.id === id)
+);
+
+export const selectCartItemsByProductId = createSelector(
+  [selectCartItems, (state: any, productId: number) => productId],
+  (items, productId) => items.filter(item => item.id === productId)
+);
 
 export const {
   setCartItems,

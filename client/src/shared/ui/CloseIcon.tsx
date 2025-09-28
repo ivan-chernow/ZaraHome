@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
 import { closeModalAuth } from '@/features/auth/model/auth.slice';
 
-const CloseIconCart: React.FC = () => {
+const CloseIconCart: React.FC = React.memo(() => {
   const dispatch = useDispatch();
   return (
     <div
@@ -22,6 +22,8 @@ const CloseIconCart: React.FC = () => {
       <CloseIcon fontSize="small" />
     </div>
   );
-};
+});
+
+CloseIconCart.displayName = 'CloseIconCart';
 
 export default CloseIconCart;

@@ -11,7 +11,7 @@ const spin = keyframes`
   }
 `;
 
-const LoadingSpinner: React.FC = () => {
+const LoadingSpinner: React.FC = React.memo(() => {
   return (
     <Box
       sx={{
@@ -43,6 +43,8 @@ const LoadingSpinner: React.FC = () => {
       />
     </Box>
   );
-};
+});
+
+LoadingSpinner.displayName = 'LoadingSpinner';
 
 export default LoadingSpinner;

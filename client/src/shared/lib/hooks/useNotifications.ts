@@ -139,8 +139,8 @@ export const useNotifications = (options: NotificationOptions = {}) => {
 
   // Очистка таймаутов при размонтировании
   useEffect(() => {
+    const timeouts = timeoutsRef.current;
     return () => {
-      const timeouts = timeoutsRef.current;
       timeouts.forEach(timeout => clearTimeout(timeout));
       timeouts.clear();
     };

@@ -17,7 +17,7 @@ interface ErrorResponse {
   message: string;
 }
 
-const RecoveryForm = () => {
+const RecoveryForm = React.memo(() => {
   const dispatch = useDispatch();
   const [
     requestPasswordReset,
@@ -120,6 +120,8 @@ const RecoveryForm = () => {
       </div>
     </Fade>
   );
-};
+});
+
+RecoveryForm.displayName = 'RecoveryForm';
 
 export default RecoveryForm;

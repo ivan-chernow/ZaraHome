@@ -55,7 +55,7 @@ export const useForm = <T extends Record<string, any>>(
     isDirty: false,
   }));
 
-  const validateTimeoutRef = useRef<NodeJS.Timeout>();
+  const validateTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Валидация формы
   const validateForm = useCallback(
@@ -95,13 +95,25 @@ export const useForm = <T extends Record<string, any>>(
 
       // Валидация при изменении
       if (validateOnChange) {
-        validateForm({ ...state.values, [field]: value }).then(errors => {
+        const validationResult = validateForm({
+          ...state.values,
+          [field]: value,
+        });
+        if (validationResult instanceof Promise) {
+          validationResult.then(errors => {
+            setState(prevState => ({
+              ...prevState,
+              errors,
+              isValid: Object.keys(errors).length === 0,
+            }));
+          });
+        } else {
           setState(prevState => ({
             ...prevState,
-            errors,
-            isValid: Object.keys(errors).length === 0,
+            errors: validationResult,
+            isValid: Object.keys(validationResult).length === 0,
           }));
-        });
+        }
       }
     },
     [state.values, validateOnChange, validateForm]
@@ -126,13 +138,22 @@ export const useForm = <T extends Record<string, any>>(
 
       // Валидация при потере фокуса
       if (validateOnBlur && touched) {
-        validateForm(state.values).then(errors => {
+        const validationResult = validateForm(state.values);
+        if (validationResult instanceof Promise) {
+          validationResult.then(errors => {
+            setState(prevState => ({
+              ...prevState,
+              errors,
+              isValid: Object.keys(errors).length === 0,
+            }));
+          });
+        } else {
           setState(prevState => ({
             ...prevState,
-            errors,
-            isValid: Object.keys(errors).length === 0,
+            errors: validationResult,
+            isValid: Object.keys(validationResult).length === 0,
           }));
-        });
+        }
       }
     },
     [state.values, validateOnBlur, validateForm]
@@ -265,7 +286,7 @@ export const useFormField = <T extends Record<string, any>, K extends keyof T>(
  */
 export const useFormFieldDebounce = <T>(value: T, delay: number = 300): T => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     if (timeoutRef.current) {

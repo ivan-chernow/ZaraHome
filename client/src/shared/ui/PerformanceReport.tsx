@@ -13,7 +13,7 @@ import {
 /**
  * Компонент для отображения анализа производительности
  */
-const PerformanceReport: React.FC = () => {
+const PerformanceReport: React.FC = React.memo(() => {
   const [analysis] = useState(analyzeBundle());
   const [showReport, setShowReport] = useState(false);
 
@@ -142,6 +142,8 @@ const PerformanceReport: React.FC = () => {
       </Card>
     </div>
   );
-};
+});
+
+PerformanceReport.displayName = 'PerformanceReport';
 
 export default PerformanceReport;

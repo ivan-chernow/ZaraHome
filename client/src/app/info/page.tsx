@@ -4,9 +4,9 @@ import React, { lazy, Suspense } from 'react';
 import { Skeleton } from '@mui/material';
 
 // Ленивая загрузка страницы информации
-const InfoPageContent = lazy(() => 
-  import('@/widgets/info/ui/InfoPageContent').then(module => ({ 
-    default: module.InfoPageContent 
+const InfoPageContent = lazy(() =>
+  import('@/widgets/info/ui/InfoPageContent').then(module => ({
+    default: module.InfoPageContent,
   }))
 );
 

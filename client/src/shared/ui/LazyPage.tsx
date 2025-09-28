@@ -11,12 +11,11 @@ interface LazyPageProps {
 /**
  * Компонент для ленивой загрузки страниц с fallback
  */
-const LazyPage: React.FC<LazyPageProps> = ({
-  children,
-  fallback = <PageSkeleton />,
-}) => {
-  return <Suspense fallback={fallback}>{children}</Suspense>;
-};
+const LazyPage: React.FC<LazyPageProps> = React.memo(
+  ({ children, fallback = <PageSkeleton /> }) => {
+    return <Suspense fallback={fallback}>{children}</Suspense>;
+  }
+);
 
 /**
  * Скелетон для загрузки страниц
@@ -50,5 +49,7 @@ const PageSkeleton: React.FC = () => (
     </div>
   </div>
 );
+
+LazyPage.displayName = 'LazyPage';
 
 export default LazyPage;

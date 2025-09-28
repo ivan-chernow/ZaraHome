@@ -13,7 +13,7 @@ import NavMenuOpenDiscounts from '@/widgets/navigation/NavMenuOpenDiscounts';
 import NavMenuOpenNewProducts from '@/widgets/navigation/NavMenuOpenNewProducts';
 import NavMenuOpenInformation from '@/widgets/navigation/NavMenuOpenInformation';
 
-const NavMenu = () => {
+const NavMenu = React.memo(() => {
   const dispatch = useDispatch();
   const {
     isOpenNewProducts,
@@ -154,6 +154,8 @@ const NavMenu = () => {
       </div>
     </div>
   );
-};
+});
+
+NavMenu.displayName = 'NavMenu';
 
 export default NavMenu;
