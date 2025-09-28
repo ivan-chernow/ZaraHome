@@ -1,12 +1,7 @@
 'use client';
 import React from 'react';
-import MainLayout from '@/widgets/layout/MainLayout';
-import { ProfilePageContent } from '@/widgets/profile/ui/ProfilePageContent';
+import ProfilePageLazy from '@/shared/ui/lazy/ProfilePageLazy';
 
-const ProfilePage: React.FC = () => (
-  <MainLayout>
-    <ProfilePageContent />
-  </MainLayout>
-);
+const ProfilePage: React.FC = () => <ProfilePageLazy />;
 
 export default ProfilePage;

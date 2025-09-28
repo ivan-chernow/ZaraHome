@@ -1,12 +1,7 @@
 'use client';
 import React from 'react';
-import MainLayout from '@/widgets/layout/MainLayout';
-import { OrderPageContent } from '@/widgets/order/ui/OrderPageContent';
+import OrderPageLazy from '@/shared/ui/lazy/OrderPageLazy';
 
-const OrderPage: React.FC = () => (
-  <MainLayout>
-    <OrderPageContent />
-  </MainLayout>
-);
+const OrderPage: React.FC = () => <OrderPageLazy />;
 
 export default OrderPage;

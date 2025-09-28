@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
-import { ProductPageContent } from '@/widgets/product/ui/ProductPageContent';
+import ProductPageLazy from '@/shared/ui/lazy/ProductPageLazy';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
 
 const ProductPage: React.FC<ProductPageProps> = ({ params }) => (
-  <ProductPageContent params={params} />
+  <ProductPageLazy params={params} />
 );
 
 export default ProductPage;

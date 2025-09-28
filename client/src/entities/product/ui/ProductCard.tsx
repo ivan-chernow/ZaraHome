@@ -11,6 +11,7 @@ import Color from '@/shared/ui/Color';
 import New from '@/shared/ui/New';
 import { Product } from '@/entities/product/api/products.api';
 import Discount from '@/widgets/discount/Discount';
+import { useNavigationPreload } from '@/shared/lib/hooks/usePreloadPage';
 
 interface ProductCardProps {
   product: Product;
@@ -23,6 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const { preloadProductPage } = useNavigationPreload();
   const activeColors = useSelector(
     (state: RootState) => state.productCard.activeColors
   );
@@ -121,6 +123,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         px-[10px]
       "
         aria-label={`Перейти к товару ${product.name_ru}`}
+        onMouseEnter={() => preloadProductPage(product.id.toString())}
       >
         {product.name_eng}
       </Link>

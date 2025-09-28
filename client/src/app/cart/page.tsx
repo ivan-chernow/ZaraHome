@@ -1,13 +1,8 @@
 'use client';
 
 import React from 'react';
-import MainLayout from '@/widgets/layout/MainLayout';
-import { CartPageContent } from '@/widgets/cart/ui/CartPageContent';
+import CartPageLazy from '@/shared/ui/lazy/CartPageLazy';
 
-const CartPage: React.FC = () => (
-  <MainLayout>
-    <CartPageContent />
-  </MainLayout>
-);
+const CartPage: React.FC = () => <CartPageLazy />;
 
 export default CartPage;
