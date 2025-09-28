@@ -67,7 +67,9 @@ interface CategoryPageContentProps {
   params: Promise<{ category: string }>;
 }
 
-export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({ params }) => {
+export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({
+  params,
+}) => {
   const { category: categorySlug } = use(params);
   const { data: categories, isLoading, error } = useGetCatalogQuery();
   const router = useRouter();

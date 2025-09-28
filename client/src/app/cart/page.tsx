@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
 import React from 'react';
 import MainLayout from '@/widgets/layout/MainLayout';
 import { CartPageContent } from '@/widgets/cart/ui/CartPageContent';
 
 const CartPage: React.FC = () => (
-    <MainLayout>
+  <MainLayout>
     <CartPageContent />
-    </MainLayout>
-  );
+  </MainLayout>
+);
 
 export default CartPage;

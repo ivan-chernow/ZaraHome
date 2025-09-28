@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const HelpElement = ({ svgPath, width, height, title, subtitle, link }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const handleClick = e => {
+  const handleClick = () => {
     window.open(link, '_blank');
   };
 

@@ -99,9 +99,7 @@ export const ProfilePageContent: React.FC = () => {
                   color: activeView === 'change-password' ? 'black' : 'gray',
                 }}
               />
-              <p className="font-medium text-[18px] ml-[2px]">
-                Сменить пароль
-              </p>
+              <p className="font-medium text-[18px] ml-[2px]">Сменить пароль</p>
             </li>
             <li
               className={`flex items-center mb-[5px] cursor-pointer transition-colors duration-200 ${
@@ -117,9 +115,7 @@ export const ProfilePageContent: React.FC = () => {
                   color: activeView === 'change-email' ? 'black' : 'gray',
                 }}
               />
-              <p className="font-medium text-[18px] ml-[2px]">
-                Сменить e-mail
-              </p>
+              <p className="font-medium text-[18px] ml-[2px]">Сменить e-mail</p>
             </li>
           </ul>
           <div className="flex-1 ">

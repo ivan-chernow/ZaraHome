@@ -14,7 +14,9 @@ interface SubCategoryPageContentProps {
   params: Promise<{ category: string; subCategory: string }>;
 }
 
-export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ params }) => {
+export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({
+  params,
+}) => {
   const { category: categorySlug, subCategory: subCategorySlug } = use(params);
   const { data: categories } = useGetCatalogQuery();
 

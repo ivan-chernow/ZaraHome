@@ -37,12 +37,11 @@ const getToday = () => {
 };
 
 // Добавляем константы для ограничений
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB
 const IMAGE_LIMIT = 12;
 
-// Функция для сжатия изображения
-const compressImage = (file: File): Promise<string> => {
+// Функция для сжатия изображения (не используется)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _unused_compressImage = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);

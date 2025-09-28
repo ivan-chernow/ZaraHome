@@ -38,8 +38,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   }, [product, dispatch]);
 
-  if (!product || !product.colors) return null;
-
   const activeColor = activeColors[product.id];
 
   const handleColorClick = useCallback(
@@ -48,6 +46,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     },
     [dispatch, product.id]
   );
+
+  if (!product || !product.colors) return null;
 
   return (
     <li

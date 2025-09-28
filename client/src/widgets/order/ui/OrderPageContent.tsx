@@ -212,9 +212,7 @@ export const OrderPageContent: React.FC = () => {
                     <div className="mr-[29px] bg-white w-[20px] h-[20px] rounded-full drop-shadow-lg relative flex items-center justify-center">
                       <span
                         className={`rounded-full w-[12px] h-[12px] transition-colors duration-300 ${
-                          paymentMethod === 'card'
-                            ? 'bg-black'
-                            : 'bg-gray-300'
+                          paymentMethod === 'card' ? 'bg-black' : 'bg-gray-300'
                         }`}
                       ></span>
                     </div>
@@ -346,14 +344,11 @@ export const OrderPageContent: React.FC = () => {
                     <HorizontalLine width="146px" />
                   </div>
                   <p className="font-medium text-[32px] font-roboto">
-                    {(applied
-                      ? applied.finalAmount
-                      : cartTotal
-                    ).toLocaleString('ru-RU')}
+                    {(applied ? applied.finalAmount : cartTotal).toLocaleString(
+                      'ru-RU'
+                    )}
                   </p>
-                  <p className="font-medium mb-[28px]">
-                    {totalCount} товаров
-                  </p>
+                  <p className="font-medium mb-[28px]">{totalCount} товаров</p>
                   <MainButton
                     text="Оплатить"
                     disabled={

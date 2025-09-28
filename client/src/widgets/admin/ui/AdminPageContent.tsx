@@ -63,15 +63,12 @@ export const AdminPageContent: React.FC = () => {
                     ? 'text-black'
                     : 'text-gray-500 hover:text-black'
                 }`}
-                onClick={() =>
-                  dispatch(setAdminActiveView('change-password'))
-                }
+                onClick={() => dispatch(setAdminActiveView('change-password'))}
               >
                 <HttpsOutlinedIcon
                   fontSize="medium"
                   sx={{
-                    color:
-                      activeView === 'change-password' ? 'black' : 'gray',
+                    color: activeView === 'change-password' ? 'black' : 'gray',
                   }}
                 />
                 <p className="font-medium text-[18px] ml-[2px]">

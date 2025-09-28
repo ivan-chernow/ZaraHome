@@ -143,9 +143,7 @@ export const ResetPasswordPageContent: React.FC = () => {
     >
       {!isSuccessResetPassword ? (
         <div className="flex flex-col items-center w-full">
-          <h1 className="text-2xl font-medium mb-6">
-            Создание нового пароля
-          </h1>
+          <h1 className="text-2xl font-medium mb-6">Создание нового пароля</h1>
           <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md">
             <div className="flex flex-col gap-4">
               <TextField
@@ -185,9 +183,7 @@ export const ResetPasswordPageContent: React.FC = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center text-center">
-          <h1 className="text-2xl font-medium mb-6">
-            Пароль успешно изменен
-          </h1>
+          <h1 className="text-2xl font-medium mb-6">Пароль успешно изменен</h1>
           <p className="text-sm text-gray-500">
             Вы будете перенаправлены на главную страницу через 5 секунд
           </p>

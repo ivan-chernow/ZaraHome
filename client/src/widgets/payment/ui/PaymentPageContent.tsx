@@ -177,9 +177,7 @@ export const PaymentPageContent: React.FC = () => {
                     placeholder="MM/YY"
                     value={exp}
                     onChange={e =>
-                      setExp(
-                        e.target.value.replace(/[^0-9/]/g, '').slice(0, 5)
-                      )
+                      setExp(e.target.value.replace(/[^0-9/]/g, '').slice(0, 5))
                     }
                     sx={{ height: '48px' }}
                   />
@@ -230,8 +228,8 @@ export const PaymentPageContent: React.FC = () => {
                   </div>
                 )}
                 <p className="text-sm text-[#00000099] mb-3">
-                  Мы отправили код подтверждения на ваш телефон. Введите 6
-                  цифр ниже.
+                  Мы отправили код подтверждения на ваш телефон. Введите 6 цифр
+                  ниже.
                 </p>
                 <TextField
                   value={code3ds}

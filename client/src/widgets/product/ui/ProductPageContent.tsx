@@ -28,10 +28,7 @@ import {
 import SliderSwiper from '@/shared/ui/SliderSwiper';
 import Link from 'next/link';
 import Skeleton from '@mui/material/Skeleton';
-import {
-  expandCategory,
-  expandSubCategory,
-} from '@/entities/category/model/catalog.slice';
+import { expandSubCategory } from '@/entities/category/model/catalog.slice';
 import {
   useAddToCartMutation,
   useRemoveFromCartMutation,
@@ -47,7 +44,9 @@ interface ProductPageContentProps {
   params: Promise<{ id: string }>;
 }
 
-export const ProductPageContent: React.FC<ProductPageContentProps> = ({ params }) => {
+export const ProductPageContent: React.FC<ProductPageContentProps> = ({
+  params,
+}) => {
   const resolvedParams = use(params);
   const { data: categories, isLoading } = useGetCatalogQuery();
   const dispatch = useDispatch();
@@ -70,6 +69,205 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({ params }
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
     pathData?.product.size ? Object.keys(pathData.product.size)[0] : undefined
   );
+
+  // Все хуки должны быть в начале, до условных возвратов
+  const { product, category, subCategory, type } = pathData || {};
+  const activeColor = activeColors[product?.id || 0];
+
+  const isInCart = useMemo(
+    () =>
+      cartItems.some(
+        (item: any) =>
+          item.id === product?.id &&
+          item.size === selectedSize &&
+          item.color === activeColor
+      ),
+    [cartItems, product?.id, selectedSize, activeColor]
+  );
+
+  const [addToCart] = useAddToCartMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
+  const getPriceBySize = useCallback(
+    (size: string) => {
+      if (!product?.size) return 0;
+      const sizeData = product.size.find((s: any) => s.size === size);
+      return sizeData ? sizeData.price : 0;
+    },
+    [product?.size]
+  );
+
+  const currentPrice = useMemo(() => {
+    if (!selectedSize || !product?.size) return 0;
+    return getPriceBySize(selectedSize);
+  }, [selectedSize, product?.size, getPriceBySize]);
+
+  const handleSizeChange = useCallback((event: SelectChangeEvent) => {
+    setSelectedSize(event.target.value);
+  }, []);
+
+  const handleAddToCart = useCallback(() => {
+    if (!product || !selectedSize || !activeColor) return;
+
+    const cartItem = {
+      id: product.id,
+      name_ru: product.name_ru,
+      name_eng: product.name_eng,
+      img: product.img,
+      size: selectedSize,
+      color: activeColor,
+      price: currentPrice,
+      quantity: 1,
+    };
+
+    if (isAuthenticated) {
+      addToCart({
+        productId: product.id,
+        size: selectedSize,
+        color: activeColor,
+      });
+    } else {
+      dispatch(addCartItem(cartItem));
+    }
+  }, [
+    product,
+    selectedSize,
+    activeColor,
+    currentPrice,
+    isAuthenticated,
+    addToCart,
+    dispatch,
+  ]);
+
+  const handleRemoveFromCart = useCallback(() => {
+    if (!product || !selectedSize || !activeColor) return;
+
+    if (isAuthenticated) {
+      removeFromCart({
+        productId: product.id,
+        size: selectedSize,
+        color: activeColor,
+      });
+    } else {
+      dispatch(
+        removeCartItem({
+          id: product.id,
+          size: selectedSize,
+          color: activeColor,
+        })
+      );
+    }
+  }, [
+    product,
+    selectedSize,
+    activeColor,
+    isAuthenticated,
+    removeFromCart,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (
+      product &&
+      !activeColor &&
+      product.colors &&
+      product.colors.length > 0
+    ) {
+      dispatch(
+        setActiveColor({
+          productId: product.id,
+          color: product.colors[0],
+        })
+      );
+    }
+  }, [product, activeColor, dispatch]);
+
+  useEffect(() => {
+    if (subCategory) {
+      dispatch(expandSubCategory(subCategory.id));
+    }
+  }, [subCategory, dispatch]);
+
+  useEffect(() => {
+    if (selectedSize === undefined && product?.size) {
+      setSelectedSize(Object.keys(product.size)[0]);
+    }
+  }, [selectedSize, product]);
+
+  const handleColorClick = useCallback(
+    (color: string) => {
+      if (product) {
+        dispatch(setActiveColor({ productId: product.id, color }));
+      }
+    },
+    [dispatch, product]
+  );
+
+  const getSizeName = useCallback(
+    (sizeKey: string) => {
+      if (!product?.size) return sizeKey;
+      const sizeData = product.size.find((s: any) => s.size === sizeKey);
+      return sizeData ? sizeData.size : sizeKey;
+    },
+    [product?.size]
+  );
+
+  const handleGuestToggle = useCallback(() => {
+    const cart = getLocalStorage('cart', []);
+    const updatedCart = isInCart
+      ? cart.filter(
+          (item: any) =>
+            !(
+              item.id === product?.id &&
+              item.size === selectedSize &&
+              item.color === activeColor
+            )
+        )
+      : [
+          ...cart,
+          {
+            id: product?.id,
+            name_ru: product?.name_ru,
+            name_eng: product?.name_eng,
+            img: product?.img,
+            size: selectedSize,
+            color: activeColor,
+            price: currentPrice,
+            quantity: 1,
+          },
+        ];
+
+    setLocalStorage('cart', updatedCart);
+    dispatch(setCartItems(updatedCart));
+  }, [
+    isInCart,
+    product?.id,
+    product?.name_ru,
+    product?.name_eng,
+    product?.img,
+    selectedSize,
+    activeColor,
+    currentPrice,
+    dispatch,
+  ]);
+
+  const handleCartClick = useCallback(() => {
+    if (isAuthenticated) {
+      if (isInCart) {
+        handleRemoveFromCart();
+      } else {
+        handleAddToCart();
+      }
+    } else {
+      handleGuestToggle();
+    }
+  }, [
+    isAuthenticated,
+    isInCart,
+    handleAddToCart,
+    handleRemoveFromCart,
+    handleGuestToggle,
+  ]);
 
   if (isLoading) {
     return (
@@ -97,160 +295,6 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({ params }
       </div>
     );
   }
-
-  const { product, category, subCategory, type } = pathData;
-  const activeColor = activeColors[product.id];
-
-  const isInCart = useMemo(
-    () =>
-      cartItems.some(
-        (item: any) =>
-          item.id === product.id &&
-          item.size === selectedSize &&
-          item.color === activeColor
-      ),
-    [cartItems, product.id, selectedSize, activeColor]
-  );
-
-  const [addToCart] = useAddToCartMutation();
-  const [removeFromCart] = useRemoveFromCartMutation();
-
-  useEffect(() => {
-    if (selectedSize === undefined && product.size) {
-      setSelectedSize(Object.keys(product.size)[0]);
-    }
-  }, [selectedSize, product]);
-
-  const handleSizeChange = (event: SelectChangeEvent<string>) =>
-    setSelectedSize(event.target.value);
-  const handleColorClick = (color: string) =>
-    dispatch(setActiveColor({ productId: product.id, color }));
-  const getPriceBySize = (sizeKey: string) =>
-    product.size?.[sizeKey]?.price || 0;
-  const getSizeName = (sizeKey: string) =>
-    product.size?.[sizeKey]?.size || sizeKey;
-
-  const currentPrice = useMemo(() => {
-    const key =
-      selectedSize || (product.size ? Object.keys(product.size)[0] : '');
-    return key ? getPriceBySize(key) : 0;
-  }, [selectedSize]);
-
-  const handleAuthenticatedToggle = useCallback(async () => {
-    try {
-      if (isInCart) {
-        dispatch(
-          removeCartItem({
-            id: product.id,
-            size: selectedSize,
-            color: activeColor,
-          })
-        );
-        await removeFromCart(product.id).unwrap();
-      } else {
-        dispatch(
-          addCartItem({
-            id: product.id,
-            price: currentPrice,
-            img: product.img?.[0],
-            size: selectedSize,
-            color: activeColor,
-            name_eng: product.name_eng,
-            name_ru: product.name_ru,
-          })
-        );
-        await addToCart(product.id).unwrap();
-      }
-    } catch (error) {
-      if (isInCart) {
-        dispatch(
-          addCartItem({
-            id: product.id,
-            price: currentPrice,
-            img: product.img?.[0],
-            size: selectedSize,
-            color: activeColor,
-            name_eng: product.name_eng,
-            name_ru: product.name_ru,
-          })
-        );
-      } else {
-        dispatch(
-          removeCartItem({
-            id: product.id,
-            size: selectedSize,
-            color: activeColor,
-          })
-        );
-      }
-      console.error('Ошибка при работе с корзиной:', error);
-    }
-  }, [
-    isInCart,
-    product?.id,
-    currentPrice,
-    product?.img,
-    addToCart,
-    removeFromCart,
-    dispatch,
-  ]);
-
-  const handleGuestToggle = useCallback(() => {
-    const cart = getLocalStorage('cart', []);
-    const updatedCart = isInCart
-      ? cart.filter(
-          (item: any) =>
-            !(
-              item.id === product.id &&
-              item.size === selectedSize &&
-              item.color === activeColor
-            )
-        )
-      : [
-          ...cart,
-          {
-            id: product.id,
-            price: currentPrice,
-            quantity: 1,
-            img: product.img?.[0],
-            size: selectedSize,
-            color: activeColor,
-            name_eng: product.name_eng,
-            name_ru: product.name_ru,
-          },
-        ];
-    setLocalStorage('cart', updatedCart);
-    dispatch(setCartItems(updatedCart));
-  }, [
-    isInCart,
-    product?.id,
-    currentPrice,
-    product?.img,
-    selectedSize,
-    activeColor,
-    product?.name_eng,
-    product?.name_ru,
-    dispatch,
-  ]);
-
-  const handleCartClick = useCallback(() => {
-    if (isAuthenticated) {
-      handleAuthenticatedToggle();
-    } else {
-      handleGuestToggle();
-    }
-  }, [isAuthenticated, handleAuthenticatedToggle, handleGuestToggle]);
-
-  // Автораскрытие аккордеона под товар
-  useEffect(() => {
-    if (!pathData) return;
-    // Открываем категорию
-    dispatch(expandCategory(category.id.toString()));
-    // Открываем подкатегорию, если есть
-    if (subCategory && subCategory.id) {
-      dispatch(expandSubCategory(subCategory.id.toString()));
-    }
-  }, [dispatch, pathData, category?.id, subCategory?.id]);
 
   const categorySlug = customSlugify(category.name);
   const subCategorySlug = customSlugify(subCategory.name);

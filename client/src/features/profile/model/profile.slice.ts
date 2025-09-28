@@ -1,9 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { profileApi } from '@/entities/user/api/profile.api';
-import {
-  ProfileDto,
-  ChangeDeliveryAddressDto,
-} from '@/entities/user/model/profile.types';
 
 type ProfileView =
   | 'my-orders'

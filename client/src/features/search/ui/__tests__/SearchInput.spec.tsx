@@ -18,7 +18,7 @@ describe('SearchInput', () => {
     const handleChange = jest.fn();
 
     const placeholder = 'Что хотите найти?';
-    const { container, rerender } = render(
+    const { rerender } = render(
       <SearchInput value="" onChange={handleChange} placeholder={placeholder} />
     );
 
@@ -30,12 +30,18 @@ describe('SearchInput', () => {
     expect(handleChange).toHaveBeenCalledTimes(1);
 
     // Компонент контролируемый: меняем проп value и убеждаемся, что input обновился
-    rerender(<SearchInput value="плед" onChange={handleChange} placeholder={placeholder} />);
-    expect((screen.getByPlaceholderText(placeholder) as HTMLInputElement).value).toBe('плед');
+    rerender(
+      <SearchInput
+        value="плед"
+        onChange={handleChange}
+        placeholder={placeholder}
+      />
+    );
+    expect(
+      (screen.getByPlaceholderText(placeholder) as HTMLInputElement).value
+    ).toBe('плед');
 
     // Проверяем наличие иконки поиска (next/image → img в моках)
     expect(screen.getByAltText('search')).toBeInTheDocument();
   });
 });
-
-
