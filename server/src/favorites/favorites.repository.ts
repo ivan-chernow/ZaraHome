@@ -63,11 +63,25 @@ export class FavoritesRepository {
   async findFavoritesByUserWithProductDetails(
     userId: number
   ): Promise<Favorite[]> {
-    return this.favoriteRepository.find({
-      where: { user: { id: userId } },
-      relations: ['product'],
-      order: { id: 'DESC' }, // Сортировка по дате добавления (новые сначала)
-    });
+    return this.favoriteRepository
+      .createQueryBuilder('favorite')
+      .leftJoinAndSelect('favorite.product', 'product')
+      .leftJoinAndSelect('favorite.user', 'user')
+      .where('favorite.user.id = :userId', { userId })
+      .andWhere('product.id IS NOT NULL') // Исключаем записи с несуществующими продуктами
+      .orderBy('favorite.id', 'DESC')
+      .getMany();
+  }
+
+  /**
+   * Очистить невалидные записи избранного (с несуществующими продуктами)
+   */
+  async cleanupInvalidFavorites(): Promise<void> {
+    await this.favoriteRepository
+      .createQueryBuilder()
+      .delete()
+      .where('productId NOT IN (SELECT id FROM products)')
+      .execute();
   }
 
   /**

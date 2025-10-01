@@ -136,6 +136,18 @@ export class FavoritesController {
     );
   }
 
+  @Post('cleanup')
+  @SkipThrottle()
+  @ApiOperation({ summary: 'Очистить невалидные записи избранного' })
+  @ApiOkResponse({ description: 'Невалидные записи очищены' })
+  async cleanupInvalidFavorites() {
+    await this.favoritesService.cleanupInvalidFavorites();
+    return this.responseService.success(
+      null,
+      'Невалидные записи избранного успешно очищены'
+    );
+  }
+
   @Get('count')
   @SkipThrottle()
   @ApiOperation({ summary: 'Получить количество товаров в избранном' })

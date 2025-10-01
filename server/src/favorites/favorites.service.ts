@@ -114,6 +114,13 @@ export class FavoritesService {
   }
 
   /**
+   * Очистить невалидные записи избранного
+   */
+  async cleanupInvalidFavorites(): Promise<void> {
+    await this.favoritesRepository.cleanupInvalidFavorites();
+  }
+
+  /**
    * Получить избранное пользователя с кешированием
    */
   async findAll(userId: number): Promise<FavoriteItemWithProduct[]> {
@@ -131,7 +138,16 @@ export class FavoritesService {
             userId
           );
 
-        return favorites.map(fav => ({
+        // Фильтруем только валидные записи с существующими продуктами
+        const validFavorites = favorites.filter(fav => 
+          fav && 
+          fav.product && 
+          fav.product.id &&
+          fav.user &&
+          fav.user.id
+        );
+
+        return validFavorites.map(fav => ({
           id: fav.id,
           userId: fav.user.id,
           productId: fav.product.id,
