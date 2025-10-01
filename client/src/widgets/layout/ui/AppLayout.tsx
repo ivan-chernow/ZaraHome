@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { Providers } from '@/shared/providers/StoreProvider';
 import NavigationProgress from '@/shared/ui/NavigationProgress';
 import AuthCheck from '@/processes/session/init-auth-check/ui/AuthCheck';
 import { useSelector } from 'react-redux';
@@ -8,11 +9,11 @@ import LoginModal from '@/features/auth/ui/LoginModal';
 import MainLayout from '@/widgets/layout/MainLayout';
 import { RootState } from '@/shared/config/store/store';
 
-interface ClientLayoutWrapperProps {
+interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = React.memo(
+export const AppLayout: React.FC<AppLayoutProps> = React.memo(
   ({ children }) => {
     const { isOpenAuth } = useSelector((state: RootState) => state.auth);
 
@@ -22,16 +23,14 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = React.memo(
     }, [isOpenAuth]);
 
     return (
-      <>
+      <Providers>
         {modalContent}
         <NavigationProgress />
         <AuthCheck />
         <MainLayout>{children}</MainLayout>
-      </>
+      </Providers>
     );
   }
 );
 
-ClientLayoutWrapper.displayName = 'ClientLayoutWrapper';
-
-export default ClientLayoutWrapper;
+AppLayout.displayName = 'AppLayout';

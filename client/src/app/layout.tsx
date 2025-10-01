@@ -1,9 +1,8 @@
 import { Inter, Roboto, Ysabeau_SC } from 'next/font/google';
 import '../../public/assets/styles/globals.css';
 import React from 'react';
-import { Providers } from '@/shared/providers/StoreProvider';
 import { Metadata } from 'next';
-import ClientLayoutWrapper from '../processes/app/ui/ClientLayoutWrapper';
+import { AppLayout } from '@/widgets/layout/ui/AppLayout';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -100,9 +99,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={ysabeau.className} suppressHydrationWarning>
-        <Providers>
-          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
-        </Providers>
+        <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );

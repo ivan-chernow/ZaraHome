@@ -1,10 +1,5 @@
-'use client';
+import { LoadingPage } from '@/widgets/layout/ui/LoadingPage';
 
-import React from 'react';
-import LoadingSpinner from '@/shared/ui/LoadingSpinner';
-
-const Loading: React.FC = () => {
-  return <LoadingSpinner />;
-};
-
-export default Loading;
+export default function Loading() {
+  return <LoadingPage />;
+}
