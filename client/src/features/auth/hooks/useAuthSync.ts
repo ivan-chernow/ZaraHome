@@ -1,7 +1,6 @@
 'use client';
 
-// Импортируем необходимые хуки и экшены
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/shared/config/store/store';
 import { setFavorites } from '@/entities/favorite/model/favorites.slice';
@@ -17,18 +16,18 @@ import {
 import type { Product } from '@/entities/product/api/products.api';
 
 /**
- * Компонент AuthCheck:
+ * Хук для синхронизации авторизации и данных пользователя:
  * - При монтировании загружает избранное и корзину из localStorage для гостей
- * - Не выполняет автоматическую авторизацию
- * - Только инициализирует локальные состояния в redux для гостей
+ * - Синхронизирует данные с сервером для авторизованных пользователей
+ * - Выполняет слияние гостевой корзины при авторизации
  */
-const AuthCheck: React.FC = React.memo(() => {
+export const useAuthSync = () => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth
   );
   const prevAuthRef = useRef<boolean>(isAuthenticated);
-  // Доступ к корзине не требуется для слияния: читаем из localStorage прямо перед мержем
+
   const { data: favoritesData } = useGetFavoritesQuery(undefined, {
     skip: !isAuthenticated,
   });
@@ -42,8 +41,8 @@ const AuthCheck: React.FC = React.memo(() => {
 
   // В пределах одной сессии не выполнять слияние повторно для одного и того же пользователя
   const mergedUserRef = useRef<string | null>(null);
-  // Можем понадобиться позже для UI, сейчас не используется напрямую
 
+  // Инициализация локальных данных при монтировании
   useEffect(() => {
     if (!isAuthenticated) {
       // Гость: читаем локальные снэпшоты
@@ -63,8 +62,7 @@ const AuthCheck: React.FC = React.memo(() => {
         dispatch(setCartItems([]));
       }
     } else {
-      // Авторизованный: моментально поднимаем локальные избранные по ключу пользователя,
-      // чтобы UI не мигал до ответа сервера
+      // Авторизованный: моментально поднимаем локальные избранные по ключу пользователя
       const key = user?.id ? `favorites:${user.id}` : 'favorites';
       try {
         const localFavorites = getLocalStorage(key, []);
@@ -76,20 +74,19 @@ const AuthCheck: React.FC = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Синхронизация избранного с сервером
   useEffect(() => {
-    // Авторизованный пользователь: синхронизируем избранное с сервером
     if (isAuthenticated && Array.isArray(favoritesData)) {
       const ids = favoritesData.map(p => p.id);
       dispatch(setFavorites(ids));
     }
   }, [isAuthenticated, favoritesData, dispatch]);
 
+  // Синхронизация корзины с сервером
   useEffect(() => {
-    // Авторизованный пользователь: поднимаем серверную корзину в локальный стор
     if (isAuthenticated && Array.isArray(serverCart)) {
       const toItems = (serverCart as Product[]).map(p => ({
         id: p.id,
-        // Берем первую цену из size, если есть
         price: (() => {
           const sizes = p.size as Record<string, { price: number }> | undefined;
           const first =
@@ -105,9 +102,8 @@ const AuthCheck: React.FC = React.memo(() => {
     }
   }, [isAuthenticated, serverCart, dispatch]);
 
+  // Слияние гостевой корзины при авторизации
   useEffect(() => {
-    // При входе пользователя переносим товары гостевой корзины на серверную
-    // Выполняем один раз на пользователя и помечаем флагом в localStorage, чтобы переживать перезагрузки
     const userId: string | null = user?.id ?? null;
     if (!isAuthenticated || !userId) return;
     if (mergedUserRef.current === userId) return;
@@ -142,7 +138,6 @@ const AuthCheck: React.FC = React.memo(() => {
           idsFromLocal.map(pid => addToCart(pid).unwrap())
         );
 
-        // Логируем ошибки для отладки
         const errors = results.filter(result => result.status === 'rejected');
         if (errors.length > 0) {
           console.warn(
@@ -154,29 +149,20 @@ const AuthCheck: React.FC = React.memo(() => {
         console.error('Ошибка при слиянии корзины:', error);
       } finally {
         mergedUserRef.current = userId;
-        // Очищаем гостевую корзину после переноса
         removeLocalStorage('cart');
         setIsMerging(false);
       }
     })();
   }, [isAuthenticated, user, addToCart]);
 
+  // Очистка данных при выходе
   useEffect(() => {
-    // Очищаем корзину только при переходе из авторизованного состояния в гостевое (logout)
     if (prevAuthRef.current === true && isAuthenticated === false) {
       dispatch(setCartItems([]));
       removeLocalStorage('cart');
-      // Очищаем выбранный адрес доставки при выходе
       dispatch(clearSelectedAddress());
-      // Сбрасываем секцию профиля на "Мои заказы" при выходе
       dispatch(setActiveView('my-orders'));
     }
     prevAuthRef.current = isAuthenticated;
   }, [isAuthenticated, dispatch]);
-
-  return null;
-});
-
-AuthCheck.displayName = 'AuthCheck';
-
-export default AuthCheck;
+};
