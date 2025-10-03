@@ -83,7 +83,7 @@ export const useDeliverySelector = () => {
 export const useFavoritesSelector = () => {
   return useSelector(
     (state: RootState) => ({
-      items: state.favorites.items,
+      items: state.favorites.ids,
       activeColors: state.productCard.activeColors,
     }),
     shallowEqual

@@ -1,5 +1,5 @@
-import { ResetPasswordPageContent } from '@/widgets/reset-password/ui/ResetPasswordPageContent';
+import { ResetPasswordPageWidget } from '@/widgets/reset-password/ui/ResetPasswordPageWidget';
 
 export default function ResetPasswordPage() {
-  return <ResetPasswordPageContent />;
+  return <ResetPasswordPageWidget />;
 }

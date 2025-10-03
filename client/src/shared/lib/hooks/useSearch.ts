@@ -46,7 +46,7 @@ export const useSearch = <T extends Record<string, any>>(
     totalResults: 0,
   });
 
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchIndexRef = useRef<Map<string, T[]>>(new Map());
 
   // Создание поискового индекса
@@ -61,7 +61,7 @@ export const useSearch = <T extends Record<string, any>>(
             const searchValue = caseSensitive ? value : value.toLowerCase();
             const words = searchValue.split(/\s+/);
 
-            words.forEach(word => {
+            words.forEach((word: string) => {
               if (word.length >= minSearchLength) {
                 if (!index.has(word)) {
                   index.set(word, []);
@@ -256,7 +256,7 @@ export const useSearchWithSuggestions = <T extends Record<string, any>>(
 
   // Генерация предложений
   const suggestions = useMemo(() => {
-    if (searchHook.query.length < searchOptions.minSearchLength) {
+    if (searchHook.query.length < (searchOptions.minSearchLength || 0)) {
       return [];
     }
 
@@ -323,7 +323,7 @@ export const useSearchWithHistory = <T extends Record<string, any>>(
   // Сохранение в историю
   const saveToHistory = useCallback(
     (query: string) => {
-      if (query.length < searchOptions.minSearchLength) return;
+      if (query.length < (searchOptions.minSearchLength || 0)) return;
 
       setSearchHistory(prevHistory => {
         const newHistory = [

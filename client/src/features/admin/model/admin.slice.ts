@@ -16,9 +16,6 @@ const adminSlice = createSlice({
   reducers: {
     setAdminActiveView: (state, action: PayloadAction<AdminView>) => {
       state.activeView = action.payload;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('adminActiveView', action.payload);
-      }
     },
   },
 });

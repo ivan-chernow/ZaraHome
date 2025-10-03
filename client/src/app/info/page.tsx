@@ -1,5 +1,5 @@
-import { InfoPageContent } from '@/widgets/info/ui/InfoPageContent';
+import { InfoPageWidget } from '@/widgets/info/ui/InfoPageWidget';
 
 export default function InfoPage() {
-  return <InfoPageContent />;
+  return <InfoPageWidget />;
 }

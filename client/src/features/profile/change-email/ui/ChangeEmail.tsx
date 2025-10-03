@@ -4,6 +4,7 @@ import MainButton from '@/shared/ui/Button/MainButton';
 import { useForm } from 'react-hook-form';
 import { useChangeEmailMutation } from '@/entities/user/api/profile.api';
 import { emailValidation } from '@/shared/lib/validation';
+import { SectionTitle } from '@/shared/ui/SectionTitle';
 
 interface FormInputs {
   email: string;
@@ -45,7 +46,7 @@ const ChangeEmail = React.memo(() => {
   return (
     <Fade in={true} timeout={1000}>
       <div className="">
-        <h4 className="font-light text-[42px] mb-[37px]">Смена E-mail</h4>
+        <SectionTitle title="Смена E-mail" />
         {errorChangeEmail && (
           <Alert severity="error" className="mb-4">
             {('data' in errorChangeEmail &&

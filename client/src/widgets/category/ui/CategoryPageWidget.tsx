@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import PaginationBlock from '@/shared/ui/pagination/PaginationBlock';
 import { usePagination } from '@/shared/lib/hooks/usePagination';
 import { useSorting } from '@/shared/lib/hooks/useSorting';
+import { SectionTitle } from '@/shared/ui/SectionTitle';
 
 const PAGE_SIZE = 12;
 
@@ -64,11 +65,11 @@ const ProductCardSkeleton = () => (
   </li>
 );
 
-interface CategoryPageContentProps {
+interface CategoryPageWidgetProps {
   params: Promise<{ category: string }>;
 }
 
-export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({
+export const CategoryPageWidget: React.FC<CategoryPageWidgetProps> = ({
   params,
 }) => {
   const { category: categorySlug } = use(params);
@@ -163,7 +164,7 @@ export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({
         {isLoading ? (
           <Skeleton variant="text" width={320} height={48} />
         ) : (
-          <h3 className="font-light text-[42px]">{categoryName}</h3>
+          <SectionTitle title={categoryName} />
         )}
 
         {/* Кнопки сортировки или их скелетоны */}
@@ -256,4 +257,4 @@ export const CategoryPageContent: React.FC<CategoryPageContentProps> = ({
   );
 };
 
-export default CategoryPageContent;
+export default CategoryPageWidget;

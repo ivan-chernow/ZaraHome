@@ -46,46 +46,48 @@ const SliderSwiper: React.FC<SliderSwiperProps> = React.memo(
     const showPagination = images.length > 1;
 
     return (
-      <Swiper
-        {...(showPagination && {
-          pagination: {
-            clickable: true,
-            dynamicBullets: true,
-          },
-          modules: [Pagination],
-        })}
-        style={{ width: '100%', height: height, overflow: 'hidden' }}
-        className={isHovered ? 'show-pagination' : 'hide-pagination'}
-        spaceBetween={0}
-        slidesPerView={1}
-        loop={showPagination}
-      >
-        {images.map((img: string, idx: number) => (
-          <SwiperSlide key={idx} style={{ width: '100%', height: '100%' }}>
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              <Image
-                src={getImageUrl(img)}
-                alt={`${product.name_ru} изображение ${idx + 1}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 326px"
-                quality={85}
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                draggable={false}
-                priority={idx === 0}
-                loading={idx === 0 ? 'eager' : 'lazy'}
-              />
-              <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div suppressHydrationWarning>
+        <Swiper
+          {...(showPagination && {
+            pagination: {
+              clickable: true,
+              dynamicBullets: true,
+            },
+            modules: [Pagination],
+          })}
+          style={{ width: '100%', height: height, overflow: 'hidden' }}
+          className={isHovered ? 'show-pagination' : 'hide-pagination'}
+          spaceBetween={0}
+          slidesPerView={1}
+          loop={showPagination}
+        >
+          {images.map((img: string, idx: number) => (
+            <SwiperSlide key={idx} style={{ width: '100%', height: '100%' }}>
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                <Image
+                  src={getImageUrl(img)}
+                  alt={`${product.name_ru} изображение ${idx + 1}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 326px"
+                  quality={85}
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  draggable={false}
+                  priority={idx === 0}
+                  loading={idx === 0 ? 'eager' : 'lazy'}
+                />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     );
   }
 );

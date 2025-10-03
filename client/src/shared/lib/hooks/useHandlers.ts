@@ -28,7 +28,10 @@ export const useClickHandler = <T extends (...args: any[]) => any>(
 export const useChangeHandler = <T extends (...args: any[]) => any>(
   handler: T
 ): T => {
-  return useCallback((...args: Parameters<T>) => handler(...args), [handler]);
+  return useCallback(
+    (...args: Parameters<T>) => handler(...args),
+    [handler]
+  ) as T;
 };
 
 /**
@@ -40,7 +43,10 @@ export const useChangeHandler = <T extends (...args: any[]) => any>(
 export const useSubmitHandler = <T extends (...args: any[]) => any>(
   handler: T
 ): T => {
-  return useCallback((...args: Parameters<T>) => handler(...args), [handler]);
+  return useCallback(
+    (...args: Parameters<T>) => handler(...args),
+    [handler]
+  ) as T;
 };
 
 /**
@@ -52,7 +58,10 @@ export const useSubmitHandler = <T extends (...args: any[]) => any>(
 export const useMouseHandler = <T extends (...args: any[]) => any>(
   handler: T
 ): T => {
-  return useCallback((...args: Parameters<T>) => handler(...args), [handler]);
+  return useCallback(
+    (...args: Parameters<T>) => handler(...args),
+    [handler]
+  ) as T;
 };
 
 /**
@@ -64,7 +73,10 @@ export const useMouseHandler = <T extends (...args: any[]) => any>(
 export const useKeyboardHandler = <T extends (...args: any[]) => any>(
   handler: T
 ): T => {
-  return useCallback((...args: Parameters<T>) => handler(...args), [handler]);
+  return useCallback(
+    (...args: Parameters<T>) => handler(...args),
+    [handler]
+  ) as T;
 };
 
 /**
@@ -101,7 +113,7 @@ export const useDebouncedHandler = <T extends (...args: any[]) => any>(
   handler: T,
   delay: number = 300
 ): T => {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   return useCallback(
     (...args: Parameters<T>) => {
@@ -127,7 +139,7 @@ export const useCancellableHandler = <T extends (...args: any[]) => any>(
   handler: T,
   delay: number = 300
 ) => {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const cancellableHandler = useCallback(
     (...args: Parameters<T>) => {

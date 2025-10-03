@@ -1,62 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
-
-export interface Product {
-  id: number;
-  name_eng: string;
-  name_ru: string;
-  img: string[];
-  colors: { [key: string]: string };
-  size: { [key: string]: { size: string; price: number } };
-  deliveryDate: string;
-  description: string;
-  isNew?: boolean;
-  discount?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-  isAvailable: boolean;
-  categoryId: number;
-  subCategoryId: number;
-  typeId?: number;
-}
-
-export interface Type {
-  id: number;
-  name: string;
-  subCategoryId: number;
-  products: Product[];
-}
-
-export interface SubCategory {
-  id: number;
-  name: string;
-  categoryId: number;
-  types: Type[];
-  products: Product[];
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  subCategories: SubCategory[];
-  products: Product[];
-}
-
-export interface CreateProductDto {
-  name_eng: string;
-  name_ru: string;
-  description: string;
-  categoryId: number;
-  subCategoryId: number;
-  typeId?: number;
-  img: string[];
-  colors: string[];
-  size: { size: string; price: number }[];
-  deliveryDate: string;
-  isNew?: boolean;
-  discount?: number;
-  isAvailable: boolean;
-}
+import { Category, CreateProductDto, Product } from './product.types';
 
 export const productsApi = createApi({
   reducerPath: 'productsApi',

@@ -1,5 +1,5 @@
-import { App } from '@/widgets/home/ui/App';
+import { HomePageWidget } from '@/widgets/home/ui/HomePageWidget';
 
 export default function HomePage() {
-  return <App />;
+  return <HomePageWidget />;
 }

@@ -6,8 +6,10 @@ import { CartSkeleton } from '@/shared/ui/skeletons/CartSkeleton';
 // Ленивая загрузка контента
 const CartContent = lazy(() => import('./CartContent'));
 
-export const CartPageContent: React.FC = () => (
+export const CartPageWidget: React.FC = () => (
   <Suspense fallback={<CartSkeleton />}>
     <CartContent />
   </Suspense>
 );
+
+export default CartPageWidget;

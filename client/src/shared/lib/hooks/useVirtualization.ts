@@ -16,7 +16,7 @@ interface VirtualizationResult {
   totalSize: number;
   scrollToIndex: (index: number) => void;
   scrollToOffset: (offset: number) => void;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 /**

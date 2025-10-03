@@ -1,5 +1,5 @@
-import { TermsOfService } from '@/widgets/agreement/ui/TermsOfService';
+import { AgreementPageWidget } from '@/widgets/agreement/ui/AgreementPageWidget';
 
 export default function AgreementPage() {
-  return <TermsOfService />;
+  return <AgreementPageWidget />;
 }

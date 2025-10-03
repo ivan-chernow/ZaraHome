@@ -1,5 +1,5 @@
-import { AdminPageContent } from '@/widgets/admin/ui/AdminPageContent';
+import { AdminPageWidget } from '@/widgets/admin/ui/AdminPageWidget';
 
-export default function AdminPage() {
-  return <AdminPageContent />;
+export default function AdminPageRoute() {
+  return <AdminPageWidget />;
 }

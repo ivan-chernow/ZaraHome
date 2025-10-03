@@ -1,5 +1,5 @@
-import { ReviewsPageContent } from '@/widgets/reviews/ui/ReviewsPageContent';
+import { ReviewsPageWidget } from '@/widgets/reviews/ui/ReviewsPageWidget';
 
 export default function ReviewsPage() {
-  return <ReviewsPageContent />;
+  return <ReviewsPageWidget />;
 }

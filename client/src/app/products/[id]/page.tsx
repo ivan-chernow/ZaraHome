@@ -1,9 +1,9 @@
-import { ProductPageContent } from '@/widgets/product/ui/ProductPageContent';
+import { ProductPageWidget } from '@/widgets/product/ui/ProductPageWidget';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default function ProductPage({ params }: ProductPageProps) {
-  return <ProductPageContent params={params} />;
+  return <ProductPageWidget params={params} />;
 }

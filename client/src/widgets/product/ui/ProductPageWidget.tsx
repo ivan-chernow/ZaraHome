@@ -40,11 +40,11 @@ import {
 } from '@/entities/cart/model/cartItems.slice';
 import { getLocalStorage, setLocalStorage } from '@/shared/lib/storage';
 
-interface ProductPageContentProps {
+interface ProductPageWidgetProps {
   params: Promise<{ id: string }>;
 }
 
-export const ProductPageContent: React.FC<ProductPageContentProps> = ({
+export const ProductPageWidget: React.FC<ProductPageWidgetProps> = ({
   params,
 }) => {
   const resolvedParams = use(params);
@@ -91,7 +91,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
   const getPriceBySize = useCallback(
     (size: string) => {
       if (!product?.size) return 0;
-      const sizeData = product.size.find((s: any) => s.size === size);
+      const sizeData = product.size[size];
       return sizeData ? sizeData.price : 0;
     },
     [product?.size]
@@ -113,18 +113,18 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
       id: product.id,
       name_ru: product.name_ru,
       name_eng: product.name_eng,
-      img: product.img,
+      img: product.img[0],
       size: selectedSize,
       color: activeColor,
       price: currentPrice,
-      quantity: 1,
     };
 
     if (isAuthenticated) {
-      addToCart({
-        productId: product.id,
-        size: selectedSize,
-        color: activeColor,
+      // Оптимистично обновляем локальное состояние для мгновенного отклика UI
+      dispatch(addCartItem(cartItem));
+      // Отправляем на сервер в фоне
+      Promise.resolve().then(() => {
+        addToCart(product.id).catch(() => {});
       });
     } else {
       dispatch(addCartItem(cartItem));
@@ -143,10 +143,15 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
     if (!product || !selectedSize || !activeColor) return;
 
     if (isAuthenticated) {
-      removeFromCart({
-        productId: product.id,
-        size: selectedSize,
-        color: activeColor,
+      dispatch(
+        removeCartItem({
+          id: product.id,
+          size: selectedSize,
+          color: activeColor,
+        })
+      );
+      Promise.resolve().then(() => {
+        removeFromCart(product.id).catch(() => {});
       });
     } else {
       dispatch(
@@ -171,12 +176,12 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
       product &&
       !activeColor &&
       product.colors &&
-      product.colors.length > 0
+      Object.keys(product.colors).length > 0
     ) {
       dispatch(
         setActiveColor({
           productId: product.id,
-          color: product.colors[0],
+          color: Object.keys(product.colors)[0],
         })
       );
     }
@@ -184,7 +189,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
 
   useEffect(() => {
     if (subCategory) {
-      dispatch(expandSubCategory(subCategory.id));
+      dispatch(expandSubCategory(subCategory.id.toString()));
     }
   }, [subCategory, dispatch]);
 
@@ -206,7 +211,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
   const getSizeName = useCallback(
     (sizeKey: string) => {
       if (!product?.size) return sizeKey;
-      const sizeData = product.size.find((s: any) => s.size === sizeKey);
+      const sizeData = product.size[sizeKey];
       return sizeData ? sizeData.size : sizeKey;
     },
     [product?.size]
@@ -229,11 +234,10 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
             id: product?.id,
             name_ru: product?.name_ru,
             name_eng: product?.name_eng,
-            img: product?.img,
+            img: product?.img[0],
             size: selectedSize,
             color: activeColor,
             price: currentPrice,
-            quantity: 1,
           },
         ];
 
@@ -296,8 +300,8 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
     );
   }
 
-  const categorySlug = customSlugify(category.name);
-  const subCategorySlug = customSlugify(subCategory.name);
+  const categorySlug = category ? customSlugify(category.name) : '';
+  const subCategorySlug = subCategory ? customSlugify(subCategory.name) : '';
   const typeSlug = type ? customSlugify(type.name) : '';
 
   return (
@@ -315,16 +319,16 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
           href={`/products/category/${categorySlug}`}
           className="hover:underline"
         >
-          {category.name}
+          {category?.name}
         </Link>
-        {subCategory.name && (
+        {subCategory?.name && (
           <>
             <span className="mx-1">{'>'}</span>
             <Link
               href={`/products/category/${categorySlug}/${subCategorySlug}`}
               className="hover:underline"
             >
-              {subCategory.name}
+              {subCategory?.name}
             </Link>
           </>
         )}
@@ -341,29 +345,31 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
         )}
         <span className="mx-1">{'>'}</span>
         <span className="text-[#00000099] underline font-medium">
-          {product.name_ru}
+          {product?.name_ru}
         </span>
       </div>
-      <h3 className="font-light text-[42px] mb-[1px]">{product.name_eng}</h3>
+      <h3 className="font-light text-[42px] mb-[1px]">{product?.name_eng}</h3>
       <p className="mb-[46px] font-medium text-[18px] text-[#00000080]">
-        {product.name_ru}
+        {product?.name_ru}
       </p>
       <div className="flex justify-between ">
         <div className="w-[470px] shrink-0 mr-[15px]">
           <SliderSwiper
-            product={product}
+            product={product!}
             isHovered={false}
-            quantity={product.img.length}
+            quantity={product?.img.length || 0}
             height={479}
           />
         </div>
         <div className="flex flex-col max-w-[440px]">
           <p className="font-light mb-[11px]">Выберите цвет</p>
           <div className="mb-[24px] flex flex-row ">
-            {Object.keys(product.colors).map(color => (
+            {Object.keys(product?.colors || {}).map(color => (
               <Color
                 key={color}
-                color={product.colors[color as keyof typeof product.colors]}
+                color={
+                  product?.colors?.[color as keyof typeof product.colors] || ''
+                }
                 isActive={activeColor === color}
                 onClick={() => handleColorClick(color)}
                 display="opacity-100"
@@ -375,6 +381,14 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
             <Select
               value={selectedSize || ''}
               onChange={handleSizeChange}
+              MenuProps={{
+                disableScrollLock: true,
+                PaperProps: {
+                  sx: {
+                    maxHeight: 360,
+                  },
+                },
+              }}
               renderValue={selected => {
                 if (!selected) return null;
                 const price = getPriceBySize(selected as string);
@@ -407,7 +421,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
                 },
               }}
             >
-              {product.size &&
+              {product?.size &&
                 Object.keys(product.size).map(sizeKey => {
                   const price = getPriceBySize(sizeKey);
                   const sizeName = getSizeName(sizeKey);
@@ -441,7 +455,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
           </FormControl>
           <div className="flex items-center mt-[35px]">
             <div className="mr-4">
-              <FavoriteButton productId={product.id} />
+              <FavoriteButton productId={product?.id || 0} />
             </div>
             <MainButton
               text={isInCart ? 'В КОРЗИНЕ' : 'ДОБАВИТЬ В КОРЗИНУ'}
@@ -467,7 +481,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
                 Ориентировочная дата доставки:
               </p>
               <p className="font-semibold text-[24px]">
-                {product.deliveryDate}
+                {product?.deliveryDate}
               </p>
             </div>
           </div>
@@ -477,7 +491,7 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
         <div className="my-12">
           <HorizontalLine width="100%" />
           <p className="font-light mt-8 text-lg text-center">
-            {product.description}
+            {product?.description || ''}
           </p>
         </div>
         <OftenBought />
@@ -488,4 +502,4 @@ export const ProductPageContent: React.FC<ProductPageContentProps> = ({
   );
 };
 
-export default ProductPageContent;
+export default ProductPageWidget;

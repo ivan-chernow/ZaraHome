@@ -1,5 +1,5 @@
-import { CartPageContent } from '@/widgets/cart/ui/CartPageContent';
+import { CartPageWidget } from '@/widgets/cart/ui/CartPageWidget';
 
 export default function CartPage() {
-  return <CartPageContent />;
+  return <CartPageWidget />;
 }

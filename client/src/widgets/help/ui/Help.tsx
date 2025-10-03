@@ -26,24 +26,24 @@ const Help: React.FC<HelpProps> = ({ title, style }) => {
         <ul className="flex  justify-center items-center ">
           <HelpElement
             svgPath="/assets/img/Help/tg.svg"
-            width="39"
-            height="40"
+            width={39}
+            height={40}
             title="Задайте его нам"
             subtitle="Напишите в наш Telegram"
             link="https://web.telegram.org/a/"
           />
           <HelpElement
             svgPath="/assets/img/Help/dzen.svg"
-            width="42"
-            height="38"
+            width={42}
+            height={38}
             title="Наши статьи в Дзен"
             subtitle="Все самое полезное для вас мы собрали тут"
             link="https://dzen.ru/"
           />
           <HelpElement
             svgPath="/assets/img/Help/vk.svg"
-            width="40"
-            height="40"
+            width={40}
+            height={40}
             title="Присоединяйтесь"
             subtitle="Наше сообщество с радостью вас приймет"
             link="https://vk.com/"

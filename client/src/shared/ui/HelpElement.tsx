@@ -2,7 +2,16 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-const HelpElement = React.memo(
+interface HelpElementProps {
+  svgPath: string;
+  width: number;
+  height: number;
+  title: string;
+  subtitle: string;
+  link: string;
+}
+
+const HelpElement = React.memo<HelpElementProps>(
   ({ svgPath, width, height, title, subtitle, link }) => {
     const [isHovered, setIsHovered] = useState(false);
     const handleClick = () => {

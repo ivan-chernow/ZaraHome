@@ -4,7 +4,7 @@ import React from 'react';
 import Header from '@/widgets/header/ui/Header';
 import Footer from '@/widgets/footer/ui/Footer';
 import NavMenu from '@/widgets/nav-menu/ui/NavMenu';
-import ScrollToTop from '@/shared/ui/ScrollToTop';
+import { ScrollToTopWrapper } from './ui/ScrollToTopWrapper';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ const MainLayout: React.FC<MainLayoutProps> = React.memo(({ children }) => {
         {children}
       </main>
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopWrapper />
     </div>
   );
 });

@@ -1,5 +1,5 @@
-import { PaymentPageContent } from '@/widgets/payment/ui/PaymentPageContent';
+import { PaymentPageWidget } from '@/widgets/payment/ui/PaymentPageWidget';
 
 export default function PaymentPage() {
-  return <PaymentPageContent />;
+  return <PaymentPageWidget />;
 }

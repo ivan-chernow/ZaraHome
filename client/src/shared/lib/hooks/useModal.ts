@@ -36,7 +36,7 @@ export const useModal = (options: ModalOptions = {}) => {
     isVisible: false,
   });
 
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Открытие модального окна
