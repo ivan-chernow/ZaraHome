@@ -36,9 +36,7 @@ import {
 import {
   addCartItem,
   removeCartItem,
-  setCartItems,
 } from '@/entities/cart/model/cartItems.slice';
-import { getLocalStorage, setLocalStorage } from '@/shared/lib/storage';
 
 interface ProductPageWidgetProps {
   params: Promise<{ id: string }>;
@@ -106,7 +104,7 @@ export const ProductPageWidget: React.FC<ProductPageWidgetProps> = ({
     setSelectedSize(event.target.value);
   }, []);
 
-  const handleAddToCart = useCallback(() => {
+  const handleAddToCart = useCallback(async () => {
     if (!product || !selectedSize || !activeColor) return;
 
     const cartItem = {
@@ -120,13 +118,32 @@ export const ProductPageWidget: React.FC<ProductPageWidgetProps> = ({
     };
 
     if (isAuthenticated) {
-      // Оптимистично обновляем локальное состояние для мгновенного отклика UI
-      dispatch(addCartItem(cartItem));
-      // Отправляем на сервер в фоне
-      Promise.resolve().then(() => {
-        addToCart(product.id).catch(() => {});
-      });
+      try {
+        // Оптимистичное обновление: сначала добавляем в локальное состояние
+        dispatch(addCartItem(cartItem));
+
+        // Затем отправляем на сервер
+        await addToCart(product.id).unwrap();
+      } catch (error) {
+        // Rollback при ошибке сервера
+        dispatch(
+          removeCartItem({
+            id: product.id,
+            size: selectedSize,
+            color: activeColor,
+          })
+        );
+
+        const anyErr: any = error as any;
+        console.error('Ошибка при добавлении товара в корзину:', {
+          raw: anyErr,
+          status: anyErr?.status,
+          data: anyErr?.data,
+          message: anyErr?.error || anyErr?.message,
+        });
+      }
     } else {
+      // Для гостей: только локальное состояние
       dispatch(addCartItem(cartItem));
     }
   }, [
@@ -139,21 +156,46 @@ export const ProductPageWidget: React.FC<ProductPageWidgetProps> = ({
     dispatch,
   ]);
 
-  const handleRemoveFromCart = useCallback(() => {
+  const handleRemoveFromCart = useCallback(async () => {
     if (!product || !selectedSize || !activeColor) return;
 
     if (isAuthenticated) {
-      dispatch(
-        removeCartItem({
-          id: product.id,
-          size: selectedSize,
-          color: activeColor,
-        })
-      );
-      Promise.resolve().then(() => {
-        removeFromCart(product.id).catch(() => {});
-      });
+      try {
+        // Оптимистичное обновление: сначала удаляем из локального состояния
+        dispatch(
+          removeCartItem({
+            id: product.id,
+            size: selectedSize,
+            color: activeColor,
+          })
+        );
+
+        // Затем отправляем запрос на сервер
+        await removeFromCart(product.id).unwrap();
+      } catch (error) {
+        // Rollback при ошибке сервера
+        dispatch(
+          addCartItem({
+            id: product.id,
+            name_ru: product.name_ru,
+            name_eng: product.name_eng,
+            img: product.img[0],
+            size: selectedSize,
+            color: activeColor,
+            price: currentPrice,
+          })
+        );
+
+        const anyErr: any = error as any;
+        console.error('Ошибка при удалении товара из корзины:', {
+          raw: anyErr,
+          status: anyErr?.status,
+          data: anyErr?.data,
+          message: anyErr?.error || anyErr?.message,
+        });
+      }
     } else {
+      // Для гостей: только локальное состояние
       dispatch(
         removeCartItem({
           id: product.id,
@@ -166,6 +208,7 @@ export const ProductPageWidget: React.FC<ProductPageWidgetProps> = ({
     product,
     selectedSize,
     activeColor,
+    currentPrice,
     isAuthenticated,
     removeFromCart,
     dispatch,
@@ -217,61 +260,13 @@ export const ProductPageWidget: React.FC<ProductPageWidgetProps> = ({
     [product?.size]
   );
 
-  const handleGuestToggle = useCallback(() => {
-    const cart = getLocalStorage('cart', []);
-    const updatedCart = isInCart
-      ? cart.filter(
-          (item: any) =>
-            !(
-              item.id === product?.id &&
-              item.size === selectedSize &&
-              item.color === activeColor
-            )
-        )
-      : [
-          ...cart,
-          {
-            id: product?.id,
-            name_ru: product?.name_ru,
-            name_eng: product?.name_eng,
-            img: product?.img[0],
-            size: selectedSize,
-            color: activeColor,
-            price: currentPrice,
-          },
-        ];
-
-    setLocalStorage('cart', updatedCart);
-    dispatch(setCartItems(updatedCart));
-  }, [
-    isInCart,
-    product?.id,
-    product?.name_ru,
-    product?.name_eng,
-    product?.img,
-    selectedSize,
-    activeColor,
-    currentPrice,
-    dispatch,
-  ]);
-
   const handleCartClick = useCallback(() => {
-    if (isAuthenticated) {
-      if (isInCart) {
-        handleRemoveFromCart();
-      } else {
-        handleAddToCart();
-      }
+    if (isInCart) {
+      handleRemoveFromCart();
     } else {
-      handleGuestToggle();
+      handleAddToCart();
     }
-  }, [
-    isAuthenticated,
-    isInCart,
-    handleAddToCart,
-    handleRemoveFromCart,
-    handleGuestToggle,
-  ]);
+  }, [isInCart, handleAddToCart, handleRemoveFromCart]);
 
   if (isLoading) {
     return (
